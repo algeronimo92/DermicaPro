@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import SparklesIcon from "../components/icons/SparklesIcon";
 import StarIcon from "../components/icons/StarIcon";
+import { Link } from "react-router-dom";
 
 // =================================================================================
 // FILE: src/pages/HomePage.jsx
@@ -59,7 +60,6 @@ const HomePage = ({ setPage, openAdvisor }) => {
   return (
     <div className="animate-fade-in">
       <section className="relative h-screen flex items-center justify-center text-center overflow-hidden">
-        {/* MODIFICACIÓN: Lógica para renderizar video o imagen */}
         {carouselItems.map((item, index) => (
           <div
             key={index}
@@ -78,7 +78,7 @@ const HomePage = ({ setPage, openAdvisor }) => {
                 autoPlay
                 loop
                 muted
-                playsInline // Importante para autoplay en móviles
+                playsInline
               />
             )}
           </div>
@@ -104,13 +104,13 @@ const HomePage = ({ setPage, openAdvisor }) => {
               <SparklesIcon className="w-5 h-5 mr-2" /> Recibir orientación
               honesta{" "}
             </button>
-            <button
-              onClick={() => setPage("servicios")}
+            <Link
+              to="/servicios"
               className="inline-block bg-white text-[#ea899a] font-bold py-3 px-8 rounded-full text-lg hover:bg-gray-100 transition-transform transform hover:scale-105"
             >
               {" "}
               Ver Tratamientos{" "}
-            </button>
+            </Link>
           </div>
         </div>
 
@@ -156,12 +156,12 @@ const HomePage = ({ setPage, openAdvisor }) => {
                     {service.name}
                   </h3>{" "}
                   <p className="mt-2 text-gray-600">{service.desc}</p>{" "}
-                  <button
-                    onClick={() => setPage("servicios")}
+                  <Link
+                    to="/servicios"
                     className="mt-4 text-[#ea899a] hover:text-[#d37989] font-semibold"
                   >
                     Ver cómo funciona &rarr;
-                  </button>{" "}
+                  </Link>{" "}
                 </div>
               </div>
             ))}
@@ -203,12 +203,12 @@ const HomePage = ({ setPage, openAdvisor }) => {
           </div>
           <div className="text-center mt-8">
             {" "}
-            <button
-              onClick={() => setPage("testimonios")}
+            <Link
+              to="/testimonios"
               className="text-[#ea899a] hover:text-[#d37989] font-semibold"
             >
               Leer más historias de confianza &rarr;
-            </button>{" "}
+            </Link>{" "}
           </div>
         </div>
       </section>
