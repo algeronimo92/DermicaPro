@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import SparklesIcon from "../components/icons/SparklesIcon";
 import StarIcon from "../components/icons/StarIcon";
+import Navbar from '../components/Navbar';
 import { Link } from "react-router-dom";
 
 // =================================================================================
@@ -17,6 +18,7 @@ const HomePage = ({ setPage, openAdvisor }) => {
     { type: "image", src: "/images/hero-2-1.png" },
   ];
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [isAdvisorOpen, setIsAdvisorOpen] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -58,7 +60,10 @@ const HomePage = ({ setPage, openAdvisor }) => {
   ];
 
   return (
+
     <div className="animate-fade-in">
+
+    <Navbar openAdvisor={() => setIsAdvisorOpen(true)} />
       <section className="relative h-screen flex items-center justify-center text-center overflow-hidden">
         {carouselItems.map((item, index) => (
           <div
