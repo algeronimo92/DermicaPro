@@ -24,7 +24,7 @@ const HollywoodPeelPage = () => {
   };
 
   return (
-    <div className="animate-fade-in pt-20">
+    <div className="animate-fade-in pt-0">
       {" "}
       {/* Añadido padding-top para el Navbar fijo */}
       <title>
