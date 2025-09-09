@@ -42,7 +42,7 @@ const ContactoPage = () => {
             <div className="space-y-4 text-lg text-gray-700">
               <p className="flex items-center">
                 <MapPinIcon className="w-6 h-6 mr-3 text-[#ea899a]" />
-                Av. Larco 893, San Andres V etapa, Trujillo, Perú
+                Av. Larco 877, San Andres V etapa, Trujillo, Perú
               </p>
               <p className="flex items-center">
                 <PhoneIcon className="w-6 h-6 mr-3 text-[#ea899a]" />
