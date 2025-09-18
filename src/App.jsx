@@ -16,11 +16,12 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import GeminiSkinAdvisor from "./components/GeminiSkinAdvisor";
 import FloatingWhatsAppButton from "./components/FloatingWhatsAppButton";
+import HifuLandingPage from "./pages/HifuLandingPage";
 
 export default function App() {
   const [isAdvisorOpen, setIsAdvisorOpen] = useState(false);
   const location = useLocation();
-  const hideLayout = ["/hollywood-peel"];
+  const hideLayout = ["/hollywood-peel", "/hifu-landing"];
   const shouldHideNavBar = hideLayout.includes(location.pathname);
 
   return (
@@ -49,6 +50,7 @@ export default function App() {
           <Route path="/contacto" element={<ContactoPage />} />
           <Route path="/reserva" element={<ReservaPage />} />
           <Route path="/hollywood-peel" element={<HollywoodPeelPage />} />
+          <Route path="/hifu-landing" element={<HifuLandingPage />} />
         </Routes>
       </main>
 

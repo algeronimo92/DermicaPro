@@ -36,7 +36,7 @@ const Navbar = ({ openAdvisor }) => {
             <Link
               to="/"
               className={`font-bold text-2xl ${
-                isScrolled ? "text-gray-800" : "text-white md:text-gray-800"
+                isScrolled ? "text-gray-800" : "md:text-gray-800"
               }`}
             >
               DermicaPro
@@ -71,7 +71,7 @@ const Navbar = ({ openAdvisor }) => {
               onClick={() => setIsOpen(!isOpen)}
               type="button"
               className={`inline-flex items-center justify-center p-2 rounded-md focus:outline-none ${
-                isScrolled ? "text-gray-800" : "text-white"
+                isScrolled ? "text-gray-800" : "text-gray-800"
               }`}
             >
               <svg
