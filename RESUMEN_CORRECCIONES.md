@@ -45,7 +45,7 @@ El error 400 ocurría por **2 problemas combinados**:
 
 **Antes:**
 ```javascript
-// GEMINI_API_KEY=AIzaSyCI2ivEXoa5k6dUMnc62CZrify424ERntU
+// GEMINI_API_KEY=AIzaSyCPDDkkJ4V---SESYIXVWa_piSacP_WHRg
 ```
 
 **Después:**
@@ -122,7 +122,7 @@ Local: http://localhost:3000
 
 2. Agrega:
    - **Name:** `GEMINI_API_KEY`
-   - **Value:** `AIzaSyCI2ivEXoa5k6dUMnc62CZrify424ERntU`
+   - **Value:** `AIzaSyCPDDkkJ4V---SESYIXVWa_piSacP_WHRg`
    - **Environments:** Production + Preview + Development
 
 3. Haz clic en **"Save"**

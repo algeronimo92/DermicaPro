@@ -20,12 +20,22 @@ function HifuLandingPage() {
     // Captura los parámetros de TikTok Ads para tracking
     useEffect(() => {
         const urlParams = new URLSearchParams(window.location.search);
+
+        // Función de sanitización para prevenir XSS
+        const sanitizeParam = (value) => {
+            if (!value || value === 'N/A') return 'N/A';
+            // Eliminar caracteres peligrosos y limitar longitud
+            return value
+                .replace(/[<>"'`]/g, '') // Eliminar chars XSS
+                .substring(0, 100); // Limitar longitud máxima
+        };
+
         setUtmData({
-            ttclid: urlParams.get('ttclid') || 'N/A',
-            tt_medium: urlParams.get('tt_medium') || 'N/A',
-            tt_campaign_id: urlParams.get('tt_campaign_id') || 'N/A',
-            tt_adgroup_id: urlParams.get('tt_adgroup_id') || 'N/A',
-            tt_ad_id: urlParams.get('tt_ad_id') || 'N/A',
+            ttclid: sanitizeParam(urlParams.get('ttclid')),
+            tt_medium: sanitizeParam(urlParams.get('tt_medium')),
+            tt_campaign_id: sanitizeParam(urlParams.get('tt_campaign_id')),
+            tt_adgroup_id: sanitizeParam(urlParams.get('tt_adgroup_id')),
+            tt_ad_id: sanitizeParam(urlParams.get('tt_ad_id')),
         });
     }, []);
 
@@ -295,7 +305,7 @@ function HifuLandingPage() {
                                 {isSubmitting ? 'Enviando...' : 'Recibir orientación honesta (gratis)'}
                             </button>
                             <p className="text-xs text-gray-400 mt-4 text-center">
-                                Al enviar, aceptas nuestra <a href="#" className="underline hover:text-primary">Política de Privacidad</a>.
+                                Al enviar, aceptas nuestra <a href="/politica-privacidad" className="underline hover:text-primary">Política de Privacidad</a>.
                             </p>
                         </form>
                     </div>

@@ -1,7 +1,7 @@
 // =================================================================================
 // FILE: src/App.jsx
 // =================================================================================
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 
@@ -14,6 +14,7 @@ import ContactoPage from "./pages/ContactoPage";
 import ReservaPage from "./pages/ReservaPage";
 import HollywoodPeelPage from "./pages/HollyWoodPeelPage";
 import HifuLandingPage from "./pages/HifuLandingPage";
+import PoliticaPrivacidadPage from "./pages/PoliticaPrivacidadPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -52,6 +53,7 @@ export default function App() {
             <Route path="/testimonios" element={<TestimoniosPage />} />
             <Route path="/contacto" element={<ContactoPage />} />
             <Route path="/reserva" element={<ReservaPage />} />
+            <Route path="/politica-privacidad" element={<PoliticaPrivacidadPage />} />
             <Route path="/hollywood-peel" element={<HollywoodPeelPage />} />
             <Route path="/hifu-landing" element={<HifuLandingPage />} />
             <Route path="*" element={<NotFoundPage />} />

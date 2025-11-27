@@ -4,7 +4,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import  SparklesIcon  from './icons/SparklesIcon';
 import TreatmentSelectionModal from './TreatmentSelectionModal';
-import { extractTreatmentsFromResponse, dermatologyKnowledge } from '../data/treatmentsData';
+import { extractTreatmentsFromResponse } from '../data/treatmentsData';
 
 const GeminiSkinAdvisor = ({ isOpen, onClose }) => {
     const [concern, setConcern] = useState('');
@@ -15,6 +15,21 @@ const GeminiSkinAdvisor = ({ isOpen, onClose }) => {
     const [recommendedTreatments, setRecommendedTreatments] = useState([]);
     const modalRef = useRef();
     const recommendationRef = useRef();
+
+    // Función para formatear markdown a HTML
+    const formatMarkdownToHTML = (text) => {
+        return text
+            // Convertir **texto** a <strong>
+            .replace(/\*\*(.+?)\*\*/g, '<strong class="font-bold text-gray-900">$1</strong>')
+            // Convertir * item a bullets
+            .replace(/^\*\s+(.+)$/gm, '<li class="ml-4">$1</li>')
+            // Envolver grupos de <li> en <ul>
+            .replace(/(<li.*?<\/li>\n?)+/g, '<ul class="list-disc list-inside space-y-2 my-3">$&</ul>')
+            // Convertir saltos de línea dobles en párrafos
+            .split('\n\n')
+            .map(para => para.trim() ? `<p class="mb-4">${para}</p>` : '')
+            .join('');
+    };
 
     useEffect(() => {
         if (!isOpen) { setConcern(''); setRecommendation(''); setError(''); setLoading(false); }
@@ -44,6 +59,7 @@ const GeminiSkinAdvisor = ({ isOpen, onClose }) => {
         ].join(', ');
 
         // Construir base de conocimiento para el prompt
+        // IMPORTANTE: Evitar comillas dobles dentro del texto para no romper JSON
         const knowledgeContext = `
 === BASE DE CONOCIMIENTO DERMATOLÓGICO ===
 
@@ -129,7 +145,7 @@ SEÑALES DE ALERTA (Derivar a consulta médica):
 
 === TU ROL COMO EXPERTO EN DERMATOLOGÍA ESTÉTICA ===
 
-Eres la Dra. Virtual de DermicaPro, una experta en dermatología estética con:
+Eres el Dr. Virtual de DermicaPro, un experto en dermatología estética con:
 - 10+ años de experiencia en tratamientos no invasivos
 - Conocimiento profundo de fisiología de la piel
 - Expertise en combinación de tecnologías para resultados óptimos
@@ -139,69 +155,91 @@ PERSONALIDAD: Empática, científicamente rigurosa pero accesible, honesta, insp
 TONO: Cálido profesional, educativo sin ser condescendiente
 MISIÓN: Educar, empoderar y recomendar la mejor solución basada en evidencia
 
-=== PROTOCOLO DE RESPUESTA EXPERTA ===
+=== PROTOCOLO DE RESPUESTA EXPERTA (CONCISA Y DIRECTA) ===
 
-1. VALIDACIÓN EMPÁTICA (2-3 líneas):
-   - Reconoce la emoción y valida la preocupación
-   - Ejemplo: "Entiendo perfectamente tu frustración con las manchas que parecen resistirse a todo. Es común sentirse desanimada, pero la buena noticia es que con la tecnología adecuada, hay soluciones reales y comprobadas."
+IMPORTANTE: Mantén la respuesta BREVE y ESCANEABLE. Máximo 200 palabras totales.
 
-2. ANÁLISIS DERMATOLÓGICO (1 párrafo breve):
-   - Explica brevemente QUÉ está pasando en la piel (la causa subyacente)
-   - Usa lenguaje simple pero científicamente correcto
-   - Ejemplo: "Las manchas como el melasma ocurren cuando los melanocitos (células productoras de pigmento) se sobreestimulan por factores como el sol o cambios hormonales. La clave está en tratamientos que regulen esta producción desde la raíz."
+1. SALUDO EMPÁTICO (1 línea):
+   - Ejemplo: '¡Entiendo tu preocupación! Vamos a encontrar la mejor solución para ti.'
 
-3. RECOMENDACIÓN DE TRATAMIENTO (Máximo 6):
-   - Si es un caso SIMPLE → Recomienda 1-2 tratamientos específicos
-   - Si es COMPLEJO (múltiples preocupaciones) → Recomienda COMBINACIÓN de 2-4 tratamientos con plan escalonado
-   - Si es un caso MUY COMPLEJO (múltiples áreas y objetivos) → Puedes recomendar hasta 6 tratamientos con protocolo integral
-   - Formatea cada tratamiento con **Nombre en Negrita**
-   - Explica el MECANISMO DE ACCIÓN en lenguaje simple
-   - Enfoca en RESULTADOS EMOCIONALES ("recuperar confianza", "sentirte radiante")
-   - Incluye EXPECTATIVAS REALISTAS de tiempo y sesiones
+2. CAUSA BREVE (1-2 líneas):
+   - Explica QUÉ causa el problema en 1 oración simple
+   - Ejemplo: 'La flacidez ocurre por pérdida de colágeno con el tiempo.'
 
-4. PLAN DE ACCIÓN (bullets breves):
-   - Número aproximado de sesiones
-   - Frecuencia recomendada
-   - Qué esperar en cada fase
-   - Cuidados complementarios (si aplica)
+3. TRATAMIENTO RECOMENDADO (Máximo 2 tratamientos):
+   - Si es SIMPLE → 1 tratamiento
+   - Si es COMPLEJO → Máximo 2 tratamientos
+   - Formato: **Nombre del Tratamiento**: Qué hace + Resultado esperado (1-2 líneas por tratamiento)
+   - Ejemplo: '**HIFU 12D**: Estimula colágeno profundo para reafirmar y definir el rostro. Resultados visibles en 3-6 meses.'
 
-5. CIERRE EMPODERADOR (1-2 líneas):
-   - Mensaje inspirador pero realista
-   - Invitación a evaluación personalizada
-   - Ejemplo: "Recuerda que cada piel es única. Una evaluación presencial nos permitirá diseñar el protocolo perfecto para ti. ¡Estás a un paso de la piel que mereces!"
+4. PLAN RÁPIDO (3-4 bullets ultra breves):
+   - Sesiones necesarias
+   - Tiempo de resultados
+   - Ejemplo:
+     * 1-2 sesiones
+     * Resultados: 3-6 meses
+     * Duración: hasta 1 año
+
+5. CIERRE (1 línea):
+   - Ejemplo: '¡Agenda tu evaluación y comencemos!'
 
 === REGLAS ESTRICTAS ===
 
 ✅ SIEMPRE:
-- Usa la base de conocimiento para razonar sobre nuevas situaciones
-- Recomienda SOLO tratamientos de la lista oficial
-- Considera combinaciones cuando el caso lo amerite
-- Sé honesta si un tratamiento tiene limitaciones
-- Deriva a consulta médica si detectas señales de alerta
+- Sé BREVE: máximo 200 palabras totales
+- Recomienda SOLO 1-2 tratamientos máximo
+- Usa bullets (*) para planes de acción
+- Formatea nombres con **negrita**
+- Sé directa y clara
 
 ❌ NUNCA:
-- Inventes tratamientos que no existen en la lista
-- Uses más de 2 tratamientos por recomendación
-- Prometas resultados "mágicos" o "instantáneos"
-- Diagnostiques condiciones médicas (solo recomiendas tratamientos estéticos)
-- Uses jerga técnica sin explicarla
+- Escribas más de 200 palabras
+- Recomiendes más de 2 tratamientos
+- Uses párrafos largos (máximo 2 líneas)
+- Inventes tratamientos fuera de la lista
+- Uses jerga técnica compleja
 
 === TRATAMIENTOS DISPONIBLES ===
 ${servicesList}
 
 === PREOCUPACIÓN DEL CLIENTE ===
-"${concern}"
+${concern.trim()}
 
 === TU RESPUESTA EXPERTA ===`;
 
 
 
         try {
-            const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
-            const apiKey = "AIzaSyCI2ivEXoa5k6dUMnc62CZrify424ERntU";
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-            const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-            if (!response.ok) { throw new Error(`API error: ${response.statusText}`); }
+            // Sanitizar caracteres de control que pueden romper JSON
+            // JSON.stringify() manejará automáticamente \n, \t, ", etc.
+            const sanitizedPrompt = prompt
+                .replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]/g, ''); // Remover caracteres de control excepto \n, \r, \t
+
+            const payload = { contents: [{ role: "user", parts: [{ text: sanitizedPrompt }] }] };
+
+            // Validar que el payload sea JSON válido antes de enviar
+            let payloadString;
+            try {
+                payloadString = JSON.stringify(payload);
+                console.log('✅ Payload is valid JSON');
+                console.log('📏 Payload length:', payloadString.length, 'characters');
+            } catch (jsonError) {
+                console.error('❌ Invalid JSON payload:', jsonError);
+                throw new Error('El texto contiene caracteres no válidos. Por favor, reformula tu consulta.');
+            }
+
+            // SEGURIDAD: API Key ahora está en backend proxy (Vercel Function)
+            // Endpoint: /api/gemini-proxy
+            const response = await fetch('/api/gemini-proxy', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: payloadString
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || `API error: ${response.statusText}`);
+            }
             const result = await response.json();
             if (result.candidates?.[0]?.content?.parts?.[0]?.text) {
                 const aiResponse = result.candidates[0].content.parts[0].text;
@@ -245,9 +283,9 @@ ${servicesList}
                             <div>
                                 <h2 className="text-2xl font-bold text-gray-800 flex items-center">
                                     <SparklesIcon className="w-6 h-6 mr-2 text-[#ea899a]" />
-                                    Dra. Virtual de DermicaPro
+                                    Dr. Virtual de DermicaPro
                                 </h2>
-                                <p className="text-xs text-gray-500 mt-1 ml-8">Experta en Dermatología Estética</p>
+                                <p className="text-xs text-gray-500 mt-1 ml-8">Experto en Dermatología Estética</p>
                             </div>
                             <button onClick={onClose} className="text-gray-500 hover:text-gray-800 text-3xl leading-none transition-colors">
                                 &times;
@@ -288,7 +326,7 @@ ${servicesList}
                                             </div>
                                             <div className="flex-1">
                                                 <p className="text-sm text-gray-700 leading-relaxed">
-                                                    <span className="font-semibold text-gray-800">¡Bienvenida a tu consulta virtual!</span> Como experta en dermatología estética, voy a analizar tu preocupación y recomendarte los tratamientos más efectivos basados en evidencia científica.
+                                                    <span className="font-semibold text-gray-800">¡Bienvenido a tu consulta virtual!</span> Como experto en dermatología estética, voy a analizar tu preocupación y recomendarte los tratamientos más efectivos basados en evidencia científica.
                                                 </p>
                                             </div>
                                         </div>
@@ -351,9 +389,10 @@ ${servicesList}
                                             </div>
                                         </div>
 
-                                        <div className="prose prose-sm max-w-none text-gray-700 leading-relaxed whitespace-pre-wrap text-sm md:text-base">
-                                            {recommendation}
-                                        </div>
+                                        <div
+                                            className="prose prose-sm max-w-none text-gray-700 leading-relaxed text-sm md:text-base"
+                                            dangerouslySetInnerHTML={{ __html: formatMarkdownToHTML(recommendation) }}
+                                        />
 
                                         {/* Badge de confianza */}
                                         <div className="mt-6 pt-4 border-t border-gray-200 flex items-center gap-2 text-xs text-gray-500">

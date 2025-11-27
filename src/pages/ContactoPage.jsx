@@ -52,13 +52,12 @@ const ContactoPage = () => {
               </p>
               <p className="flex items-center">
                 <i className="fab fa-whatsapp w-6 h-6 mr-3 text-[#ea899a] text-xl"></i>
-                <a
-                  href="#"
+                <button
                   onClick={handleWhatsAppClick}
-                  className="hover:text-[#ea899a]"
+                  className="hover:text-[#ea899a] text-left"
                 >
                   +51 974 637 783
-                </a>
+                </button>
               </p>
               <p className="flex items-center">
                 <MailIcon className="w-6 h-6 mr-3 text-[#ea899a]" />
@@ -82,13 +81,14 @@ const ContactoPage = () => {
           </div>
           <div>
             <div className="w-full h-full rounded-lg shadow-md overflow-hidden">
-              <iframe 
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3949.647028888397!2d-79.05267178762256!3d-8.137369391858808!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91ad3d311a491201%3A0xa4452c7571338104!2sDermicaPro!5e0!3m2!1sen!2spe!4v1755335019131!5m2!1sen!2spe" 
-                width="100%" 
-                height="100%" 
-                style={{ border: 0, minHeight: '450px' }} 
-                allowFullScreen="" 
-                loading="lazy" 
+              <iframe
+                title="Mapa de ubicación de DermicaPro"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3949.647028888397!2d-79.05267178762256!3d-8.137369391858808!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91ad3d311a491201%3A0xa4452c7571338104!2sDermicaPro!5e0!3m2!1sen!2spe!4v1755335019131!5m2!1sen!2spe"
+                width="100%"
+                height="100%"
+                style={{ border: 0, minHeight: '450px' }}
+                allowFullScreen=""
+                loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade">
               </iframe>
             </div>

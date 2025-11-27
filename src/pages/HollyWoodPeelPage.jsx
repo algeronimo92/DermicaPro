@@ -2,7 +2,6 @@
 // FILE: src/pages/ServiciosPage.jsx
 // =================================================================================
 import React from "react";
-import SparklesIcon from "../components/icons/SparklesIcon"; // Ejemplo
 import { Link } from "react-router-dom";
 
 const HollywoodPeelPage = () => {

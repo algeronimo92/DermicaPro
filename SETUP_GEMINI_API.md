@@ -47,7 +47,7 @@ Esta es la configuración **más importante** para que funcione en producción:
 
 2. Agrega una nueva variable de entorno:
    - **Name:** `GEMINI_API_KEY`
-   - **Value:** `AIzaSyCI2ivEXoa5k6dUMnc62CZrify424ERntU`
+   - **Value:** `AIzaSyCPDDkkJ4V---SESYIXVWa_piSacP_WHRg`
    - **Environment:**
      - ✅ Production
      - ✅ Preview
@@ -78,7 +78,7 @@ Para desarrollo local usando `.env.local`:
 
 2. Edita `.env.local` y agrega:
    ```bash
-   GEMINI_API_KEY=AIzaSyCI2ivEXoa5k6dUMnc62CZrify424ERntU
+   GEMINI_API_KEY=AIzaSyCPDDkkJ4V---SESYIXVWa_piSacP_WHRg
    ```
 
 3. Reinicia el servidor de desarrollo:
@@ -144,7 +144,7 @@ Frontend → /api/gemini-proxy → gemini-proxy.js (api/) → Google Gemini API
 
 1. **`src/setupProxy.js:31`** - Para desarrollo local
    ```javascript
-   const API_KEY = 'AIzaSyCI2ivEXoa5k6dUMnc62CZrify424ERntU';
+   const API_KEY = 'AIzaSyCPDDkkJ4V---SESYIXVWa_piSacP_WHRg';
    ```
 
 ### ✅ **Recomendaciones de Seguridad**

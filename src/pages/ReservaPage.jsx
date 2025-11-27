@@ -10,10 +10,78 @@ const ReservaPage = () => {
     schedule: "",
   });
   const [submitted, setSubmitted] = useState(false);
-  const handleChange = (e) =>
-    setFormState({ ...formState, [e.target.name]: e.target.value });
+  const [errors, setErrors] = useState({});
+  const [honeypot, setHoneypot] = useState(""); // Anti-spam honeypot
+
+  // Validación de campos
+  const validateField = (name, value) => {
+    switch (name) {
+      case 'name':
+        if (value.trim().length < 2) return 'El nombre debe tener al menos 2 caracteres';
+        if (value.trim().length > 100) return 'El nombre es demasiado largo';
+        return '';
+      case 'phone':
+        const cleanPhone = value.replace(/\D/g, ''); // Solo dígitos
+        if (cleanPhone.length !== 9) return 'Ingresa un número de 9 dígitos';
+        return '';
+      default:
+        return '';
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    let processedValue = value;
+
+    // Capitalizar nombre automáticamente
+    if (name === 'name') {
+      processedValue = value.toLowerCase().replace(/(^|\s)\S/g, char => char.toUpperCase());
+    }
+
+    // Solo números para teléfono
+    if (name === 'phone') {
+      processedValue = value.replace(/\D/g, '');
+    }
+
+    setFormState({ ...formState, [name]: processedValue });
+
+    // Limpiar error del campo al editar
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
+
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    const error = validateField(name, value);
+    if (error) {
+      setErrors(prev => ({ ...prev, [name]: error }));
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    // Anti-spam: Verificar honeypot
+    if (honeypot !== '') {
+      console.warn('Bot detected - submission blocked');
+      return;
+    }
+
+    // Validar todos los campos
+    const newErrors = {};
+    const nameError = validateField('name', formState.name);
+    const phoneError = validateField('phone', formState.phone);
+
+    if (nameError) newErrors.name = nameError;
+    if (phoneError) newErrors.phone = phoneError;
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    // Si pasa validación, marcar como enviado
     setSubmitted(true);
   };
   const services = [
@@ -88,17 +156,34 @@ const ReservaPage = () => {
                 required
                 value={formState.name}
                 onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#ea899a] focus:border-[#ea899a]"
-              />{" "}
+                onBlur={handleBlur}
+                className={`mt-1 block w-full px-3 py-2 bg-white border rounded-md shadow-sm focus:outline-none focus:ring-[#ea899a] focus:border-[#ea899a] ${
+                  errors.name ? 'border-red-500' : 'border-gray-300'
+                }`}
+              />
+              {errors.name && (
+                <p className="mt-1 text-sm text-red-600">{errors.name}</p>
+              )}
             </div>
+
+            {/* Honeypot anti-spam (campo invisible) */}
+            <input
+              type="text"
+              name="website"
+              value={honeypot}
+              onChange={(e) => setHoneypot(e.target.value)}
+              style={{ position: 'absolute', left: '-9999px', tabIndex: '-1' }}
+              autoComplete="off"
+              aria-hidden="true"
+            />
+
             <div>
-              {" "}
               <label
                 htmlFor="phone"
                 className="block text-sm font-medium text-gray-700"
               >
                 Número de Teléfono / WhatsApp
-              </label>{" "}
+              </label>
               <input
                 type="tel"
                 name="phone"
@@ -106,8 +191,16 @@ const ReservaPage = () => {
                 required
                 value={formState.phone}
                 onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#ea899a] focus:border-[#ea899a]"
-              />{" "}
+                onBlur={handleBlur}
+                maxLength="9"
+                placeholder="987654321"
+                className={`mt-1 block w-full px-3 py-2 bg-white border rounded-md shadow-sm focus:outline-none focus:ring-[#ea899a] focus:border-[#ea899a] ${
+                  errors.phone ? 'border-red-500' : 'border-gray-300'
+                }`}
+              />
+              {errors.phone && (
+                <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
+              )}
             </div>
             <div>
               {" "}
