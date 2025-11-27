@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import SparklesIcon from "../components/icons/SparklesIcon";
 import StarIcon from "../components/icons/StarIcon";
-import Navbar from '../components/Navbar';
 import { Link } from "react-router-dom";
 
 // =================================================================================
@@ -68,13 +67,13 @@ const HomePage = ({ setPage, openAdvisor }) => {
         {/* Meta Description optimizada */}
         <meta
           name="description"
-          content="Recupera la confianza en tu piel con DermicaPro. Tratamientos profesionales: HIFU 12D, Pico Láser, Hollywood Peel y más. Tecnología real, resultados visibles. ¡Agenda tu cita!"
+          content="Recupera la confianza en tu piel con DermicaPro. Tratamientos profesionales: HIFU 12D, Pico Láser, Exosomas, Botox, Hollywood Peel y más. Tecnología real, resultados visibles. ¡Agenda tu cita!"
         />
 
         {/* Keywords relevantes */}
         <meta
           name="keywords"
-          content="dermicapro, clínica de piel, tratamientos faciales, cuidado de la piel, dermatología estética, HIFU 12D, pico láser, hollywood peel, rejuvenecimiento facial, borrado de manchas, lifting sin cirugía, clínica dermatológica"
+          content="dermicapro, clínica de piel, tratamientos faciales, cuidado de la piel, dermatología estética, HIFU 12D, pico láser, exosomas, ácido tranexámico, botox, hollywood peel, rejuvenecimiento facial, borrado de manchas, lifting sin cirugía, micropigmentación, clínica dermatológica trujillo"
         />
 
         {/* Open Graph / Facebook */}
@@ -101,7 +100,7 @@ const HomePage = ({ setPage, openAdvisor }) => {
             "@type": "MedicalBusiness",
             "name": "DermicaPro",
             "image": "https://dermicapro.com/logo512.png",
-            "description": "Clínica especializada en cuidado de la piel y tratamientos estéticos. HIFU 12D, Pico Láser, Hollywood Peel, enzimas recombinantes y más tratamientos profesionales.",
+            "description": "Clínica especializada en cuidado de la piel y tratamientos estéticos. HIFU 12D, Pico Láser, Exosomas con Ácido Tranexámico, Botox, Hollywood Peel, enzimas recombinantes, micropigmentación y más tratamientos profesionales.",
             "url": "https://dermicapro.com",
             "telephone": "+51974637783",
             "email": "contacto@dermicapro.com",
@@ -200,11 +199,11 @@ const HomePage = ({ setPage, openAdvisor }) => {
 
         <div className="absolute inset-0 bg-black opacity-50"></div>
 
-        <div className="relative z-10 px-4">
-          <h1 className="text-4xl md:text-6xl font-extrabold text-white leading-tight">
+        <div className="relative z-10 px-6 max-w-7xl mx-auto">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight max-w-6xl mx-auto mb-6">
             ¿Cansada de gastar en cremas que no eliminan tus manchas ni tu flacidez?
           </h1>
-          <p className="mt-4 text-lg md:text-xl text-gray-200 max-w-3xl mx-auto">
+          <p className="mt-6 text-base sm:text-lg md:text-xl text-gray-200 max-w-5xl mx-auto leading-relaxed">
             Sabemos lo frustrante que es invertir tiempo y dinero sin ver cambios reales.
             Aquí encontrarás tecnología profesional y un equipo que te explica con honestidad
             qué sí funciona para tu piel.

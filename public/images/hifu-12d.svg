@@ -1,0 +1,87 @@
+<svg width="800" height="600" viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fondo degradado azul-rosa -->
+  <rect width="800" height="600" fill="url(#gradHIFU)"/>
+  <defs>
+    <linearGradient id="gradHIFU" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#dbeafe;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#fce7f3;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Ondas de ultrasonido -->
+  <g opacity="0.3">
+    <path d="M 200,300 Q 250,280 300,300" stroke="#3b82f6" stroke-width="2" fill="none"/>
+    <path d="M 200,320 Q 250,300 300,320" stroke="#3b82f6" stroke-width="2" fill="none"/>
+    <path d="M 200,340 Q 250,320 300,340" stroke="#3b82f6" stroke-width="2" fill="none"/>
+  </g>
+
+  <!-- Rostro antes (izquierda) -->
+  <g transform="translate(250, 280)">
+    <ellipse cx="0" cy="0" rx="70" ry="80" fill="#f3d5c8" opacity="0.8"/>
+    <!-- Línea de flacidez -->
+    <path d="M -40,20 Q -30,35 -20,40" stroke="#8b5a3c" stroke-width="1.5" fill="none" opacity="0.4"/>
+    <path d="M 40,20 Q 30,35 20,40" stroke="#8b5a3c" stroke-width="1.5" fill="none" opacity="0.4"/>
+    <!-- Ojos -->
+    <circle cx="-20" cy="-15" r="3" fill="#4a2c2a"/>
+    <circle cx="20" cy="-15" r="3" fill="#4a2c2a"/>
+  </g>
+
+  <!-- Flecha de transformación -->
+  <g transform="translate(400, 280)">
+    <polygon points="0,-10 20,0 0,10" fill="#3b82f6" opacity="0.9"/>
+    <line x1="-30" y1="0" x2="0" y2="0" stroke="#3b82f6" stroke-width="3"/>
+  </g>
+
+  <!-- Rostro después (derecha) - más definido -->
+  <g transform="translate(550, 280)">
+    <ellipse cx="0" cy="0" rx="65" ry="75" fill="#f3d5c8" opacity="0.9"/>
+    <!-- Línea de mandíbula más definida -->
+    <path d="M -35,25 L 0,40 L 35,25" stroke="#d4a59a" stroke-width="2" fill="none" opacity="0.5"/>
+    <!-- Ojos -->
+    <circle cx="-20" cy="-15" r="3" fill="#4a2c2a"/>
+    <circle cx="20" cy="-15" r="3" fill="#4a2c2a"/>
+    <!-- Flechas de lifting -->
+    <line x1="-35" y1="10" x2="-35" y2="-5" stroke="#3b82f6" stroke-width="2" opacity="0.5" marker-end="url(#arrowhead)"/>
+    <line x1="35" y1="10" x2="35" y2="-5" stroke="#3b82f6" stroke-width="2" opacity="0.5" marker-end="url(#arrowhead)"/>
+  </g>
+
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="5" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#3b82f6" opacity="0.5"/>
+    </marker>
+  </defs>
+
+  <!-- Dispositivo HIFU -->
+  <g transform="translate(400, 150)">
+    <rect x="-35" y="-50" width="70" height="80" rx="8" fill="#3b82f6" opacity="0.9"/>
+    <rect x="-30" y="-45" width="60" height="70" rx="6" fill="#dbeafe" opacity="0.3"/>
+    <!-- Pantalla digital -->
+    <rect x="-20" y="-35" width="40" height="20" rx="2" fill="#1e3a8a"/>
+    <text x="0" y="-18" font-family="Arial, sans-serif" font-size="10" fill="#60a5fa" text-anchor="middle">12D</text>
+    <!-- Cabezal ultrasonido -->
+    <rect x="-15" y="30" width="30" height="15" rx="3" fill="#2563eb"/>
+    <circle cx="0" cy="42" r="3" fill="#60a5fa" opacity="0.7"/>
+  </g>
+
+  <!-- Capas de penetración -->
+  <g transform="translate(600, 400)">
+    <text x="0" y="0" font-family="Arial, sans-serif" font-size="12" fill="#6b7280">12 capas</text>
+    <line x1="0" y1="5" x2="30" y2="5" stroke="#3b82f6" stroke-width="1.5" opacity="0.3"/>
+    <line x1="0" y1="10" x2="30" y2="10" stroke="#3b82f6" stroke-width="1.5" opacity="0.4"/>
+    <line x1="0" y1="15" x2="30" y2="15" stroke="#3b82f6" stroke-width="1.5" opacity="0.5"/>
+  </g>
+
+  <!-- Texto -->
+  <text x="400" y="500" font-family="Arial, sans-serif" font-size="36" font-weight="bold" fill="#ea899a" text-anchor="middle">
+    HIFU 12D
+  </text>
+  <text x="400" y="535" font-family="Arial, sans-serif" font-size="18" fill="#6b7280" text-anchor="middle">
+    Lifting sin Cirugía
+  </text>
+
+  <!-- Badge -->
+  <rect x="620" y="30" width="150" height="50" rx="25" fill="#3b82f6" opacity="0.9"/>
+  <text x="695" y="60" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="white" text-anchor="middle">
+    Tecnología 12D
+  </text>
+</svg>

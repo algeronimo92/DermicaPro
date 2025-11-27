@@ -4,16 +4,46 @@
 // =================================================================================
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import  SparklesIcon  from '../components/icons/SparklesIcon'; // Ejemplo
+import  SparklesIcon  from '../components/icons/SparklesIcon';
+import { treatmentsData } from '../data/treatmentsData';
+
 const ServiciosPage = ({ openAdvisor }) => {
-  const services = [
-    { title: "HIFU 12D (Lifting sin Cirugía)", description: "Combate la flacidez y redefine tu rostro sin cirugías. Esta tecnología de ultrasonido recupera la firmeza para un rejuvenecimiento visible y natural.", ideal: "Personas entre 35 y 55 años que notan flacidez facial, caída de párpados o cejas y papada, y buscan un lifting sin pasar por quirófano.", icon: 'fas fa-user-md' },
-    { title: "Borrado de Manchas (Pico Láser)", description: "La solución más efectiva para manchas hormonales, solares o post-acné que no se van con cremas. Recupera un tono de piel uniforme y siéntete segura sin maquillaje.", ideal: "Personas entre 28 y 55 años que ya probaron otros métodos sin éxito y buscan resultados visibles y seguros sin dañar su piel.", icon: 'fas fa-laser' },
-    { title: "Enzimas Recombinantes", description: "Tratamos de forma específica y segura la grasa localizada (papada), fibrosis o exceso de ácido hialurónico, devolviendo la armonía a tu rostro.", ideal: "Personas entre 30 y 55 años que quieren evitar cirugías y se sienten incómodas con zonas inflamadas, pesadas o con grasa.", icon: 'fas fa-vial' },
-    { title: "Reducción de Papada (Enzimas + HIFU)", description: "Combinamos lo mejor de dos tecnologías para eliminar la grasa localizada y tensar la piel de la papada. Define tu perfil y afina tu rostro.", ideal: "Hombres y mujeres entre 28 y 50 años con papada marcada que no mejora con dieta ni ejercicio y buscan una solución sin bisturí.", icon: 'fas fa-compress-arrows-alt' },
-    { title: "Hollywood Peel", description: "Devuélvele la vida a tu piel opaca y cierra poros dilatados. Un tratamiento rápido para una luminosidad instantánea que te hará sentir radiante.", ideal: "Personas entre 30 y 50 años con piel apagada, poros abiertos o marquitas de acné que quieren rejuvenecer sin dolor ni tiempo de recuperación.", icon: 'fas fa-star' },
-    { title: "Borrado de Tatuajes y Micropigmentación", description: "Eliminamos de forma definitiva y segura esas marcas del pasado, ya sea un tatuaje que no te representa o una micropigmentación fallida.", ideal: "Personas entre 25 y 45 años que desean borrar de su piel marcas con carga emocional o que salieron mal, para empezar de cero.", icon: 'fas fa-eraser' }
-  ];
+  // Helper function para asignar iconos según el tratamiento
+  const getIconForTreatment = (name) => {
+    if (name.includes('HIFU')) return 'fas fa-user-md';
+    if (name.includes('Borrado') && name.includes('Micropigmentación')) return 'fas fa-eraser';
+    if (name.includes('Borrado') && name.includes('Tatuajes')) return 'fas fa-eraser';
+    if (name.includes('Hollywood Peel')) return 'fas fa-star';
+    if (name.includes('Exosomas')) return 'fas fa-dna';
+    if (name.includes('Botox')) return 'fas fa-syringe';
+    if (name.includes('Enzimas')) return 'fas fa-vial';
+    if (name.includes('Papada')) return 'fas fa-compress-arrows-alt';
+    if (name.includes('Micropigmentación')) return 'fas fa-paint-brush';
+    if (name.includes('Grasa')) return 'fas fa-weight';
+    if (name.includes('Dermapen')) return 'fas fa-syringe';
+    return 'fas fa-spa'; // Icono por defecto
+  };
+
+  // Generar ideal para cada tratamiento basado en beneficios
+  const getIdealFor = (name) => {
+    if (name.includes('HIFU')) return 'Personas entre 35 y 55 años que notan flacidez facial y buscan lifting sin cirugía.';
+    if (name.includes('Hollywood Peel')) return 'Personas entre 30 y 50 años con piel apagada o poros abiertos.';
+    if (name.includes('Exosomas')) return 'Personas entre 35 y 60 años con manchas, arrugas y pérdida de firmeza.';
+    if (name.includes('Botox')) return 'Personas entre 30 y 60 años con arrugas de expresión.';
+    if (name.includes('Dermapen con PRP')) return 'Personas con cicatrices de acné profundas que buscan regeneración natural.';
+    if (name.includes('Dermapen con Ácido Hialurónico')) return 'Personas con líneas finas y deshidratación que buscan hidratación profunda.';
+    if (name.includes('Dermapen con Vitamina C')) return 'Personas que buscan iluminar y unificar el tono de su piel.';
+    if (name.includes('Dermapen')) return 'Personas que buscan mejorar textura, poros abiertos o cicatrices.';
+    return 'Personas que buscan mejorar el aspecto de su piel de forma segura y efectiva.';
+  };
+
+  // Convertir treatmentsData a formato de servicios
+  const services = Object.values(treatmentsData).map(treatment => ({
+    title: treatment.name,
+    description: treatment.description,
+    ideal: getIdealFor(treatment.name),
+    icon: getIconForTreatment(treatment.name)
+  }));
 
   return (
     <>
@@ -24,13 +54,13 @@ const ServiciosPage = ({ openAdvisor }) => {
         {/* Meta Description optimizada */}
         <meta
           name="description"
-          content="Descubre nuestros tratamientos especializados: HIFU 12D, Pico Láser para manchas, Hollywood Peel, Enzimas Recombinantes y más. Resultados reales sin cirugía."
+          content="Descubre nuestros tratamientos especializados: HIFU 12D, Pico Láser, Exosomas con Ácido Tranexámico, Botox, Hollywood Peel, Enzimas y más. Resultados reales sin cirugía."
         />
 
         {/* Keywords relevantes */}
         <meta
           name="keywords"
-          content="HIFU 12D, lifting sin cirugía, pico láser, borrado de manchas, hollywood peel, enzimas recombinantes, reducción de papada, tratamientos faciales, dermatología estética, rejuvenecimiento facial"
+          content="HIFU 12D, lifting sin cirugía, pico láser, borrado de manchas, exosomas, ácido tranexámico, botox, toxina botulínica, hollywood peel, enzimas recombinantes, reducción de papada, micropigmentación, tratamientos faciales, dermatología estética, rejuvenecimiento facial"
         />
 
         {/* Open Graph / Facebook */}
@@ -50,7 +80,7 @@ const ServiciosPage = ({ openAdvisor }) => {
         {/* Canonical URL */}
         <link rel="canonical" href="https://dermicapro.com/servicios" />
 
-        {/* Schema.org para Google */}
+        {/* Schema.org para Google - Generado dinámicamente desde treatmentsData */}
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
@@ -61,32 +91,14 @@ const ServiciosPage = ({ openAdvisor }) => {
             "hasOfferCatalog": {
               "@type": "OfferCatalog",
               "name": "Tratamientos de Cuidado de la Piel",
-              "itemListElement": [
-                {
-                  "@type": "Offer",
-                  "itemOffered": {
-                    "@type": "Service",
-                    "name": "HIFU 12D - Lifting sin Cirugía",
-                    "description": "Tecnología de ultrasonido para combatir la flacidez facial sin cirugía"
-                  }
-                },
-                {
-                  "@type": "Offer",
-                  "itemOffered": {
-                    "@type": "Service",
-                    "name": "Borrado de Manchas con Pico Láser",
-                    "description": "Tratamiento efectivo para manchas hormonales, solares y post-acné"
-                  }
-                },
-                {
-                  "@type": "Offer",
-                  "itemOffered": {
-                    "@type": "Service",
-                    "name": "Hollywood Peel",
-                    "description": "Tratamiento de luminosidad instantánea y cierre de poros"
-                  }
+              "itemListElement": Object.values(treatmentsData).map(treatment => ({
+                "@type": "Offer",
+                "itemOffered": {
+                  "@type": "Service",
+                  "name": treatment.name,
+                  "description": treatment.description
                 }
-              ]
+              }))
             }
           })}
         </script>

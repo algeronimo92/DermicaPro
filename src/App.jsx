@@ -13,11 +13,12 @@ import TestimoniosPage from "./pages/TestimoniosPage";
 import ContactoPage from "./pages/ContactoPage";
 import ReservaPage from "./pages/ReservaPage";
 import HollywoodPeelPage from "./pages/HollyWoodPeelPage";
+import HifuLandingPage from "./pages/HifuLandingPage";
+import NotFoundPage from "./pages/NotFoundPage";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import GeminiSkinAdvisor from "./components/GeminiSkinAdvisor";
 import FloatingWhatsAppButton from "./components/FloatingWhatsAppButton";
-import HifuLandingPage from "./pages/HifuLandingPage";
 
 export default function App() {
   const [isAdvisorOpen, setIsAdvisorOpen] = useState(false);
@@ -53,6 +54,7 @@ export default function App() {
             <Route path="/reserva" element={<ReservaPage />} />
             <Route path="/hollywood-peel" element={<HollywoodPeelPage />} />
             <Route path="/hifu-landing" element={<HifuLandingPage />} />
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </main>
 
