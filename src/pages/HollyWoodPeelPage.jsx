@@ -48,17 +48,17 @@ const HollywoodPeelPage = () => {
         <div className="absolute inset-0 bg-black opacity-50"></div>
         <div className="relative z-10 px-4">
           <h1 className="text-4xl md:text-6xl font-extrabold text-white leading-tight">
-            ¿Sientes tu piel opaca y sin vida?
+            ¿Cansada de ver tu piel opaca y con poros abiertos?
           </h1>
           <p className="mt-4 text-lg md:text-xl text-gray-200 max-w-3xl mx-auto">
-            Recupera la luminosidad y siéntete radiante al instante con el
-            tratamiento preferido de las celebridades: Hollywood Peel.
+            Sabemos que escondes tu rostro con maquillaje. El Hollywood Peel te devuelve
+            esa luminosidad natural que creías perdida. Sin dolor, sin tiempo de recuperación.
           </p>
           <button
             onClick={handleWhatsAppClick}
             className="mt-8 inline-block bg-[#ea899a] text-white font-bold py-3 px-8 rounded-full text-lg hover:bg-[#d37989] transition-transform transform hover:scale-105"
           >
-            Quiero mi piel de alfombra roja
+            Recibir evaluación honesta (sin compromiso)
           </button>
         </div>
       </section>
@@ -66,16 +66,16 @@ const HollywoodPeelPage = () => {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 grid md:grid-cols-2 gap-12 items-center">
           <div className="text-center md:text-left">
             <h2 className="text-3xl font-extrabold text-gray-900">
-              Es frustrante ver tu piel cansada en el espejo. Lo sabemos.
+              Te entendemos: ya probaste cremas sin resultado
             </h2>
             <p className="mt-4 text-lg text-gray-600">
-              Has probado cremas y mascarillas, pero los poros siguen visibles y
-              la piel no recupera esa luz que tenía antes. Te sientes incómoda
-              sin maquillaje y evitas las fotos con luz natural.
+              Gastas en productos que prometen luminosidad, pero los poros siguen ahí
+              y tu piel sigue apagada. Evitas las fotos sin filtros porque no te sientes
+              segura con tu piel al natural.
             </p>
             <p className="mt-4 text-lg text-gray-600 font-semibold text-[#ea899a]">
-              El Hollywood Peel es la solución real para renovar tu piel desde
-              adentro, sin dolor y sin tiempo de recuperación.
+              El Hollywood Peel actúa donde las cremas no pueden: desde las capas
+              profundas de tu piel, renovándola y devolviéndole esa luz que perdiste.
             </p>
           </div>
           <div>
@@ -91,10 +91,11 @@ const HollywoodPeelPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
-              Beneficios que verás y sentirás al instante
+              Resultados que verás desde la primera sesión
             </h2>
             <p className="mt-4 text-lg text-gray-600">
-              Más que un tratamiento, es un impulso de confianza.
+              No prometemos milagros. Te mostramos cambios reales que sentirás en tu piel
+              y verás en el espejo.
             </p>
           </div>
           <div className="mt-12 grid gap-8 md:grid-cols-3">
@@ -134,17 +135,17 @@ const HollywoodPeelPage = () => {
       <section className="py-20 bg-white text-center">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
-            ¿Lista para una piel que refleje tu verdadera luz?
+            ¿Quieres sentirte segura sin maquillaje?
           </h2>
           <p className="mt-4 text-lg text-gray-600">
-            El primer paso es una evaluación honesta. Conversemos sin compromiso
-            para saber si el Hollywood Peel es la mejor opción para ti.
+            El primer paso es una evaluación gratuita y sin compromiso.
+            Te explicamos con honestidad si el Hollywood Peel es para ti, sin presiones.
           </p>
           <Link
             to="/reserva"
             className="mt-8 inline-block bg-[#ea899a] text-white font-bold py-3 px-8 rounded-full text-lg hover:bg-[#d37989] transition-transform transform hover:scale-105"
           >
-            Agendar mi Evaluación de Honestidad
+            Agenda tu evaluación gratuita
           </Link>
         </div>
       </section>
