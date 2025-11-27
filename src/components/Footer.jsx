@@ -8,9 +8,9 @@ import MapPinIcon from "./icons/MapPinIcon";
 import { Link } from "react-router-dom";
 const Footer = () => {
   const socialLinks = [
-    { name: "Facebook", url: "#", icon: "fab fa-facebook-f" },
-    { name: "Instagram", url: "#", icon: "fab fa-instagram" },
-    { name: "WhatsApp", url: "#", icon: "fab fa-whatsapp" },
+    { name: "Facebook", url: "https://www.facebook.com/profile.php?id=61570893266230", icon: "fab fa-facebook-f" },
+    { name: "Instagram", url: "https://www.instagram.com/dermicapro/", icon: "fab fa-instagram" },
+    { name: "WhatsApp", url: "https://wa.me/51974637783", icon: "fab fa-whatsapp" },
   ];
   useEffect(() => {
     const link = document.createElement("link");

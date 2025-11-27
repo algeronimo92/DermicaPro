@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 import SparklesIcon from "../components/icons/SparklesIcon";
 import StarIcon from "../components/icons/StarIcon";
 import Navbar from '../components/Navbar';
@@ -29,17 +30,17 @@ const HomePage = ({ setPage, openAdvisor }) => {
   const featuredServices = [
     {
       name: "Borrado de Manchas (Pico Láser)",
-      desc: "Para ti, que ya probaste cremas sin éxito y buscas eliminar de forma segura esas manchas (hormonales, solares) o marcas de acné.",
+      desc: "¿Ya probaste cremas sin éxito? Las manchas hormonales, solares o post-acné necesitan tecnología real. Este tratamiento actúa directamente en la pigmentación. Siéntete segura sin maquillaje.",
       img: "/images/beforeafter-manchas.jpg",
     },
     {
       name: "HIFU 12D (Lifting sin Cirugía)",
-      desc: "Si notas flacidez, caída de párpados o papada, esta tecnología de ultrasonido redefine tu rostro y recupera la firmeza perdida.",
+      desc: "¿Notas flacidez pero no quieres pasar por cirugía? Esta tecnología de ultrasonido redefine tu rostro de forma natural, recuperando la firmeza que creías perdida. Sin bisturí, sin tiempo de recuperación.",
       img: "/images/beforeafter-hifu.jpg",
     },
     {
       name: "Borrado de Tatuajes y Micropigmentación",
-      desc: "Eliminamos de forma segura y definitiva ese tatuaje que ya no te representa o esa micropigmentación fallida que te genera inseguridad.",
+      desc: "Ese tatuaje que ya no te representa o esa micropigmentación fallida que escondes. Te entendemos. Eliminamos de forma segura y definitiva lo que te genera inseguridad.",
       img: "/images/beforeafter-tatuajes.jpg",
     },
   ];
@@ -59,6 +60,116 @@ const HomePage = ({ setPage, openAdvisor }) => {
   ];
 
   return (
+    <>
+      <Helmet>
+        {/* Title optimizado para SEO */}
+        <title>DermicaPro - Clínica de Cuidado de la Piel | Tratamientos Estéticos Profesionales</title>
+
+        {/* Meta Description optimizada */}
+        <meta
+          name="description"
+          content="Recupera la confianza en tu piel con DermicaPro. Tratamientos profesionales: HIFU 12D, Pico Láser, Hollywood Peel y más. Tecnología real, resultados visibles. ¡Agenda tu cita!"
+        />
+
+        {/* Keywords relevantes */}
+        <meta
+          name="keywords"
+          content="dermicapro, clínica de piel, tratamientos faciales, cuidado de la piel, dermatología estética, HIFU 12D, pico láser, hollywood peel, rejuvenecimiento facial, borrado de manchas, lifting sin cirugía, clínica dermatológica"
+        />
+
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://dermicapro.com/" />
+        <meta property="og:title" content="DermicaPro - Recupera la Confianza en tu Piel" />
+        <meta property="og:description" content="Tratamientos especializados para el cuidado de tu piel. HIFU 12D, Pico Láser, Hollywood Peel y más. Resultados reales y profesionales." />
+        <meta property="og:image" content="https://dermicapro.com/images/hero-1.png" />
+
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:url" content="https://dermicapro.com/" />
+        <meta name="twitter:title" content="DermicaPro - Recupera la Confianza en tu Piel" />
+        <meta name="twitter:description" content="Tratamientos especializados para el cuidado de tu piel. HIFU 12D, Pico Láser, Hollywood Peel y más." />
+        <meta name="twitter:image" content="https://dermicapro.com/images/hero-1.png" />
+
+        {/* Canonical URL */}
+        <link rel="canonical" content="https://dermicapro.com/" />
+
+        {/* Schema.org para Google - LocalBusiness */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "MedicalBusiness",
+            "name": "DermicaPro",
+            "image": "https://dermicapro.com/logo512.png",
+            "description": "Clínica especializada en cuidado de la piel y tratamientos estéticos. HIFU 12D, Pico Láser, Hollywood Peel, enzimas recombinantes y más tratamientos profesionales.",
+            "url": "https://dermicapro.com",
+            "telephone": "+51974637783",
+            "email": "contacto@dermicapro.com",
+            "priceRange": "$$",
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "Av. Larco 877, San Andres V etapa",
+              "addressLocality": "Trujillo",
+              "addressRegion": "La Libertad",
+              "addressCountry": "PE"
+            },
+            "geo": {
+              "@type": "GeoCoordinates",
+              "latitude": "-8.137369",
+              "longitude": "-79.052671"
+            },
+            "openingHoursSpecification": [
+              {
+                "@type": "OpeningHoursSpecification",
+                "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+                "opens": "09:00",
+                "closes": "19:00"
+              },
+              {
+                "@type": "OpeningHoursSpecification",
+                "dayOfWeek": "Saturday",
+                "opens": "09:00",
+                "closes": "14:00"
+              }
+            ],
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": "5",
+              "reviewCount": "2"
+            }
+          })}
+        </script>
+
+        {/* Schema.org - Organization */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": "DermicaPro",
+            "url": "https://dermicapro.com",
+            "logo": "https://dermicapro.com/logo512.png",
+            "sameAs": [
+              "https://www.facebook.com/profile.php?id=61570893266230",
+              "https://www.instagram.com/dermicapro/"
+            ]
+          })}
+        </script>
+
+        {/* Schema.org - WebSite con SearchAction */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "name": "DermicaPro",
+            "url": "https://dermicapro.com",
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": "https://dermicapro.com/servicios?q={search_term_string}",
+              "query-input": "required name=search_term_string"
+            }
+          })}
+        </script>
+      </Helmet>
 
     <div className="animate-fade-in">
 
@@ -91,12 +202,12 @@ const HomePage = ({ setPage, openAdvisor }) => {
 
         <div className="relative z-10 px-4">
           <h1 className="text-4xl md:text-6xl font-extrabold text-white leading-tight">
-            ¿Cansada de soluciones que no funcionan?
+            ¿Cansada de gastar en cremas que no eliminan tus manchas ni tu flacidez?
           </h1>
           <p className="mt-4 text-lg md:text-xl text-gray-200 max-w-3xl mx-auto">
-            Recupera la confianza en tu piel con tecnología real y un equipo que
-            sí se preocupa por ti. Sin promesas vacías, solo resultados
-            visibles.
+            Sabemos lo frustrante que es invertir tiempo y dinero sin ver cambios reales.
+            Aquí encontrarás tecnología profesional y un equipo que te explica con honestidad
+            qué sí funciona para tu piel.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row justify-center items-center gap-4">
             <button
@@ -112,7 +223,7 @@ const HomePage = ({ setPage, openAdvisor }) => {
               className="inline-block bg-white text-[#ea899a] font-bold py-3 px-8 rounded-full text-lg hover:bg-gray-100 transition-transform transform hover:scale-105"
             >
               {" "}
-              Ver Tratamientos{" "}
+              Conoce tu tratamiento ideal{" "}
             </Link>
           </div>
         </div>
@@ -135,11 +246,11 @@ const HomePage = ({ setPage, openAdvisor }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
-              Soluciones Reales para Problemas Reales
+              Tratamientos que sí funcionan para manchas, flacidez y marcas
             </h2>
             <p className="mt-4 text-lg text-gray-600">
-              No vendemos tratamientos, ofrecemos un camino honesto para
-              recuperar tu confianza.
+              Ya probaste suficientes productos que prometen milagros.
+              Aquí te explicamos con honestidad qué necesita tu piel y cómo lo logramos.
             </p>
           </div>
           <div className="mt-12 grid gap-8 md:grid-cols-3">
@@ -163,7 +274,7 @@ const HomePage = ({ setPage, openAdvisor }) => {
                     to="/servicios"
                     className="mt-4 text-[#ea899a] hover:text-[#d37989] font-semibold"
                   >
-                    Ver cómo funciona &rarr;
+                    Descubre si es para ti &rarr;
                   </Link>{" "}
                 </div>
               </div>
@@ -175,11 +286,11 @@ const HomePage = ({ setPage, openAdvisor }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
-              Historias Reales de Personas Como Tú
+              Ellas también dudaban antes de venir
             </h2>
             <p className="mt-4 text-lg text-gray-600">
-              Ellas también se sentían inseguras. Hoy, su piel refleja su
-              verdadera luz.
+              Personas que ya probaron otros métodos sin éxito.
+              Hoy recuperaron la confianza que les faltaba.
             </p>
           </div>
           <div className="mt-12 grid gap-8 md:grid-cols-2">
@@ -216,6 +327,7 @@ const HomePage = ({ setPage, openAdvisor }) => {
         </div>
       </section>
     </div>
+    </>
   );
 };
 

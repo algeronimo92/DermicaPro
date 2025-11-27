@@ -1,3 +1,48 @@
-# https://www.robotstxt.org/robotstxt.html
+# robots.txt para DermicaPro
+# https://dermicapro.com/robots.txt
+
+# Permitir acceso a todos los bots de búsqueda
 User-agent: *
-Disallow:
+Allow: /
+
+# Bloquear acceso a archivos de configuración y build
+Disallow: /build/
+Disallow: /node_modules/
+Disallow: /.git/
+
+# Bloquear landing pages de campañas (solo para anuncios pagados)
+Disallow: /hollywood-peel
+Disallow: /hifu-landing
+
+# Permitir explícitamente páginas importantes
+Allow: /servicios
+Allow: /resultados
+Allow: /nosotros
+Allow: /testimonios
+Allow: /contacto
+Allow: /reserva
+
+# Permitir acceso a recursos estáticos
+Allow: /images/
+Allow: /videos/
+Allow: /static/
+
+# Sitemap principal
+Sitemap: https://dermicapro.com/sitemap.xml
+
+# Configuración específica para bots populares
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /images/
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+# Crawl-delay para bots menos conocidos (evitar sobrecarga)
+User-agent: *
+Crawl-delay: 1
