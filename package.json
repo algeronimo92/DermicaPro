@@ -19,7 +19,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "create:landing": "node scripts/landing-creator.js"
+    "create:landing": "node scripts/landing-creator.js",
+    "test:gemini": "node scripts/test-gemini-api.js"
   },
   "eslintConfig": {
     "extends": [
@@ -38,5 +39,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "http-proxy-middleware": "^3.0.5",
+    "vercel": "^48.11.1"
   }
 }
