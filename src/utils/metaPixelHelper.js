@@ -6,16 +6,58 @@
  */
 
 /**
+ * Verifica si Meta Pixel está listo
+ * @returns {boolean}
+ */
+const isPixelReady = () => {
+  return typeof window !== 'undefined' && typeof window.fbq === 'function';
+};
+
+/**
+ * Espera a que el pixel esté listo (máximo 5 segundos)
+ * @returns {Promise<boolean>}
+ */
+const waitForPixel = () => {
+  return new Promise((resolve) => {
+    if (isPixelReady()) {
+      resolve(true);
+      return;
+    }
+
+    let attempts = 0;
+    const maxAttempts = 50; // 50 * 100ms = 5 segundos
+
+    const interval = setInterval(() => {
+      attempts++;
+      if (isPixelReady()) {
+        clearInterval(interval);
+        resolve(true);
+      } else if (attempts >= maxAttempts) {
+        clearInterval(interval);
+        console.warn('Meta Pixel no se cargó después de 5 segundos');
+        resolve(false);
+      }
+    }, 100);
+  });
+};
+
+/**
  * Track evento estándar de Meta Pixel
  * @param {string} eventName - Nombre del evento (Lead, Contact, Schedule, etc.)
  * @param {object} params - Parámetros del evento
  */
-export const trackMetaEvent = (eventName, params = {}) => {
-  if (window.fbq) {
-    window.fbq('track', eventName, params);
-    console.log(`Meta Pixel - ${eventName} tracked:`, params);
+export const trackMetaEvent = async (eventName, params = {}) => {
+  const ready = await waitForPixel();
+
+  if (ready && window.fbq) {
+    try {
+      window.fbq('track', eventName, params);
+      console.log(`✅ Meta Pixel - ${eventName} tracked:`, params);
+    } catch (error) {
+      console.error(`❌ Error tracking Meta Pixel event ${eventName}:`, error);
+    }
   } else {
-    console.warn('Meta Pixel no disponible para trackear:', eventName);
+    console.warn(`⚠️ Meta Pixel no disponible para trackear: ${eventName}`);
   }
 };
 
@@ -24,12 +66,18 @@ export const trackMetaEvent = (eventName, params = {}) => {
  * @param {string} eventName - Nombre del evento personalizado
  * @param {object} params - Parámetros del evento
  */
-export const trackMetaCustomEvent = (eventName, params = {}) => {
-  if (window.fbq) {
-    window.fbq('trackCustom', eventName, params);
-    console.log(`Meta Pixel - Custom ${eventName} tracked:`, params);
+export const trackMetaCustomEvent = async (eventName, params = {}) => {
+  const ready = await waitForPixel();
+
+  if (ready && window.fbq) {
+    try {
+      window.fbq('trackCustom', eventName, params);
+      console.log(`✅ Meta Pixel - Custom ${eventName} tracked:`, params);
+    } catch (error) {
+      console.error(`❌ Error tracking custom event ${eventName}:`, error);
+    }
   } else {
-    console.warn('Meta Pixel no disponible para trackear custom event:', eventName);
+    console.warn(`⚠️ Meta Pixel no disponible para custom event: ${eventName}`);
   }
 };
 
@@ -249,6 +297,7 @@ export const DermicaProEvents = {
   }
 };
 
+// eslint-disable-next-line import/no-anonymous-default-export
 export default {
   trackMetaEvent,
   trackMetaCustomEvent,
