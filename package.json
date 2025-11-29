@@ -42,6 +42,6 @@
   },
   "devDependencies": {
     "http-proxy-middleware": "^3.0.5",
-    "vercel": "^48.11.1"
+    "vercel": "^48.12.0"
   }
 }

@@ -65,8 +65,8 @@ module.exports = async function handler(req, res) {
     // TODO: Implementar rate limiting con Redis o similar
 
     // Hacer request a Google Gemini API
-    // Modelo: gemini-1.5-flash (rápido y eficiente para chatbots)
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`;
+    // Modelo: gemini-2.5-flash (versión estable, rápida y eficiente para chatbots)
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`;
 
     const response = await fetch(apiUrl, {
       method: 'POST',
