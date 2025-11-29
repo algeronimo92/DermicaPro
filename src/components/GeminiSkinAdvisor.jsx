@@ -228,9 +228,13 @@ ${concern.trim()}
                 throw new Error('El texto contiene caracteres no válidos. Por favor, reformula tu consulta.');
             }
 
-            // SEGURIDAD: API Key ahora está en backend proxy (Vercel Function)
-            // Endpoint: /api/gemini-proxy
-            const response = await fetch('/api/gemini-proxy', {
+            // SEGURIDAD: API Key está en backend proxy (Vercel Function)
+            // Endpoint: Vercel production API (hosted separately from Hostinger frontend)
+            const API_URL = process.env.NODE_ENV === 'development'
+                ? '/api/gemini-proxy'  // Local development with Vercel CLI
+                : 'https://dermicapro-kf6b9mxf2-alan-geronimos-projects.vercel.app/api/gemini-proxy';  // Production Vercel API
+
+            const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: payloadString
