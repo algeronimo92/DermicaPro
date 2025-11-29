@@ -212,8 +212,8 @@ ${concern.trim()}
         try {
             // Sanitizar caracteres de control que pueden romper JSON
             // JSON.stringify() manejará automáticamente \n, \t, ", etc.
-            const sanitizedPrompt = prompt
-                .replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]/g, ''); // Remover caracteres de control excepto \n, \r, \t
+            // eslint-disable-next-line no-control-regex
+            const sanitizedPrompt = prompt.replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]/g, ''); // Remover caracteres de control excepto \n, \r, \t
 
             const payload = { contents: [{ role: "user", parts: [{ text: sanitizedPrompt }] }] };
 

@@ -6,7 +6,7 @@
 
 const https = require('https');
 
-const API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyCI2ivEXoa5k6dUMnc62CZrify424ERntU';
+const API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyCPDDkkJ4V---SESYIXVWa_piSacP_WHRg';
 const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
 
 console.log('\n🧪 Probando Gemini API...\n');
