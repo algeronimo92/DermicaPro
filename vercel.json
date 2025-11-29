@@ -4,7 +4,7 @@
   "outputDirectory": "build",
   "rewrites": [
     {
-      "source": "/((?!api|static|.*\\.js|.*\\.css|.*\\.png|.*\\.jpg|.*\\.ico|.*\\.json).*)",
+      "source": "/((?!api/)(?!static/).*)",
       "destination": "/index.html"
     }
   ]
