@@ -1,6 +1,8 @@
 // =================================================================================
 // FILE: src/components/FloatingWhatsAppButton.jsx (COMPONENTE CORREGIDO)
 // =================================================================================
+import { trackContact } from '../utils/metaPixelHelper';
+
 const FloatingWhatsAppButton = () => {
     // CORRECCIÓN: Se ha reemplazado el SVG por el logo oficial de WhatsApp.
     const WhatsAppIcon = () => (
@@ -11,6 +13,10 @@ const FloatingWhatsAppButton = () => {
 
     const handleWhatsAppClick = (e) => {
         e.preventDefault();
+
+        // Track contacto por WhatsApp en Meta Pixel
+        trackContact('whatsapp', 'floating_button');
+
         const phone = '51974637783';
         const message = 'Hola, quisiera más información sobre los tratamientos en DermicaPro.';
         const appUrl = `whatsapp://send?phone=${phone}&text=${encodeURIComponent(message)}`;

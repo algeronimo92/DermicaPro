@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { trackViewContent, trackLead, saveMetaUTM } from '../utils/metaPixelHelper';
 
 // Este es el componente de React que contiene tu landing page de Botox.
 function BotoxLandingPage() {
@@ -17,7 +18,7 @@ function BotoxLandingPage() {
         message: '',
     });
 
-    // Captura los parámetros de TikTok Ads para tracking
+    // Captura los parámetros de TikTok Ads y Meta Ads para tracking
     useEffect(() => {
         const urlParams = new URLSearchParams(window.location.search);
 
@@ -30,6 +31,7 @@ function BotoxLandingPage() {
                 .substring(0, 100); // Limitar longitud máxima
         };
 
+        // Capturar parámetros de TikTok
         setUtmData({
             ttclid: sanitizeParam(urlParams.get('ttclid')),
             tt_medium: sanitizeParam(urlParams.get('tt_medium')),
@@ -37,6 +39,12 @@ function BotoxLandingPage() {
             tt_adgroup_id: sanitizeParam(urlParams.get('tt_adgroup_id')),
             tt_ad_id: sanitizeParam(urlParams.get('tt_ad_id')),
         });
+
+        // Capturar parámetros de Meta Ads (Facebook/Instagram)
+        saveMetaUTM();
+
+        // Track ViewContent en Meta Pixel al cargar la landing
+        trackViewContent('Botox Landing Page', 'landing_page');
     }, []);
 
     // Inyecta el Píxel de TikTok una sola vez.
@@ -173,6 +181,14 @@ function BotoxLandingPage() {
                     if (window.ttq) {
                         window.ttq.track('SubmitForm');
                     }
+
+                    // Meta Pixel Event: Registra el Lead
+                    trackLead({
+                        contentName: 'Botox',
+                        contentCategory: 'Tratamiento Facial',
+                        value: 180,
+                        currency: 'PEN'
+                    });
 
                     setModal({
                         show: true,

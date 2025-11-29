@@ -21,6 +21,7 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import GeminiSkinAdvisor from "./components/GeminiSkinAdvisor";
 import FloatingWhatsAppButton from "./components/FloatingWhatsAppButton";
+import MetaPixel from "./components/MetaPixel";
 
 export default function App() {
   const [isAdvisorOpen, setIsAdvisorOpen] = useState(false);
@@ -32,6 +33,9 @@ export default function App() {
     <HelmetProvider>
       <div className="font-sans bg-white">
         <style>{`@keyframes fade-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } } .animate-fade-in { animation: fade-in 0.5s ease-out forwards; }`}</style>
+
+        {/* Meta Pixel - Track PageView en cada cambio de ruta */}
+        <MetaPixel />
 
         {!shouldHideNavBar && (
           <Navbar openAdvisor={() => setIsAdvisorOpen(true)} />

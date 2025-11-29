@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { trackViewContent, trackLead, saveMetaUTM } from '../utils/metaPixelHelper';
 
 // Este es el componente de React que contiene tu landing page.
 function HifuLandingPage() {
@@ -17,7 +18,7 @@ function HifuLandingPage() {
         message: '',
     });
 
-    // Captura los parámetros de TikTok Ads para tracking
+    // Captura los parámetros de TikTok Ads y Meta Ads para tracking
     useEffect(() => {
         const urlParams = new URLSearchParams(window.location.search);
 
@@ -30,6 +31,7 @@ function HifuLandingPage() {
                 .substring(0, 100); // Limitar longitud máxima
         };
 
+        // Capturar parámetros de TikTok
         setUtmData({
             ttclid: sanitizeParam(urlParams.get('ttclid')),
             tt_medium: sanitizeParam(urlParams.get('tt_medium')),
@@ -37,6 +39,12 @@ function HifuLandingPage() {
             tt_adgroup_id: sanitizeParam(urlParams.get('tt_adgroup_id')),
             tt_ad_id: sanitizeParam(urlParams.get('tt_ad_id')),
         });
+
+        // Capturar parámetros de Meta Ads (Facebook/Instagram)
+        saveMetaUTM();
+
+        // Track ViewContent en Meta Pixel al cargar la landing
+        trackViewContent('HIFU 12D Landing Page', 'landing_page');
     }, []);
 
     // Inyecta el Píxel de TikTok una sola vez.
@@ -172,6 +180,14 @@ function HifuLandingPage() {
                     if (window.ttq) {
                         window.ttq.track('SubmitForm');
                     }
+
+                    // Meta Pixel Event: Registra el Lead
+                    trackLead({
+                        contentName: 'HIFU 12D',
+                        contentCategory: 'Tratamiento Facial',
+                        value: 200,
+                        currency: 'PEN'
+                    });
 
                     setModal({
                         show: true,

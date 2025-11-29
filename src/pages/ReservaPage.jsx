@@ -1,7 +1,9 @@
 // =================================================================================
 // FILE: src/pages/ReservaPage.jsx
 // =================================================================================
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { trackInitiateCheckout, trackSchedule, LEAD_VALUES } from "../utils/metaPixelHelper";
+
 const ReservaPage = () => {
   const [formState, setFormState] = useState({
     name: "",
@@ -12,6 +14,11 @@ const ReservaPage = () => {
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState({});
   const [honeypot, setHoneypot] = useState(""); // Anti-spam honeypot
+
+  // Track InitiateCheckout al cargar la página de reserva
+  useEffect(() => {
+    trackInitiateCheckout('Evaluación de Piel');
+  }, []);
 
   // Validación de campos
   const validateField = (name, value) => {
@@ -80,6 +87,12 @@ const ReservaPage = () => {
       setErrors(newErrors);
       return;
     }
+
+    // Track evento de Schedule (agendamiento) en Meta Pixel
+    const serviceName = formState.service || 'Consulta General';
+    const serviceValue = LEAD_VALUES[serviceName] || LEAD_VALUES['Consulta General'];
+
+    trackSchedule(serviceName, serviceValue);
 
     // Si pasa validación, marcar como enviado
     setSubmitted(true);

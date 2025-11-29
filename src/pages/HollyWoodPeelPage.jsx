@@ -1,12 +1,26 @@
 // =================================================================================
 // FILE: src/pages/ServiciosPage.jsx
 // =================================================================================
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
+import { trackViewContent, trackContact, saveMetaUTM } from "../utils/metaPixelHelper";
 
 const HollywoodPeelPage = () => {
+  // Track ViewContent al cargar la landing page
+  useEffect(() => {
+    // Capturar parámetros UTM de Meta Ads
+    saveMetaUTM();
+
+    // Track visualización de la landing
+    trackViewContent('Hollywood Peel Landing Page', 'landing_page');
+  }, []);
+
   const handleWhatsAppClick = (e) => {
     e.preventDefault();
+
+    // Track contacto por WhatsApp desde landing page
+    trackContact('whatsapp', 'hollywood_peel_cta');
+
     const phone = "51974637783";
     const message =
       "Hola, quisiera agendar una evaluación para el tratamiento Hollywood Peel.";
