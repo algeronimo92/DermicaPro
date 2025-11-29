@@ -14,6 +14,7 @@ import ContactoPage from "./pages/ContactoPage";
 import ReservaPage from "./pages/ReservaPage";
 import HollywoodPeelPage from "./pages/HollyWoodPeelPage";
 import HifuLandingPage from "./pages/HifuLandingPage";
+import BotoxLandingPage from "./pages/BotoxLandingPage";
 import PoliticaPrivacidadPage from "./pages/PoliticaPrivacidadPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import Navbar from "./components/Navbar";
@@ -24,7 +25,7 @@ import FloatingWhatsAppButton from "./components/FloatingWhatsAppButton";
 export default function App() {
   const [isAdvisorOpen, setIsAdvisorOpen] = useState(false);
   const location = useLocation();
-  const hideLayout = ["/hollywood-peel", "/hifu-landing"];
+  const hideLayout = ["/hollywood-peel", "/hifu-landing", "/botox-landing"];
   const shouldHideNavBar = hideLayout.includes(location.pathname);
 
   return (
@@ -56,6 +57,7 @@ export default function App() {
             <Route path="/politica-privacidad" element={<PoliticaPrivacidadPage />} />
             <Route path="/hollywood-peel" element={<HollywoodPeelPage />} />
             <Route path="/hifu-landing" element={<HifuLandingPage />} />
+            <Route path="/botox-landing" element={<BotoxLandingPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </main>
