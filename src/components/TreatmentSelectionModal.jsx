@@ -2,6 +2,7 @@
 // FILE: src/components/TreatmentSelectionModal.jsx
 // =================================================================================
 import React, { useEffect, useRef } from 'react';
+import { trackContact } from '../utils/metaPixelHelper';
 
 const TreatmentSelectionModal = ({ isOpen, onClose, treatments, userConcern }) => {
     const modalRef = useRef();
@@ -19,6 +20,9 @@ const TreatmentSelectionModal = ({ isOpen, onClose, treatments, userConcern }) =
     if (!isOpen) return null;
 
     const handleWhatsAppContact = (treatmentName) => {
+        // Track contacto por WhatsApp desde modal de asesor virtual
+        trackContact('whatsapp', 'gemini_advisor_modal', treatmentName);
+
         const message = `Hola! Me interesa el tratamiento de *${treatmentName}*. ${userConcern ? `Mi consulta fue: "${userConcern}"` : ''} ¿Podrían darme más información?`;
         const encodedMessage = encodeURIComponent(message);
         const whatsappUrl = `https://wa.me/51974637783?text=${encodedMessage}`;

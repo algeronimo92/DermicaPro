@@ -1,8 +1,8 @@
 // =================================================================================
 // FILE: src/pages/ReservaPage.jsx
 // =================================================================================
-import React, { useState, useEffect } from "react";
-import { trackInitiateCheckout, trackSchedule, LEAD_VALUES } from "../utils/metaPixelHelper";
+import React, { useState } from "react";
+import { trackSchedule, trackContact, LEAD_VALUES } from "../utils/metaPixelHelper";
 
 const ReservaPage = () => {
   const [formState, setFormState] = useState({
@@ -15,10 +15,10 @@ const ReservaPage = () => {
   const [errors, setErrors] = useState({});
   const [honeypot, setHoneypot] = useState(""); // Anti-spam honeypot
 
-  // Track InitiateCheckout al cargar la página de reserva
-  useEffect(() => {
-    trackInitiateCheckout('Evaluación de Piel');
-  }, []);
+  // Handler para botón de WhatsApp
+  const handleWhatsAppClick = () => {
+    trackContact('whatsapp', 'reserva_page_button');
+  };
 
   // Validación de campos
   const validateField = (name, value) => {
@@ -143,6 +143,7 @@ const ReservaPage = () => {
             href="https://wa.me/51974637783?text=Hola,%20quisiera%20agendar%20una%20evaluación%20en%20DermicaPro."
             target="_blank"
             rel="noopener noreferrer"
+            onClick={handleWhatsAppClick}
             className="mt-6 inline-flex items-center bg-green-500 text-white font-bold py-3 px-6 rounded-full text-lg hover:bg-green-600 transition-transform transform hover:scale-105"
           >
             {" "}

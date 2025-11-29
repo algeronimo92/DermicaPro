@@ -5,9 +5,15 @@ import React from "react";
 import PhoneIcon from "../components/icons/PhoneIcon";
 import MailIcon from "../components/icons/MailIcon";
 import MapPinIcon from "../components/icons/MapPinIcon";
+import { trackContact } from "../utils/metaPixelHelper";
+
 const ContactoPage = () => {
   const handleWhatsAppClick = (e) => {
     e.preventDefault();
+
+    // Track contacto por WhatsApp
+    trackContact('whatsapp', 'contacto_page');
+
     const phone = '51974637783';
     const message = 'Hola, quisiera agendar una evaluación en DermicaPro.';
     const appUrl = `whatsapp://send?phone=${phone}&text=${encodeURIComponent(message)}`;
