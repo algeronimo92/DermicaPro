@@ -1,0 +1,62 @@
+# =================================================================================
+# GitHub Actions Workflow: Deploy to Hostinger
+# =================================================================================
+# Se ejecuta automáticamente cuando haces push a la rama main
+# Hace build del proyecto React y sube los archivos a Hostinger vía FTP
+
+name: Deploy to Hostinger
+
+# Trigger: Se activa en push a main
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Build and Deploy to Hostinger
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout del código
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      # 3. Instalar dependencias
+      - name: Install dependencies
+        run: npm ci
+
+      # 4. Build del proyecto React
+      - name: Build React app
+        run: npm run build
+        env:
+          CI: false  # Desactiva "treat warnings as errors" en build
+
+      # 5. Deploy a Hostinger vía FTP
+      - name: Deploy to Hostinger via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./build/
+          server-dir: ${{ secrets.FTP_SERVER_DIR }}
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/.vscode/**
+            **/.github/**
+
+      # 6. Notificación de éxito
+      - name: Deployment Success
+        run: |
+          echo "✅ Deployment completado exitosamente"
+          echo "🌐 Sitio: https://dermicapro.com"
