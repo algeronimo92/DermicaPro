@@ -46,8 +46,13 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
+          port: 21  # Puerto FTP estándar
+          protocol: ftp  # Usar FTP (no FTPS)
           local-dir: ./build/
           server-dir: ${{ secrets.FTP_SERVER_DIR }}
+          timeout: 600000  # 10 minutos timeout (en ms)
+          log-level: verbose  # Logs detallados para debugging
+          security: loose  # Menos restrictivo para evitar problemas de SSL
           exclude: |
             **/.git*
             **/.git*/**
