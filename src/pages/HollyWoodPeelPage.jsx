@@ -243,15 +243,15 @@ function HollywoodPeelPage() {
 
 
             <header className="relative min-h-screen bg-gray-900 flex items-center justify-center overflow-hidden">
-                <img src="/images/bg.webp" alt="Modelo con piel rejuvenecida gracias a HIFU 12D" className="absolute inset-0 w-full h-full object-cover opacity-20" />
+                <img src="/images/bg.webp" alt="Modelo con piel iluminada gracias a Hollywood Peel" className="absolute inset-0 w-full h-full object-cover opacity-20" />
                 <div className="relative z-10 container mx-auto px-6 py-16 grid lg:grid-cols-2 gap-12 items-center">
                     <div className="text-white text-center lg:text-left">
-                        <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-4">¿Notas Flacidez pero no Quieres Pasar por <span className="text-primary-light">Cirugía?</span></h1>
-                        <p className="text-lg md:text-xl text-gray-300 mb-8">Entendemos tu miedo al bisturí. HIFU 12D redefine tu rostro de forma natural, recuperando la firmeza que creías perdida. Sin cirugía, sin agujas, sin tiempo de recuperación.</p>
+                        <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-4">¿Tu Piel Luce Apagada y los Poros <span className="text-primary-light">Ya No Se Cierran?</span></h1>
+                        <p className="text-lg md:text-xl text-gray-300 mb-8">Sabemos lo frustrante que es ver tu rostro sin brillo. Hollywood Peel es el tratamiento láser que ilumina, refina textura y cierra poros visiblemente. Sin dolor, sin tiempo de recuperación, con resultados inmediatos.</p>
                     </div>
                     <div id="hero-form-container" className="w-full max-w-md mx-auto bg-white rounded-2xl shadow-2xl p-8">
                         <h2 className="text-2xl font-bold text-main mb-2 text-center">Empieza tu transformación sin compromiso</h2>
-                        <p className="text-custom-secondary text-center mb-6">Agenda tu evaluación gratuita. Te explicamos con honestidad si HIFU es para ti.</p>
+                        <p className="text-custom-secondary text-center mb-6">Agenda tu evaluación gratuita. Te explicamos con honestidad si Hollywood Peel es para ti.</p>
                         <form onSubmit={handleSubmit} noValidate>
                             <div className="mb-4">
                                 <label htmlFor="nombre" className="block text-sm font-medium text-custom-secondary mb-1">Nombre completo</label>
@@ -285,24 +285,41 @@ function HollywoodPeelPage() {
             <main>
                 <section className="py-16 md:py-24 bg-background-medium">
                     <div className="container mx-auto px-6 text-center">
-                        <h2 className="text-3xl md:text-4xl font-bold text-main mb-4">Por qué <span className="text-primary">HIFU 12D</span> funciona cuando otros métodos fallan</h2>
-                        <p className="max-w-3xl mx-auto text-custom-secondary text-lg mb-12">Ya probaste cremas antiarrugas sin éxito. Este tratamiento actúa donde las cremas no pueden: en las capas profundas de tu piel, estimulando el colágeno real.</p>
+                        <h2 className="text-3xl md:text-4xl font-bold text-main mb-4">Por qué <span className="text-primary">Hollywood Peel</span> funciona cuando otros métodos fallan</h2>
+                        <p className="max-w-3xl mx-auto text-custom-secondary text-lg mb-12">Ya probaste exfoliantes y sueros sin resultados reales. Este tratamiento láser actúa en las capas profundas para eliminar impurezas, cerrar poros y devolver el brillo natural que creías perdido.</p>
                         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                             <div className="bg-white p-8 rounded-xl shadow-lg transform hover:-translate-y-2 transition-transform duration-300">
-                                <h3 className="text-xl font-bold mb-2 text-main">Lifting Sin Bisturí</h3>
-                                <p className="text-custom-secondary">Tensa y levanta la piel de rostro y cuello sin incisiones, agujas ni tiempo de recuperación.</p>
+                                {/* Icono: Iluminación/Brillo - Sparkles */}
+                                <svg className="w-12 h-12 text-primary mb-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                                </svg>
+                                <h3 className="text-xl font-bold mb-2 text-main">Iluminación Instantánea</h3>
+                                <p className="text-custom-secondary">Recupera el brillo natural de tu piel desde la primera sesión. Verte radiante sin maquillaje.</p>
                             </div>
                             <div className="bg-white p-8 rounded-xl shadow-lg transform hover:-translate-y-2 transition-transform duration-300">
-                                <h3 className="text-xl font-bold mb-2 text-main">Resultados Naturales</h3>
-                                <p className="text-custom-secondary">Estimula la producción de colágeno para un rejuvenecimiento progresivo que respeta tus facciones.</p>
+                                {/* Icono: Poros Cerrados - Target/Focus */}
+                                <svg className="w-12 h-12 text-primary mb-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                </svg>
+                                <h3 className="text-xl font-bold mb-2 text-main">Poros Visiblemente Cerrados</h3>
+                                <p className="text-custom-secondary">Reduce el tamaño de poros dilatados para una textura refinada y uniforme que perdura.</p>
                             </div>
                             <div className="bg-white p-8 rounded-xl shadow-lg transform hover:-translate-y-2 transition-transform duration-300">
-                                <h3 className="text-xl font-bold mb-2 text-main">Rápido y Cómodo</h3>
-                                <p className="text-custom-secondary">Una sesión puede durar entre 30 y 90 minutos. Retoma tu rutina inmediatamente.</p>
+                                {/* Icono: Exfoliación - Refresh/Renew */}
+                                <svg className="w-12 h-12 text-primary mb-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                </svg>
+                                <h3 className="text-xl font-bold mb-2 text-main">Exfoliación Profunda</h3>
+                                <p className="text-custom-secondary">Elimina células muertas y puntos negros. Una sesión de 30-40 minutos, retomas tu rutina de inmediato.</p>
                             </div>
                             <div className="bg-white p-8 rounded-xl shadow-lg transform hover:-translate-y-2 transition-transform duration-300">
-                                <h3 className="text-xl font-bold mb-2 text-main">Efecto Duradero</h3>
-                                <p className="text-custom-secondary">Disfruta de una apariencia más joven y firme por hasta 1-2 años con una sola sesión.</p>
+                                {/* Icono: Textura Suave - Check Shield */}
+                                <svg className="w-12 h-12 text-primary mb-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                                </svg>
+                                <h3 className="text-xl font-bold mb-2 text-main">Textura Mejorada</h3>
+                                <p className="text-custom-secondary">Suaviza líneas finas, cicatrices superficiales y marcas de acné para un rostro terso al tacto.</p>
                             </div>
                         </div>
                     </div>
@@ -317,39 +334,39 @@ function HollywoodPeelPage() {
                             <div className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center">
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="relative">
-                                        <img src="/images/hifu-1-before.png" alt="Rostro de mujer antes del tratamiento HIFU" className="rounded-lg shadow-md w-full h-full object-cover" />
+                                        <img src="/images/hifu-1-before.png" alt="Rostro de mujer antes del tratamiento Hollywood Peel" className="rounded-lg shadow-md w-full h-full object-cover" />
                                         <span className="absolute top-2 left-2 bg-black bg-opacity-50 text-white text-sm px-2 py-1 rounded">ANTES</span>
                                     </div>
                                     <div className="relative">
-                                    <img src="/images/hifu-1-after.png" alt="Rostro de la misma mujer después del tratamiento HIFU, con piel más firme" className="rounded-lg shadow-md w-full h-full object-cover" />
+                                    <img src="/images/hifu-1-after.png" alt="Rostro de la misma mujer después del tratamiento Hollywood Peel, con piel más iluminada y poros cerrados" className="rounded-lg shadow-md w-full h-full object-cover" />
                                     <span className="absolute top-2 left-2 bg-primary bg-opacity-80 text-white text-sm px-2 py-1 rounded">DESPUÉS</span>
                                     </div>
                                 </div>
                                 <div className="bg-background-medium p-8 rounded-xl shadow-lg">
                                     <svg className="w-12 h-12 text-primary mb-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a2 2 0 00-2 2v12a2 2 0 002 2h1a2 2 0 002-2V4a2 2 0 00-2-2h-1zM3 5a2 2 0 00-2 2v8a2 2 0 002 2h1a2 2 0 002-2V7a2 2 0 00-2-2H3zM16 5a2 2 0 00-2 2v8a2 2 0 002 2h1a2 2 0 002-2V7a2 2 0 00-2-2h-1z"></path></svg>
-                                    <p className="text-lg text-custom-secondary mb-6">"Tenía miedo de los procedimientos invasivos y ya había gastado en cremas que no funcionaron. Aquí me explicaron todo con paciencia, sin presiones. El HIFU me devolvió la firmeza en la mandíbula que había perdido. Lo mejor: nadie nota que me hice algo, solo que me veo más descansada."</p>
+                                    <p className="text-lg text-custom-secondary mb-6">"Mi piel lucía opaca y los poros de mi nariz se notaban mucho, probé mil productos sin resultados. Aquí me explicaron todo con paciencia, sin presiones. Hollywood Peel me devolvió la luminosidad que había perdido y mis poros se cerraron increíblemente. Lo mejor: mi rostro luce natural, solo más radiante."</p>
                                     <div>
-                                        <p className="font-bold text-main">Laura G.</p>
-                                        <p className="text-sm text-custom-secondary">48 años, Abogada</p>
+                                        <p className="font-bold text-main">Carla M.</p>
+                                        <p className="text-sm text-custom-secondary">35 años, Ejecutiva de Marketing</p>
                                     </div>
                                 </div>
                             </div>
                             <div className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center">
                                 <div className="bg-background-medium p-8 rounded-xl shadow-lg lg:order-first">
                                     <svg className="w-12 h-12 text-primary mb-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a2 2 0 00-2 2v12a2 2 0 002 2h1a2 2 0 002-2V4a2 2 0 00-2-2h-1zM3 5a2 2 0 00-2 2v8a2 2 0 002 2h1a2 2 0 002-2V7a2 2 0 00-2-2H3zM16 5a2 2 0 00-2 2v8a2 2 0 002 2h1a2 2 0 002-2V7a2 2 0 00-2-2h-1z"></path></svg>
-                                    <p className="text-lg text-custom-secondary mb-6">"Buscaba una alternativa segura a la cirugía después de una mala experiencia en otro lugar. Aquí me dieron la confianza que necesitaba. El HIFU superó mis expectativas: mi piel está más tersa y las líneas se suavizaron. El resultado es natural, respeta mis facciones."</p>
+                                    <p className="text-lg text-custom-secondary mb-6">"Tenía una textura irregular por cicatrices de acné y puntos negros que no se iban con nada. Aquí me dieron la confianza que necesitaba sin venderme tratamientos innecesarios. Hollywood Peel superó mis expectativas: mi piel está tersa al tacto, los poros se cerraron y recuperé ese glow que no tenía hace años."</p>
                                     <div>
-                                        <p className="font-bold text-main">Ana R.</p>
-                                        <p className="text-sm text-custom-secondary">55 años, Diseñadora</p>
+                                        <p className="font-bold text-main">Valeria S.</p>
+                                        <p className="text-sm text-custom-secondary">42 años, Arquitecta</p>
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="relative">
-                                        <img src="/images/hifu-2-before.png" alt="Otro rostro de mujer antes del tratamiento HIFU" className="rounded-lg shadow-md w-full h-full object-cover" />
+                                        <img src="/images/hifu-2-before.png" alt="Otro rostro de mujer antes del tratamiento Hollywood Peel" className="rounded-lg shadow-md w-full h-full object-cover" />
                                         <span className="absolute top-2 left-2 bg-black bg-opacity-50 text-white text-sm px-2 py-1 rounded">ANTES</span>
                                     </div>
                                     <div className="relative">
-                                    <img src="/images/hifu-2-after.png" alt="Otro rostro de la misma mujer después del tratamiento HIFU, con piel más firme" className="rounded-lg shadow-md w-full h-full object-cover" />
+                                    <img src="/images/hifu-2-after.png" alt="Otro rostro de la misma mujer después del tratamiento Hollywood Peel, con piel más iluminada y textura mejorada" className="rounded-lg shadow-md w-full h-full object-cover" />
                                     <span className="absolute top-2 left-2 bg-primary bg-opacity-80 text-white text-sm px-2 py-1 rounded">DESPUÉS</span>
                                     </div>
                                 </div>
@@ -366,32 +383,32 @@ function HollywoodPeelPage() {
                         <div className="space-y-4">
                             <details className="group bg-white p-6 rounded-lg shadow-sm">
                                 <summary className="flex justify-between items-center font-semibold cursor-pointer text-main">
-                                    ¿El tratamiento HIFU 12D duele?
+                                    ¿El tratamiento Hollywood Peel duele?
                                     <svg className="w-5 h-5 text-primary transform group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
                                 </summary>
-                                <p className="text-custom-secondary mt-4">La mayoría de los pacientes describen una sensación de calor y ligeros pinchazos. Es tolerable y no requiere anestesia. Nos aseguramos de que tu experiencia sea lo más cómoda posible.</p>
+                                <p className="text-custom-secondary mt-4">No, es completamente indoloro. Solo sentirás una ligera sensación de calor reconfortante durante el tratamiento láser. No requiere anestesia ni recuperación. Nos aseguramos de que tu experiencia sea relajante y cómoda.</p>
                             </details>
                             <details className="group bg-white p-6 rounded-lg shadow-sm">
                                 <summary className="flex justify-between items-center font-semibold cursor-pointer text-main">
                                     ¿Cuántas sesiones necesito para ver resultados?
                                     <svg className="w-5 h-5 text-primary transform group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
                                 </summary>
-                                <p className="text-custom-secondary mt-4">¡Los resultados son visibles desde la primera sesión! El efecto lifting mejora progresivamente durante los siguientes 2-3 meses. Generalmente, se recomienda una sesión al año o cada dos años para mantenimiento.</p>
+                                <p className="text-custom-secondary mt-4">¡Notarás tu piel más luminosa desde la primera sesión! Para resultados óptimos de cierre de poros y textura refinada, recomendamos 3-4 sesiones mensuales. Luego, 1 sesión de mantenimiento cada 2-3 meses.</p>
                             </details>
                             <details className="group bg-white p-6 rounded-lg shadow-sm">
                                 <summary className="flex justify-between items-center font-semibold cursor-pointer text-main">
                                     ¿Es seguro? ¿Quién realiza el tratamiento?
                                     <svg className="w-5 h-5 text-primary transform group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
                                 </summary>
-                                <p className="text-custom-secondary mt-4">Es un procedimiento extremadamente seguro, aprobado por entidades reguladoras. Todos nuestros tratamientos son realizados por profesionales certificados y con amplia experiencia, utilizando equipos de última generación.</p>
+                                <p className="text-custom-secondary mt-4">Es un procedimiento extremadamente seguro, aprobado dermatológicamente y usado por celebridades. Todos nuestros tratamientos son realizados por profesionales certificados y con amplia experiencia, utilizando equipos láser de última generación.</p>
                             </details>
                         </div>
                     </div>
                 </section>
                 <section id="form-section" className="py-16 md:py-24 bg-primary text-white">
                     <div className="container mx-auto px-6 text-center">
-                        <h2 className="text-3xl md:text-4xl font-bold mb-4">¿Lista para recuperar la firmeza que perdiste?</h2>
-                        <p className="max-w-2xl mx-auto text-primary-light text-lg mb-8">El primer paso es una evaluación honesta y sin compromiso. Te explicamos con claridad si HIFU es para ti, sin presiones de venta.</p>
+                        <h2 className="text-3xl md:text-4xl font-bold mb-4">¿Lista para recuperar la luminosidad que perdiste?</h2>
+                        <p className="max-w-2xl mx-auto text-primary-light text-lg mb-8">El primer paso es una evaluación honesta y sin compromiso. Te explicamos con claridad si Hollywood Peel es para ti, sin presiones de venta.</p>
                         <a href="#hero-form-container" className="inline-block bg-cta font-bold py-4 px-10 rounded-full transition-transform duration-300 transform hover:scale-105 bg-cta-hover">Agenda tu evaluación gratuita</a>
                     </div>
                 </section>
