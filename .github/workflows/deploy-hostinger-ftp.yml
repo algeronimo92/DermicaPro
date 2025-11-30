@@ -42,12 +42,13 @@ jobs:
       # 4.1. Preparar .htaccess específicos para subdominios
       - name: Setup subdomain .htaccess files
         run: |
-          cp public/.htaccess-hf-reservas build-hf/.htaccess
-          cp public/.htaccess-btx-reservas build-btx/.htaccess
-          cp public/.htaccess-hp-reservas build-hp/.htaccess
+          mkdir -p build-hf build-btx build-hp
           cp -r build/* build-hf/
           cp -r build/* build-btx/
           cp -r build/* build-hp/
+          cp public/.htaccess-hf-reservas build-hf/.htaccess
+          cp public/.htaccess-btx-reservas build-btx/.htaccess
+          cp public/.htaccess-hp-reservas build-hp/.htaccess
 
       # 5. Deploy sitio principal usando FTP
       - name: Deploy Sitio Principal
