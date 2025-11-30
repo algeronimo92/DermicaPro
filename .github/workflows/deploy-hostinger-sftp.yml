@@ -40,57 +40,57 @@ jobs:
         env:
           CI: false
 
-      # 5. Deploy sitio principal usando SFTP
+      # 5. Deploy sitio principal usando FTP
       - name: Deploy Sitio Principal
-        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          port: 22  # Puerto SFTP/SSH
-          local_path: './build/*'
-          remote_path: ${{ secrets.FTP_SERVER_DIR }}
-          sftp_only: true
-          delete_remote_files: false  # No borrar archivos existentes
+          protocol: ftp
+          port: 21
+          local-dir: ./build/
+          server-dir: ${{ secrets.FTP_SERVER_DIR }}
+          dangerous-clean-slate: false
 
       # 6. Deploy a hf-reservas.dermicapro.com
       - name: Deploy HIFU Reservas (hf-reservas)
-        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          port: 22
-          local_path: './build/*'
-          remote_path: '/public_html/hf-reservas/'
-          sftp_only: true
-          delete_remote_files: false
+          protocol: ftp
+          port: 21
+          local-dir: ./build/
+          server-dir: /public_html/hf-reservas/
+          dangerous-clean-slate: false
 
       # 7. Deploy a btx-reservas.dermicapro.com
       - name: Deploy Botox Reservas (btx-reservas)
-        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          port: 22
-          local_path: './build/*'
-          remote_path: '/public_html/btx-reservas/'
-          sftp_only: true
-          delete_remote_files: false
+          protocol: ftp
+          port: 21
+          local-dir: ./build/
+          server-dir: /public_html/btx-reservas/
+          dangerous-clean-slate: false
 
       # 8. Deploy a hp-reservas.dermicapro.com
       - name: Deploy Hollywood Peel Reservas (hp-reservas)
-        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          port: 22
-          local_path: './build/*'
-          remote_path: '/public_html/hp-reservas/'
-          sftp_only: true
-          delete_remote_files: false
+          protocol: ftp
+          port: 21
+          local-dir: ./build/
+          server-dir: /public_html/hp-reservas/
+          dangerous-clean-slate: false
 
       # 9. Notificación de éxito
       - name: Deployment Success
