@@ -1,10 +1,9 @@
 # =================================================================================
-# GitHub Actions Workflow: Deploy to Hostinger (SFTP Version)
+# GitHub Actions Workflow: Deploy to Hostinger
 # =================================================================================
-# Versión alternativa usando SFTP en lugar de FTP
-# Usa este workflow si el FTP regular no funciona
+# Deploy automático del sitio principal y subdominios a Hostinger vía FTP
 
-name: Deploy to Hostinger (SFTP)
+name: Deploy to Hostinger
 
 # Trigger: Manual o en push a main
 on:
@@ -15,7 +14,7 @@ on:
 
 jobs:
   deploy:
-    name: Build and Deploy to Hostinger via SFTP
+    name: Build and Deploy to Hostinger via FTP
     runs-on: ubuntu-latest
 
     steps:
@@ -95,7 +94,7 @@ jobs:
       # 9. Notificación de éxito
       - name: Deployment Success
         run: |
-          echo "✅ Deployment completado exitosamente via SFTP"
+          echo "✅ Deployment completado exitosamente via FTP"
           echo ""
           echo "🌐 Sitios desplegados:"
           echo "   • https://dermicapro.com (principal)"
