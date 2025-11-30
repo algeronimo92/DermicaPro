@@ -343,18 +343,41 @@ function HifuLandingPage() {
                         <p className="max-w-3xl mx-auto text-custom-secondary text-lg mb-12">Ya probaste cremas antiarrugas sin éxito. Este tratamiento actúa donde las cremas no pueden: en las capas profundas de tu piel, estimulando el colágeno real.</p>
                         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                             <div className="bg-white p-8 rounded-xl shadow-lg transform hover:-translate-y-2 transition-transform duration-300">
+                                <div className="flex justify-center mb-4">
+                                    <svg className="w-16 h-16 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11" />
+                                        <line x1="3" y1="3" x2="21" y2="21" strokeWidth="2" strokeLinecap="round" />
+                                    </svg>
+                                </div>
                                 <h3 className="text-xl font-bold mb-2 text-main">Lifting Sin Bisturí</h3>
                                 <p className="text-custom-secondary">Tensa y levanta la piel de rostro y cuello sin incisiones, agujas ni tiempo de recuperación.</p>
                             </div>
                             <div className="bg-white p-8 rounded-xl shadow-lg transform hover:-translate-y-2 transition-transform duration-300">
+                                <div className="flex justify-center mb-4">
+                                    <svg className="w-16 h-16 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8.5 9.5c.5-.5 1-1 1.5-1.5M15.5 14.5c-.5.5-1 1-1.5 1.5" />
+                                    </svg>
+                                </div>
                                 <h3 className="text-xl font-bold mb-2 text-main">Resultados Naturales</h3>
                                 <p className="text-custom-secondary">Estimula la producción de colágeno para un rejuvenecimiento progresivo que respeta tus facciones.</p>
                             </div>
                             <div className="bg-white p-8 rounded-xl shadow-lg transform hover:-translate-y-2 transition-transform duration-300">
+                                <div className="flex justify-center mb-4">
+                                    <svg className="w-16 h-16 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
                                 <h3 className="text-xl font-bold mb-2 text-main">Rápido y Cómodo</h3>
                                 <p className="text-custom-secondary">Una sesión puede durar entre 30 y 90 minutos. Retoma tu rutina inmediatamente.</p>
                             </div>
                             <div className="bg-white p-8 rounded-xl shadow-lg transform hover:-translate-y-2 transition-transform duration-300">
+                                <div className="flex justify-center mb-4">
+                                    <svg className="w-16 h-16 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6" opacity="0.5" />
+                                    </svg>
+                                </div>
                                 <h3 className="text-xl font-bold mb-2 text-main">Efecto Duradero</h3>
                                 <p className="text-custom-secondary">Disfruta de una apariencia más joven y firme por hasta 1-2 años con una sola sesión.</p>
                             </div>
