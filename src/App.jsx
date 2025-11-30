@@ -12,7 +12,7 @@ import NosotrosPage from "./pages/NosotrosPage";
 import TestimoniosPage from "./pages/TestimoniosPage";
 import ContactoPage from "./pages/ContactoPage";
 import ReservaPage from "./pages/ReservaPage";
-import HollywoodPeelPage from "./pages/HollyWoodPeelPage";
+import HollywoodPeelPage from "./pages/HollywoodPeelPage";
 import HifuLandingPage from "./pages/HifuLandingPage";
 import BotoxLandingPage from "./pages/BotoxLandingPage";
 import PoliticaPrivacidadPage from "./pages/PoliticaPrivacidadPage";
@@ -26,7 +26,7 @@ import MetaPixel from "./components/MetaPixel";
 export default function App() {
   const [isAdvisorOpen, setIsAdvisorOpen] = useState(false);
   const location = useLocation();
-  const hideLayout = ["/hollywood-peel", "/hifu-landing", "/botox-landing"];
+  const hideLayout = ["/hollywood-peel-landing", "/hifu-landing", "/botox-landing"];
   const shouldHideNavBar = hideLayout.includes(location.pathname);
 
   return (
@@ -59,7 +59,7 @@ export default function App() {
             <Route path="/contacto" element={<ContactoPage />} />
             <Route path="/reserva" element={<ReservaPage />} />
             <Route path="/politica-privacidad" element={<PoliticaPrivacidadPage />} />
-            <Route path="/hollywood-peel" element={<HollywoodPeelPage />} />
+            <Route path="/hollywood-peel-landing" element={<HollywoodPeelPage />} />
             <Route path="/hifu-landing" element={<HifuLandingPage />} />
             <Route path="/botox-landing" element={<BotoxLandingPage />} />
             <Route path="*" element={<NotFoundPage />} />

@@ -167,8 +167,16 @@ function BotoxLandingPage() {
                 ...utmData
             };
 
+            // Detectar si está en producción o desarrollo
+            const isProduction = process.env.NODE_ENV === 'production';
+            const webhookUrl = isProduction
+                ? 'https://dermica-pro-n8n.rcsgeg.easypanel.host/webhook/botox'
+                : 'https://dermica-pro-n8n.rcsgeg.easypanel.host/webhook-test/botox';
+
+            console.log(`🔗 Enviando a webhook ${isProduction ? 'PRODUCCIÓN' : 'TEST'}:`, webhookUrl);
+
             try {
-                const response = await fetch('https://dermica-pro-n8n.rcsgeg.easypanel.host/webhook-test/4eb758d3-3c26-4f0c-96a8-7d8b19bf0f0a', {
+                const response = await fetch(webhookUrl, {
                     method: 'POST',
                     headers: {
                     'Content-Type': 'application/json',
