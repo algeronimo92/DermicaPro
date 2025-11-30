@@ -24,7 +24,7 @@ const PoliticaPrivacidadPage = () => {
             Política de Privacidad
           </h1>
           <p className="mt-4 text-lg text-gray-600">
-            Última actualización: 27 de noviembre de 2025
+            Última actualización: 30 de noviembre de 2025
           </p>
         </div>
 
@@ -133,7 +133,57 @@ const PoliticaPrivacidadPage = () => {
 
               <div className="border-l-4 border-[#ea899a] pl-4">
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                  4.2 TikTok Pixel (Análisis y Publicidad)
+                  4.2 Meta Pixel (Facebook Pixel - Análisis y Publicidad)
+                </h3>
+                <p className="text-gray-700 leading-relaxed">
+                  Utilizamos <strong>Meta Pixel</strong> (anteriormente Facebook Pixel) para medir
+                  la efectividad de nuestras campañas publicitarias en Facebook e Instagram,
+                  comprender cómo usas nuestro sitio web y mostrarte anuncios relevantes.
+                </p>
+                <p className="text-gray-700 leading-relaxed mt-2">
+                  <strong>Datos recopilados por Meta Pixel:</strong>
+                </p>
+                <ul className="list-disc list-inside text-gray-600 text-sm space-y-1 ml-4 mt-2">
+                  <li>Páginas visitadas y acciones realizadas en el sitio</li>
+                  <li>Información del navegador y dispositivo</li>
+                  <li>Dirección IP</li>
+                  <li>Cookies de Meta (_fbp, _fbc)</li>
+                  <li>Parámetros de campañas (fbclid, utm_source, utm_campaign)</li>
+                  <li>Eventos de conversión (visualización de contenido, envío de formularios)</li>
+                </ul>
+                <p className="text-gray-700 leading-relaxed mt-3">
+                  <strong>Cómo usamos Meta Pixel:</strong>
+                </p>
+                <ul className="list-disc list-inside text-gray-600 text-sm space-y-1 ml-4 mt-2">
+                  <li>Medir el rendimiento de anuncios en Facebook e Instagram</li>
+                  <li>Crear audiencias personalizadas para remarketing</li>
+                  <li>Optimizar la entrega de anuncios a personas con mayor probabilidad de conversión</li>
+                  <li>Generar informes de análisis sobre el comportamiento de usuarios</li>
+                </ul>
+                <p className="text-gray-600 text-sm mt-3">
+                  • Proveedor: Meta Platforms, Inc. (Facebook, Instagram)<br />
+                  • Política de privacidad de Meta: <a
+                    href="https://www.facebook.com/privacy/policy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#ea899a] hover:underline"
+                  >
+                    https://www.facebook.com/privacy/policy
+                  </a><br />
+                  • Configuración de anuncios: <a
+                    href="https://www.facebook.com/adpreferences"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#ea899a] hover:underline"
+                  >
+                    https://www.facebook.com/adpreferences
+                  </a>
+                </p>
+              </div>
+
+              <div className="border-l-4 border-[#ea899a] pl-4">
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                  4.3 TikTok Pixel (Análisis y Publicidad)
                 </h3>
                 <p className="text-gray-700 leading-relaxed">
                   Utilizamos el <strong>TikTok Pixel</strong> en algunas landing pages para medir
@@ -156,7 +206,7 @@ const PoliticaPrivacidadPage = () => {
 
               <div className="border-l-4 border-[#ea899a] pl-4">
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                  4.3 n8n (Automatización de Formularios)
+                  4.4 n8n (Automatización de Formularios)
                 </h3>
                 <p className="text-gray-700 leading-relaxed">
                   Utilizamos <strong>n8n</strong> para procesar los formularios de contacto y
@@ -170,7 +220,7 @@ const PoliticaPrivacidadPage = () => {
 
               <div className="border-l-4 border-[#ea899a] pl-4">
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                  4.4 WhatsApp Business API
+                  4.5 WhatsApp Business API
                 </h3>
                 <p className="text-gray-700 leading-relaxed">
                   Facilitamos el contacto directo a través de <strong>WhatsApp Business</strong>
@@ -203,11 +253,38 @@ const PoliticaPrivacidadPage = () => {
             <ul className="list-disc list-inside text-gray-700 space-y-2 ml-4">
               <li>Recordar tus preferencias y mejorar tu experiencia</li>
               <li>Analizar el tráfico del sitio web</li>
-              <li>Medir el rendimiento de campañas publicitarias (TikTok Pixel)</li>
+              <li>Medir el rendimiento de campañas publicitarias (Meta Pixel, TikTok Pixel)</li>
+              <li>Personalizar contenido y anuncios</li>
+              <li>Crear audiencias de remarketing</li>
             </ul>
-            <p className="text-gray-700 leading-relaxed mt-4">
-              Puedes controlar las cookies desde la configuración de tu navegador. Sin embargo,
-              desactivar las cookies puede afectar algunas funcionalidades del sitio.
+
+            <h3 className="text-xl font-semibold text-gray-800 mb-3 mt-6">
+              5.1 Gestión de Cookies
+            </h3>
+            <p className="text-gray-700 leading-relaxed">
+              Puedes controlar y eliminar cookies mediante la configuración de tu navegador:
+            </p>
+            <ul className="list-disc list-inside text-gray-700 space-y-2 ml-4 mt-3">
+              <li><strong>Google Chrome:</strong> Configuración → Privacidad y seguridad → Cookies</li>
+              <li><strong>Safari:</strong> Preferencias → Privacidad → Gestionar datos del sitio web</li>
+              <li><strong>Firefox:</strong> Opciones → Privacidad y seguridad → Cookies y datos del sitio</li>
+              <li><strong>Edge:</strong> Configuración → Privacidad y servicios → Cookies</li>
+            </ul>
+
+            <h3 className="text-xl font-semibold text-gray-800 mb-3 mt-6">
+              5.2 Rechazar Publicidad Personalizada
+            </h3>
+            <p className="text-gray-700 leading-relaxed">
+              Puedes optar por no recibir anuncios personalizados:
+            </p>
+            <ul className="list-disc list-inside text-gray-700 space-y-2 ml-4 mt-3">
+              <li><strong>Meta (Facebook/Instagram):</strong> <a href="https://www.facebook.com/adpreferences" target="_blank" rel="noopener noreferrer" className="text-[#ea899a] hover:underline">Configuración de anuncios</a></li>
+              <li><strong>TikTok:</strong> Configuración → Privacidad → Anuncios → Anuncios personalizados</li>
+              <li><strong>Google:</strong> <a href="https://adssettings.google.com" target="_blank" rel="noopener noreferrer" className="text-[#ea899a] hover:underline">Configuración de anuncios</a></li>
+            </ul>
+
+            <p className="text-gray-700 leading-relaxed mt-4 bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-400">
+              <strong>⚠️ Nota importante:</strong> Desactivar las cookies puede afectar algunas funcionalidades del sitio web, como formularios o contenido personalizado.
             </p>
           </section>
 
@@ -304,10 +381,51 @@ const PoliticaPrivacidadPage = () => {
             </p>
           </section>
 
+          {/* Base Legal */}
+          <section>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              11. Base Legal para el Procesamiento de Datos
+            </h2>
+            <p className="text-gray-700 leading-relaxed mb-3">
+              Procesamos tus datos personales bajo las siguientes bases legales:
+            </p>
+            <ul className="list-disc list-inside text-gray-700 space-y-2 ml-4">
+              <li><strong>Consentimiento:</strong> Has dado tu consentimiento explícito al completar formularios o aceptar el uso de cookies</li>
+              <li><strong>Ejecución de contrato:</strong> Necesitamos procesar tus datos para proporcionar los servicios que has solicitado (reserva de citas, asesoramiento)</li>
+              <li><strong>Interés legítimo:</strong> Tenemos un interés legítimo en mejorar nuestros servicios, analizar el uso del sitio web y prevenir fraudes</li>
+              <li><strong>Cumplimiento legal:</strong> Debemos procesar ciertos datos para cumplir con obligaciones legales y regulatorias</li>
+            </ul>
+          </section>
+
+          {/* Transferencias Internacionales */}
+          <section>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              12. Transferencias Internacionales de Datos
+            </h2>
+            <p className="text-gray-700 leading-relaxed mb-3">
+              Algunos de nuestros proveedores de servicios están ubicados fuera de Perú, principalmente en Estados Unidos y Europa:
+            </p>
+            <ul className="list-disc list-inside text-gray-700 space-y-2 ml-4">
+              <li><strong>Google (Estados Unidos):</strong> Para el servicio de Gemini AI</li>
+              <li><strong>Meta/Facebook (Estados Unidos):</strong> Para Meta Pixel y análisis publicitario</li>
+              <li><strong>TikTok (Estados Unidos/Singapur):</strong> Para TikTok Pixel</li>
+            </ul>
+            <p className="text-gray-700 leading-relaxed mt-4">
+              Al utilizar nuestros servicios, consientes la transferencia de tus datos a estos países.
+              Nos aseguramos de que todos estos proveedores cumplan con estándares adecuados de protección
+              de datos mediante:
+            </p>
+            <ul className="list-disc list-inside text-gray-700 space-y-2 ml-4 mt-3">
+              <li>Cláusulas contractuales estándar aprobadas</li>
+              <li>Certificaciones de privacidad (Privacy Shield Framework)</li>
+              <li>Cumplimiento con regulaciones internacionales (GDPR, CCPA)</li>
+            </ul>
+          </section>
+
           {/* Enlaces a Otros Sitios */}
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              11. Enlaces a Otros Sitios Web
+              13. Enlaces a Otros Sitios Web
             </h2>
             <p className="text-gray-700 leading-relaxed">
               Nuestro sitio puede contener enlaces a sitios web de terceros (Facebook, Instagram,
@@ -319,7 +437,7 @@ const PoliticaPrivacidadPage = () => {
           {/* Cambios a esta Política */}
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              12. Cambios a esta Política de Privacidad
+              14. Cambios a esta Política de Privacidad
             </h2>
             <p className="text-gray-700 leading-relaxed">
               Podemos actualizar esta Política de Privacidad ocasionalmente para reflejar cambios
@@ -335,7 +453,7 @@ const PoliticaPrivacidadPage = () => {
           {/* Contacto */}
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              13. Contacto
+              15. Contacto
             </h2>
             <p className="text-gray-700 leading-relaxed mb-4">
               Si tienes preguntas, inquietudes o solicitudes sobre esta Política de Privacidad
