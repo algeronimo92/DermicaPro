@@ -62,7 +62,7 @@ jobs:
           protocol: ftp
           port: 21
           local-dir: ./build/
-          server-dir: /public_html/hf-reservas/
+          server-dir: ./hf-reservas/
           dangerous-clean-slate: false
 
       # 7. Deploy a btx-reservas.dermicapro.com
@@ -75,7 +75,7 @@ jobs:
           protocol: ftp
           port: 21
           local-dir: ./build/
-          server-dir: /public_html/btx-reservas/
+          server-dir: ./btx-reservas/
           dangerous-clean-slate: false
 
       # 8. Deploy a hp-reservas.dermicapro.com
@@ -88,7 +88,7 @@ jobs:
           protocol: ftp
           port: 21
           local-dir: ./build/
-          server-dir: /public_html/hp-reservas/
+          server-dir: ./hp-reservas/
           dangerous-clean-slate: false
 
       # 9. Notificación de éxito
