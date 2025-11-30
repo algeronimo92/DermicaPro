@@ -1,0 +1,77 @@
+<svg width="800" height="600" viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fondo degradado rosa suave -->
+  <rect width="800" height="600" fill="url(#gradMicropig)"/>
+  <defs>
+    <linearGradient id="gradMicropig" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fef2f2;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#fce7f3;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Patrón decorativo -->
+  <circle cx="150" cy="150" r="4" fill="#ea899a" opacity="0.2"/>
+  <circle cx="650" cy="450" r="4" fill="#ea899a" opacity="0.2"/>
+
+  <!-- Rostro con cejas -->
+  <g transform="translate(400, 280)">
+    <!-- Cara -->
+    <ellipse cx="0" cy="0" rx="80" ry="95" fill="#f3d5c8" opacity="0.9"/>
+
+    <!-- Ceja izquierda perfecta -->
+    <path d="M -55,-50 Q -40,-55 -25,-52 Q -30,-50 -45,-48" fill="#6b4423" opacity="0.8"/>
+    <!-- Ceja derecha perfecta -->
+    <path d="M 25,-52 Q 40,-55 55,-50 Q 45,-48 30,-50" fill="#6b4423" opacity="0.8"/>
+
+    <!-- Ojos -->
+    <ellipse cx="-30" cy="-20" rx="12" ry="8" fill="white" opacity="0.9"/>
+    <circle cx="-28" cy="-20" r="5" fill="#4a2c2a"/>
+    <circle cx="-26" cy="-22" r="2" fill="white"/>
+
+    <ellipse cx="30" cy="-20" rx="12" ry="8" fill="white" opacity="0.9"/>
+    <circle cx="28" cy="-20" r="5" fill="#4a2c2a"/>
+    <circle cx="26" cy="-22" r="2" fill="white"/>
+
+    <!-- Labios con micropigmentación -->
+    <ellipse cx="0" cy="30" rx="20" ry="8" fill="#ea899a" opacity="0.7"/>
+    <ellipse cx="0" cy="27" rx="18" ry="6" fill="#d37989" opacity="0.6"/>
+  </g>
+
+  <!-- Herramienta de micropigmentación -->
+  <g transform="translate(250, 200)">
+    <rect x="-5" y="-50" width="10" height="80" rx="2" fill="#ea899a" opacity="0.9"/>
+    <rect x="-3" y="-45" width="6" height="70" rx="1" fill="white" opacity="0.3"/>
+    <!-- Punta -->
+    <circle cx="0" cy="30" r="3" fill="#6b4423" opacity="0.8"/>
+    <line x1="0" y1="27" x2="0" y2="35" stroke="#6b4423" stroke-width="1"/>
+  </g>
+
+  <!-- Paleta de colores -->
+  <g transform="translate(600, 200)">
+    <ellipse cx="0" cy="0" rx="40" ry="30" fill="white" opacity="0.9" stroke="#ea899a" stroke-width="2"/>
+    <circle cx="-15" cy="-5" r="6" fill="#6b4423"/>
+    <circle cx="0" cy="-5" r="6" fill="#8b5a3c"/>
+    <circle cx="15" cy="-5" r="6" fill="#a0826d"/>
+    <circle cx="-8" cy="8" r="6" fill="#ea899a"/>
+    <circle cx="8" cy="8" r="6" fill="#d37989"/>
+  </g>
+
+  <!-- Detalles de precisión -->
+  <g transform="translate(250, 220)">
+    <line x1="0" y1="0" x2="40" y2="-20" stroke="#6b4423" stroke-width="1" opacity="0.3"/>
+    <circle cx="40" cy="-20" r="1.5" fill="#6b4423" opacity="0.5"/>
+  </g>
+
+  <!-- Texto -->
+  <text x="400" y="480" font-family="Arial, sans-serif" font-size="32" font-weight="bold" fill="#ea899a" text-anchor="middle">
+    Micropigmentación
+  </text>
+  <text x="400" y="515" font-family="Arial, sans-serif" font-size="18" fill="#6b7280" text-anchor="middle">
+    Cejas y Labios Perfectos
+  </text>
+
+  <!-- Badge -->
+  <rect x="620" y="30" width="150" height="50" rx="25" fill="#ea899a" opacity="0.9"/>
+  <text x="695" y="60" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="white" text-anchor="middle">
+    Arte Facial
+  </text>
+</svg>

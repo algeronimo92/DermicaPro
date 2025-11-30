@@ -1,0 +1,77 @@
+<svg width="800" height="600" viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fondo degradado azul-rosa (hidratación) -->
+  <rect width="800" height="600" fill="url(#gradHA)"/>
+  <defs>
+    <linearGradient id="gradHA" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#dbeafe;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#fbcfe8;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Burbujas de agua decorativas -->
+  <circle cx="100" cy="100" r="15" fill="#3b82f6" opacity="0.1"/>
+  <circle cx="150" cy="150" r="10" fill="#3b82f6" opacity="0.15"/>
+  <circle cx="700" cy="500" r="20" fill="#3b82f6" opacity="0.1"/>
+  <circle cx="650" cy="450" r="12" fill="#3b82f6" opacity="0.15"/>
+  <circle cx="120" cy="500" r="8" fill="#ea899a" opacity="0.2"/>
+  <circle cx="680" cy="120" r="8" fill="#ea899a" opacity="0.2"/>
+
+  <!-- Dermapen -->
+  <g transform="translate(300, 280)">
+    <rect x="-30" y="-100" width="60" height="150" rx="8" fill="#ea899a" opacity="0.9"/>
+    <rect x="-25" y="-95" width="50" height="140" rx="6" fill="white" opacity="0.3"/>
+    <rect x="-35" y="50" width="70" height="35" rx="4" fill="#d37989"/>
+
+    <!-- Microagujas -->
+    <circle cx="-20" cy="75" r="2" fill="white"/>
+    <circle cx="-7" cy="75" r="2" fill="white"/>
+    <circle cx="6" cy="75" r="2" fill="white"/>
+    <circle cx="19" cy="75" r="2" fill="white"/>
+  </g>
+
+  <!-- Gota de Ácido Hialurónico -->
+  <g transform="translate(500, 260)">
+    <!-- Gota grande -->
+    <path d="M 0,-40 Q 20,-20 20,0 Q 20,30 0,40 Q -20,30 -20,0 Q -20,-20 0,-40 Z" fill="#3b82f6" opacity="0.7"/>
+    <path d="M 0,-35 Q 15,-18 15,0 Q 15,25 0,35 Q -15,25 -15,0 Q -15,-18 0,-35 Z" fill="#60a5fa" opacity="0.5"/>
+
+    <!-- Brillo -->
+    <circle cx="-5" cy="-10" r="5" fill="white" opacity="0.6"/>
+    <circle cx="3" cy="-5" r="3" fill="white" opacity="0.4"/>
+
+    <!-- Moléculas (pequeñas burbujas) -->
+    <circle cx="0" cy="10" r="3" fill="white" opacity="0.4"/>
+    <circle cx="-8" cy="5" r="2" fill="white" opacity="0.3"/>
+    <circle cx="8" cy="3" r="2" fill="white" opacity="0.3"/>
+  </g>
+
+  <!-- Símbolo + -->
+  <g transform="translate(400, 300)">
+    <circle cx="0" cy="0" r="25" fill="#3b82f6" opacity="0.8"/>
+    <rect x="-12" y="-2" width="24" height="4" fill="white"/>
+    <rect x="-2" y="-12" width="4" height="24" fill="white"/>
+  </g>
+
+  <!-- Ondas de hidratación -->
+  <circle cx="400" cy="380" r="80" stroke="#3b82f6" stroke-width="2" fill="none" opacity="0.3"/>
+  <circle cx="400" cy="380" r="100" stroke="#3b82f6" stroke-width="2" fill="none" opacity="0.2"/>
+  <circle cx="400" cy="380" r="120" stroke="#3b82f6" stroke-width="2" fill="none" opacity="0.1"/>
+
+  <!-- Gotas decorativas flotantes -->
+  <path d="M 200,150 Q 205,155 205,160 Q 205,168 200,172 Q 195,168 195,160 Q 195,155 200,150 Z" fill="#3b82f6" opacity="0.3"/>
+  <path d="M 600,420 Q 605,425 605,430 Q 605,438 600,442 Q 595,438 595,430 Q 595,425 600,420 Z" fill="#3b82f6" opacity="0.3"/>
+
+  <!-- Texto -->
+  <text x="400" y="500" font-family="Arial, sans-serif" font-size="30" font-weight="bold" fill="#ea899a" text-anchor="middle">
+    Dermapen con Ácido Hialurónico
+  </text>
+  <text x="400" y="535" font-family="Arial, sans-serif" font-size="18" fill="#6b7280" text-anchor="middle">
+    Hidratación Profunda
+  </text>
+
+  <!-- Badge -->
+  <rect x="620" y="30" width="150" height="50" rx="25" fill="#3b82f6" opacity="0.9"/>
+  <text x="695" y="60" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="white" text-anchor="middle">
+    Hidratante
+  </text>
+</svg>
