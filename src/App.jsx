@@ -30,6 +30,14 @@ import MetaPixel from "./components/MetaPixel";
 export default function App() {
   const [isAdvisorOpen, setIsAdvisorOpen] = useState(false);
   const location = useLocation();
+
+  // Detectar si estamos en un subdominio de reservas
+  const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
+  const isHifuSubdomain = hostname.includes('hf-reservas');
+  const isBotoxSubdomain = hostname.includes('btx-reservas');
+  const isHollywoodSubdomain = hostname.includes('hp-reservas');
+  const isReservasSubdomain = isHifuSubdomain || isBotoxSubdomain || isHollywoodSubdomain;
+
   const hideLayout = [
     "/hollywood-peel-landing",
     "/hifu-landing",
@@ -39,7 +47,19 @@ export default function App() {
     "/btx-reservas",
     "/hp-reservas"
   ];
-  const shouldHideNavBar = hideLayout.includes(location.pathname);
+  const shouldHideNavBar = hideLayout.includes(location.pathname) || isReservasSubdomain;
+
+  // Determinar qué componente mostrar en la raíz según el subdominio
+  let rootElement;
+  if (isHifuSubdomain) {
+    rootElement = <HifuReservasPage />;
+  } else if (isBotoxSubdomain) {
+    rootElement = <BotoxReservasPage />;
+  } else if (isHollywoodSubdomain) {
+    rootElement = <HollywoodPeelReservasPage />;
+  } else {
+    rootElement = <HomePage openAdvisor={() => setIsAdvisorOpen(true)} />;
+  }
 
   return (
     <HelmetProvider>
@@ -57,7 +77,7 @@ export default function App() {
           <Routes>
             <Route
               path="/"
-              element={<HomePage openAdvisor={() => setIsAdvisorOpen(true)} />}
+              element={rootElement}
             />
             <Route
               path="/servicios"

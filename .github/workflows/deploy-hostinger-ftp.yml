@@ -39,17 +39,6 @@ jobs:
         env:
           CI: false
 
-      # 4.1. Preparar .htaccess específicos para subdominios
-      - name: Setup subdomain .htaccess files
-        run: |
-          mkdir -p build-hf build-btx build-hp
-          cp -r build/* build-hf/
-          cp -r build/* build-btx/
-          cp -r build/* build-hp/
-          cp public/.htaccess-hf-reservas build-hf/.htaccess
-          cp public/.htaccess-btx-reservas build-btx/.htaccess
-          cp public/.htaccess-hp-reservas build-hp/.htaccess
-
       # 5. Deploy sitio principal usando FTP
       - name: Deploy Sitio Principal
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
@@ -72,7 +61,7 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftp
           port: 21
-          local-dir: ./build-hf/
+          local-dir: ./build/
           server-dir: ./hf-reservas/
           dangerous-clean-slate: false
 
@@ -85,7 +74,7 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftp
           port: 21
-          local-dir: ./build-btx/
+          local-dir: ./build/
           server-dir: ./btx-reservas/
           dangerous-clean-slate: false
 
@@ -98,7 +87,7 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftp
           port: 21
-          local-dir: ./build-hp/
+          local-dir: ./build/
           server-dir: ./hp-reservas/
           dangerous-clean-slate: false
 
