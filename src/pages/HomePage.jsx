@@ -138,6 +138,7 @@ const HomePage = ({ setPage, openAdvisor }) => {
             }
           })}
         </script>
+        
 
         {/* Schema.org - Organization */}
         <script type="application/ld+json">
