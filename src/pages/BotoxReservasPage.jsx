@@ -157,7 +157,7 @@ function BotoxReservasPage() {
     };
 
     return (
-        <div className="antialiased bg-gray-50 min-h-screen">
+        <div className="antialiased bg-gray-50 min-h-screen flex flex-col">
             <Helmet>
                 <title>Reserva tu Evaluación Gratuita - DermicaPro</title>
                 <meta name="description" content="Agenda tu evaluación gratuita. Asesoría personalizada y profesional sin compromiso." />
@@ -317,7 +317,7 @@ function BotoxReservasPage() {
             </main>
 
             {/* Footer */}
-            <footer className="bg-gray-800 text-gray-400 py-6 text-center text-sm">
+            <footer className="mt-auto bg-gray-800 text-gray-400 py-6 text-center text-sm">
                 <p>&copy; 2025 DermicaPro. Todos los derechos reservados.</p>
                 <p className="mt-2">Av. Larco 877, Trujillo, Perú | +51 974 637 783</p>
             </footer>
