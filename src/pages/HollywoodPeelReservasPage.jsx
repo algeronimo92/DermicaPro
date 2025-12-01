@@ -157,7 +157,7 @@ function HollywoodPeelReservasPage() {
     };
 
     return (
-        <div className="antialiased bg-gray-50">
+        <div className="antialiased bg-gray-50 min-h-screen">
             <Helmet>
                 <title>Reserva tu Evaluación Gratuita - DermicaPro</title>
                 <meta name="description" content="Agenda tu evaluación gratuita. Asesoría personalizada y profesional sin compromiso." />

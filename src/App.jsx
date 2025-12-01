@@ -63,7 +63,7 @@ export default function App() {
 
   return (
     <HelmetProvider>
-      <div className="font-sans bg-white">
+      <div className="font-sans bg-white min-h-screen flex flex-col">
         <style>{`@keyframes fade-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } } .animate-fade-in { animation: fade-in 0.5s ease-out forwards; }`}</style>
 
         {/* Meta Pixel - Track PageView en cada cambio de ruta */}
@@ -73,7 +73,7 @@ export default function App() {
           <Navbar openAdvisor={() => setIsAdvisorOpen(true)} />
         )}
 
-        <main>
+        <main className="flex-grow">
           <Routes>
             <Route
               path="/"
