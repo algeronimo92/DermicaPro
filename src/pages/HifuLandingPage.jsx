@@ -31,8 +31,16 @@ function HifuLandingPage() {
                 .substring(0, 100); // Limitar longitud máxima
         };
 
-        // Capturar parámetros de TikTok
+        // Capturar parámetros de Meta Ads y TikTok Ads
         setUtmData({
+            // Parámetros de Meta Ads (Facebook/Instagram)
+            fbclid: sanitizeParam(urlParams.get('fbclid')),
+            utm_source: sanitizeParam(urlParams.get('utm_source')),
+            utm_medium: sanitizeParam(urlParams.get('utm_medium')),
+            utm_campaign: sanitizeParam(urlParams.get('utm_campaign')),
+            utm_content: sanitizeParam(urlParams.get('utm_content')),
+            utm_term: sanitizeParam(urlParams.get('utm_term')),
+            // Parámetros de TikTok Ads
             ttclid: sanitizeParam(urlParams.get('ttclid')),
             tt_medium: sanitizeParam(urlParams.get('tt_medium')),
             tt_campaign_id: sanitizeParam(urlParams.get('tt_campaign_id')),
