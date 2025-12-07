@@ -10,7 +10,6 @@ function HollywoodPeelPage() {
     });
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [utmData, setUtmData] = useState({});
     const [modal, setModal] = useState({
         show: false,
         type: '', // 'success' or 'error'
