@@ -112,8 +112,7 @@ function HollywoodPeelPage() {
             const payload = {
                 nombre: formData.nombre,
                 whatsapp: `+51${formData.whatsapp}`,
-                email: formData.email,
-                ...utmData
+                email: formData.email
             };
 
             // Detectar si está en producción o desarrollo
