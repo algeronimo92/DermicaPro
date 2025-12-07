@@ -174,6 +174,7 @@ function HifuLandingPage() {
                 ...utmData
             };
 
+
             // Detectar si está en producción o desarrollo
             const isProduction = process.env.NODE_ENV === 'production';
             const webhookUrl = isProduction
