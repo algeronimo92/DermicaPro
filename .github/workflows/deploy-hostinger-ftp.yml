@@ -1,7 +1,7 @@
 # =================================================================================
 # GitHub Actions Workflow: Deploy to Hostinger
 # =================================================================================
-# Deploy automático del sitio principal y subdominios a Hostinger vía FTP
+# Deploy automático del sitio principal a Hostinger vía FTP
 
 name: Deploy to Hostinger
 
@@ -51,6 +51,8 @@ jobs:
           local-dir: ./build/
           server-dir: ${{ secrets.FTP_SERVER_DIR }}
           dangerous-clean-slate: false
+          log-level: verbose
+          timeout: 60000
 
       # 6. Notificación de éxito
       - name: Deployment Success

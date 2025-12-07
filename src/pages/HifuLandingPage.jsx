@@ -171,6 +171,8 @@ function HifuLandingPage() {
                 nombre: formData.nombre,
                 whatsapp: `+51${formData.whatsapp}`,
                 email: formData.email,
+                landing: "hifu-landing",
+                servicio: "HIFU",
                 ...utmData
             };
 
