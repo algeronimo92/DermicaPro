@@ -52,52 +52,10 @@ jobs:
           server-dir: ${{ secrets.FTP_SERVER_DIR }}
           dangerous-clean-slate: false
 
-      # 6. Deploy a hf-reservas.dermicapro.com
-      - name: Deploy HIFU Reservas (hf-reservas)
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftp
-          port: 21
-          local-dir: ./build/
-          server-dir: ./hf-reservas/
-          dangerous-clean-slate: false
-
-      # 7. Deploy a btx-reservas.dermicapro.com
-      - name: Deploy Botox Reservas (btx-reservas)
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftp
-          port: 21
-          local-dir: ./build/
-          server-dir: ./btx-reservas/
-          dangerous-clean-slate: false
-
-      # 8. Deploy a hp-reservas.dermicapro.com
-      - name: Deploy Hollywood Peel Reservas (hp-reservas)
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftp
-          port: 21
-          local-dir: ./build/
-          server-dir: ./hp-reservas/
-          dangerous-clean-slate: false
-
-      # 9. Notificación de éxito
+      # 6. Notificación de éxito
       - name: Deployment Success
         run: |
           echo "✅ Deployment completado exitosamente via FTP"
           echo ""
-          echo "🌐 Sitios desplegados:"
+          echo "🌐 Sitio desplegado:"
           echo "   • https://dermicapro.com (principal)"
-          echo "   • https://hf-reservas.dermicapro.com"
-          echo "   • https://btx-reservas.dermicapro.com"
-          echo "   • https://hp-reservas.dermicapro.com"
