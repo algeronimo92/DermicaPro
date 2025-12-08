@@ -26,6 +26,7 @@ import Footer from "./components/Footer";
 import GeminiSkinAdvisor from "./components/GeminiSkinAdvisor";
 import FloatingWhatsAppButton from "./components/FloatingWhatsAppButton";
 import MetaPixel from "./components/MetaPixel";
+import TikTokPixel from "./components/TikTokPixel";
 
 export default function App() {
   const [isAdvisorOpen, setIsAdvisorOpen] = useState(false);
@@ -68,6 +69,9 @@ export default function App() {
 
         {/* Meta Pixel - Track PageView en cada cambio de ruta */}
         <MetaPixel />
+
+        {/* TikTok Pixel - Track PageView en cada cambio de ruta */}
+        <TikTokPixel />
 
         {!shouldHideNavBar && (
           <Navbar openAdvisor={() => setIsAdvisorOpen(true)} />

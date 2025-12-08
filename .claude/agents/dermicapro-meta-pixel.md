@@ -419,11 +419,224 @@ export default async function handler(req, res) {
 }
 ```
 
-**Cliente en React** (helper function):
+**Cliente en React** - Crear archivo completo `src/utils/metaPixelHelper.js`:
 
 ```javascript
 // src/utils/metaPixelHelper.js
+// Helper functions para Meta Pixel (Facebook Pixel)
 
+/**
+ * Inicializa Meta Pixel en el sitio
+ * @param {string} pixelId - ID del Meta Pixel
+ */
+export const initMetaPixel = (pixelId) => {
+  if (typeof window === 'undefined') return;
+
+  // Evitar inicialización duplicada
+  if (window.fbq) {
+    console.warn('[Meta Pixel] Already initialized');
+    return;
+  }
+
+  // Inyectar script base de Meta Pixel
+  const script = document.createElement('script');
+  script.innerHTML = `
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '${pixelId}');
+    fbq('track', 'PageView');
+  `;
+  document.head.appendChild(script);
+
+  // Agregar noscript fallback
+  const noscript = document.createElement('noscript');
+  const img = document.createElement('img');
+  img.height = 1;
+  img.width = 1;
+  img.style.display = 'none';
+  img.src = `https://www.facebook.com/tr?id=${pixelId}&ev=PageView&noscript=1`;
+  noscript.appendChild(img);
+  document.body.appendChild(noscript);
+
+  console.log('[Meta Pixel] Initialized:', pixelId);
+};
+
+/**
+ * Trackea un evento genérico de Meta
+ * @param {string} eventName - Nombre del evento (Lead, ViewContent, etc.)
+ * @param {object} params - Parámetros adicionales del evento
+ */
+export const trackMetaEvent = (eventName, params = {}) => {
+  if (typeof window === 'undefined' || !window.fbq) {
+    console.warn('[Meta Pixel] Not initialized. Call initMetaPixel first.');
+    return;
+  }
+
+  try {
+    window.fbq('track', eventName, params);
+    console.log(`[Meta Pixel] Event tracked: ${eventName}`, params);
+  } catch (error) {
+    console.error('[Meta Pixel] Error tracking event:', error);
+  }
+};
+
+/**
+ * Trackea un evento PageView
+ * Útil para SPAs cuando cambia la ruta
+ * @param {object} params - Parámetros adicionales (content_name, content_category)
+ */
+export const trackPageView = (params = {}) => {
+  trackMetaEvent('PageView', params);
+};
+
+/**
+ * Trackea un evento Lead (conversión de formulario)
+ * @param {object} options - Opciones del lead
+ * @param {string} options.contentName - Nombre del contenido (ej: "Formulario HIFU")
+ * @param {string} options.contentCategory - Categoría (ej: "Tratamiento Facial")
+ * @param {number} options.value - Valor monetario del lead
+ * @param {string} options.currency - Moneda (default: "PEN")
+ */
+export const trackLead = (options = {}) => {
+  const {
+    contentName = 'Lead Form',
+    contentCategory = 'Tratamiento',
+    value = 0,
+    currency = 'PEN'
+  } = options;
+
+  trackMetaEvent('Lead', {
+    content_name: contentName,
+    content_category: contentCategory,
+    value: value,
+    currency: currency
+  });
+};
+
+/**
+ * Trackea un evento ViewContent (ver detalles de producto/servicio)
+ * @param {object} options - Opciones del contenido
+ * @param {string} options.contentName - Nombre del servicio/tratamiento
+ * @param {string} options.contentCategory - Categoría del servicio
+ * @param {string} options.contentIds - IDs de contenido (array o string)
+ * @param {number} options.value - Valor del servicio
+ * @param {string} options.currency - Moneda (default: "PEN")
+ */
+export const trackViewContent = (options = {}) => {
+  const {
+    contentName,
+    contentCategory = 'Servicio',
+    contentIds = [],
+    value = 0,
+    currency = 'PEN'
+  } = options;
+
+  trackMetaEvent('ViewContent', {
+    content_name: contentName,
+    content_category: contentCategory,
+    content_ids: Array.isArray(contentIds) ? contentIds : [contentIds],
+    value: value,
+    currency: currency
+  });
+};
+
+/**
+ * Trackea un evento Contact (contacto vía WhatsApp, teléfono, etc.)
+ * @param {object} options - Opciones del contacto
+ * @param {string} options.contentName - Nombre del método (ej: "WhatsApp Button")
+ * @param {string} options.contactMethod - Método de contacto (whatsapp, phone, email)
+ */
+export const trackContact = (options = {}) => {
+  const {
+    contentName = 'Contact',
+    contactMethod = 'whatsapp'
+  } = options;
+
+  trackMetaEvent('Contact', {
+    content_name: contentName,
+    contact_method: contactMethod
+  });
+};
+
+/**
+ * Trackea un evento InitiateCheckout (inicio de proceso de reserva)
+ * @param {object} options - Opciones del checkout
+ * @param {string} options.contentName - Nombre del servicio
+ * @param {string} options.contentCategory - Categoría
+ * @param {number} options.value - Valor estimado
+ * @param {string} options.currency - Moneda (default: "PEN")
+ */
+export const trackInitiateCheckout = (options = {}) => {
+  const {
+    contentName,
+    contentCategory = 'Reserva',
+    value = 0,
+    currency = 'PEN'
+  } = options;
+
+  trackMetaEvent('InitiateCheckout', {
+    content_name: contentName,
+    content_category: contentCategory,
+    value: value,
+    currency: currency
+  });
+};
+
+/**
+ * Trackea un evento Schedule (reserva de cita confirmada)
+ * @param {object} options - Opciones de la cita
+ * @param {string} options.contentName - Nombre del servicio reservado
+ * @param {string} options.contentCategory - Categoría
+ * @param {number} options.value - Valor de la cita
+ * @param {string} options.currency - Moneda (default: "PEN")
+ */
+export const trackSchedule = (options = {}) => {
+  const {
+    contentName,
+    contentCategory = 'Cita',
+    value = 0,
+    currency = 'PEN'
+  } = options;
+
+  trackMetaEvent('Schedule', {
+    content_name: contentName,
+    content_category: contentCategory,
+    value: value,
+    currency: currency
+  });
+};
+
+/**
+ * Trackea un evento personalizado
+ * @param {string} eventName - Nombre del evento personalizado
+ * @param {object} params - Parámetros del evento
+ */
+export const trackCustomEvent = (eventName, params = {}) => {
+  if (typeof window === 'undefined' || !window.fbq) {
+    console.warn('[Meta Pixel] Not initialized.');
+    return;
+  }
+
+  try {
+    window.fbq('trackCustom', eventName, params);
+    console.log(`[Meta Pixel] Custom event tracked: ${eventName}`, params);
+  } catch (error) {
+    console.error('[Meta Pixel] Error tracking custom event:', error);
+  }
+};
+
+/**
+ * Trackea evento server-side con Conversions API (CAPI)
+ * Requiere endpoint backend configurado
+ * @param {string} eventName - Nombre del evento
+ * @param {object} userData - Datos del usuario
+ */
 export const trackServerSideEvent = async (eventName, userData) => {
   try {
     const fbp = getCookie('_fbp');
@@ -445,16 +658,212 @@ export const trackServerSideEvent = async (eventName, userData) => {
         fbc
       })
     });
+
+    console.log(`[Meta CAPI] Event sent: ${eventName}`);
   } catch (error) {
-    console.error('Error tracking server-side event:', error);
+    console.error('[Meta CAPI] Error tracking server-side event:', error);
   }
 };
 
+/**
+ * Obtiene el valor de una cookie
+ * @param {string} name - Nombre de la cookie
+ * @returns {string|undefined} Valor de la cookie
+ */
 function getCookie(name) {
+  if (typeof document === 'undefined') return undefined;
+
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
   if (parts.length === 2) return parts.pop().split(';').shift();
 }
+
+// ============================================
+// EVENTOS ESPECÍFICOS DE DERMICAPRO
+// ============================================
+
+/**
+ * Valores estimados de servicios de DermicaPro (en PEN)
+ */
+const SERVICE_VALUES = {
+  'HIFU 12D': 600,
+  'Hollywood Peel': 400,
+  'Borrado de Manchas': 450,
+  'Hydrafacial': 275,
+  'Botox': 850,
+  'Plasma Pen': 550,
+  'Consulta General': 50
+};
+
+/**
+ * Trackea visualización de landing page de tratamiento
+ * @param {string} treatment - Nombre del tratamiento (HIFU, Hollywood Peel, etc.)
+ */
+export const trackTreatmentLandingView = (treatment) => {
+  trackViewContent({
+    contentName: `${treatment} Landing Page`,
+    contentCategory: 'Tratamiento Facial',
+    contentIds: [treatment.replace(/\s+/g, '-').toUpperCase()],
+    value: SERVICE_VALUES[treatment] || 0,
+    currency: 'PEN'
+  });
+};
+
+/**
+ * Trackea scroll al formulario en landing page
+ * @param {string} formName - Nombre del formulario
+ */
+export const trackFormScroll = (formName) => {
+  trackCustomEvent('ScrollToForm', {
+    form_name: formName,
+    engagement_type: 'scroll'
+  });
+};
+
+/**
+ * Trackea lead de tratamiento específico
+ * @param {string} treatment - Nombre del tratamiento
+ * @param {object} utmData - Datos UTM de campaña
+ */
+export const trackTreatmentLead = (treatment, utmData = {}) => {
+  trackLead({
+    contentName: `Formulario ${treatment}`,
+    contentCategory: 'Tratamiento Facial',
+    value: SERVICE_VALUES[treatment] || 0,
+    currency: 'PEN'
+  });
+
+  // Si hay datos UTM, enviar evento personalizado adicional
+  if (utmData.fbclid) {
+    trackCustomEvent('LeadWithAttribution', {
+      treatment: treatment,
+      fbclid: utmData.fbclid,
+      campaign: utmData.utm_campaign,
+      source: utmData.utm_source
+    });
+  }
+};
+
+/**
+ * Trackea click en botón de WhatsApp
+ * @param {string} source - Origen del click (floating-button, landing-form, etc.)
+ */
+export const trackWhatsAppClick = (source = 'floating-button') => {
+  trackContact({
+    contentName: `WhatsApp - ${source}`,
+    contactMethod: 'whatsapp'
+  });
+};
+
+/**
+ * Trackea apertura del asesor de IA (GeminiSkinAdvisor)
+ */
+export const trackAIAdvisorOpen = () => {
+  trackCustomEvent('ConsultaAsesorIA', {
+    engagement_type: 'modal_open',
+    feature: 'gemini_advisor'
+  });
+};
+
+/**
+ * Trackea recomendación recibida del asesor de IA
+ * @param {string} recommendation - Tratamiento recomendado
+ */
+export const trackAIRecommendation = (recommendation) => {
+  trackCustomEvent('RecomendacionIA', {
+    treatment_recommended: recommendation,
+    feature: 'gemini_advisor'
+  });
+};
+```
+
+**Ejemplo de uso en componentes:**
+
+```javascript
+// En HifuLandingPage.jsx
+import {
+  initMetaPixel,
+  trackTreatmentLandingView,
+  trackTreatmentLead,
+  trackFormScroll
+} from '../utils/metaPixelHelper';
+
+const HifuLandingPage = () => {
+  const [utmData, setUtmData] = useState({});
+
+  useEffect(() => {
+    // Inicializar pixel (solo si aún no existe)
+    initMetaPixel('TU_PIXEL_ID');
+
+    // Trackear vista de landing
+    trackTreatmentLandingView('HIFU 12D');
+
+    // Capturar UTM
+    const params = new URLSearchParams(window.location.search);
+    setUtmData({
+      fbclid: params.get('fbclid'),
+      utm_campaign: params.get('utm_campaign'),
+      utm_source: params.get('utm_source')
+    });
+  }, []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      // Enviar formulario...
+
+      // Trackear conversión
+      trackTreatmentLead('HIFU 12D', utmData);
+
+      setSubmitted(true);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  return (
+    // JSX...
+  );
+};
+```
+
+```javascript
+// En HomePage.jsx
+import { trackWhatsAppClick, trackViewContent } from '../utils/metaPixelHelper';
+
+const HomePage = () => {
+  const handleServiceClick = (serviceName) => {
+    trackViewContent({
+      contentName: serviceName,
+      contentCategory: 'Servicio',
+      value: SERVICE_VALUES[serviceName] || 0,
+      currency: 'PEN'
+    });
+  };
+
+  return (
+    // JSX con servicios...
+  );
+};
+```
+
+```javascript
+// En FloatingWhatsAppButton.jsx
+import { trackWhatsAppClick } from '../utils/metaPixelHelper';
+
+const FloatingWhatsAppButton = () => {
+  const handleClick = () => {
+    trackWhatsAppClick('floating-button');
+    // Redirigir a WhatsApp...
+  };
+
+  return (
+    <button onClick={handleClick}>
+      {/* Icono WhatsApp */}
+    </button>
+  );
+};
 ```
 
 **Uso en formularios:**
@@ -770,17 +1179,61 @@ fbq('trackCustom', 'DermicaPro_VideoReproducido', {...});
 Asignar valor monetario estimado a cada tipo de lead:
 
 ```javascript
-const LEAD_VALUES = {
-  'Consulta General': 50,  // MXN
-  'HIFU 12D': 200,
-  'Hollywood Peel': 150,
-  'Borrado de Manchas': 180
+// Usar SERVICE_VALUES del metaPixelHelper.js
+const SERVICE_VALUES = {
+  'HIFU 12D': 600,          // PEN
+  'Hollywood Peel': 400,
+  'Borrado de Manchas': 450,
+  'Hydrafacial': 275,
+  'Botox': 850,
+  'Plasma Pen': 550,
+  'Consulta General': 50
 };
 
-fbq('track', 'Lead', {
-  content_name: 'HIFU 12D',
-  value: LEAD_VALUES['HIFU 12D'],
-  currency: 'MXN'
+// Uso con la función trackLead
+trackLead({
+  contentName: 'Formulario HIFU',
+  contentCategory: 'Tratamiento Facial',
+  value: SERVICE_VALUES['HIFU 12D'],
+  currency: 'PEN'
+});
+```
+
+### 2.1 Eventos Avanzados con Parámetros Completos
+
+**Para maximizar la optimización del algoritmo de Meta, incluir todos los parámetros posibles:**
+
+```javascript
+// Evento Lead completo con todos los parámetros recomendados
+trackMetaEvent('Lead', {
+  content_name: 'Formulario HIFU 12D',
+  content_category: 'Tratamiento Facial',
+  content_ids: ['HIFU-12D'],
+  content_type: 'landing_page',
+  value: 600,
+  currency: 'PEN',
+  predicted_ltv: 1200, // Lifetime Value estimado (2 sesiones)
+  status: 'completed'
+});
+
+// Evento ViewContent completo
+trackViewContent({
+  contentName: 'HIFU 12D Detalle',
+  contentCategory: 'Tratamiento',
+  contentIds: ['HIFU-12D'],
+  value: 600,
+  currency: 'PEN'
+});
+
+// Evento personalizado con atribución completa
+trackCustomEvent('LeadQualified', {
+  treatment: 'HIFU 12D',
+  lead_quality: 'high',
+  phone_provided: true,
+  email_provided: true,
+  utm_source: utmData.utm_source,
+  utm_campaign: utmData.utm_campaign,
+  fbclid: utmData.fbclid
 });
 ```
 
@@ -851,6 +1304,376 @@ grep -r "ttq" src/
 - Actualizar CLAUDE.md si es cambio arquitectónico
 - Comentar código con propósito de cada evento
 - Proporcionar guía de mantenimiento
+
+## Casos de Uso Específicos por Componente
+
+### GeminiSkinAdvisor.jsx - Asesor de IA
+
+**Eventos a trackear:**
+1. Apertura del modal del asesor
+2. Envío de consulta
+3. Recepción de recomendación
+
+**Implementación:**
+
+```javascript
+import { trackAIAdvisorOpen, trackAIRecommendation, trackCustomEvent } from '../utils/metaPixelHelper';
+
+const GeminiSkinAdvisor = ({ isOpen, onClose }) => {
+  const [concern, setConcern] = useState('');
+  const [recommendation, setRecommendation] = useState('');
+
+  useEffect(() => {
+    if (isOpen) {
+      // Trackear apertura del asesor
+      trackAIAdvisorOpen();
+    }
+  }, [isOpen]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      // Llamar a Gemini AI...
+      const response = await fetch(API_URL, {...});
+      const aiRecommendation = response.text;
+
+      setRecommendation(aiRecommendation);
+
+      // Trackear recomendación recibida
+      trackAIRecommendation(aiRecommendation);
+
+      // Evento personalizado adicional
+      trackCustomEvent('ConsultaAsesorCompletada', {
+        concern_type: concern,
+        recommendation_provided: true
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  return (
+    // Modal JSX...
+  );
+};
+```
+
+### FloatingWhatsAppButton.jsx - Botón Flotante de WhatsApp
+
+**Eventos a trackear:**
+1. Click en botón flotante
+
+**Implementación:**
+
+```javascript
+import { trackWhatsAppClick } from '../utils/metaPixelHelper';
+
+const FloatingWhatsAppButton = () => {
+  const handleWhatsAppClick = () => {
+    // Trackear click antes de redirigir
+    trackWhatsAppClick('floating-button');
+
+    // Intentar abrir app
+    const whatsappUrl = 'whatsapp://send?phone=51974637783&text=Hola';
+    window.location.href = whatsappUrl;
+
+    // Fallback a web después de 500ms
+    setTimeout(() => {
+      window.open('https://wa.me/51974637783', '_blank');
+    }, 500);
+  };
+
+  return (
+    <button onClick={handleWhatsAppClick}>
+      {/* Icono WhatsApp */}
+    </button>
+  );
+};
+```
+
+### ReservaPage.jsx - Página de Reservas
+
+**Eventos a trackear:**
+1. Vista de página (InitiateCheckout)
+2. Envío de formulario (Schedule)
+3. Click en WhatsApp alternativo
+
+**Implementación:**
+
+```javascript
+import { trackInitiateCheckout, trackSchedule, trackWhatsAppClick } from '../utils/metaPixelHelper';
+
+const ReservaPage = () => {
+  const [formState, setFormState] = useState({
+    nombre: '',
+    phone: '',
+    service: ''
+  });
+  const [submitted, setSubmitted] = useState(false);
+
+  // Trackear que usuario inició proceso de reserva
+  useEffect(() => {
+    trackInitiateCheckout({
+      contentName: 'Formulario de Reserva',
+      contentCategory: 'Reserva',
+      value: 300, // Valor promedio de tratamiento
+      currency: 'PEN'
+    });
+  }, []);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    // Construir mensaje WhatsApp
+    const message = `Hola, me gustaría agendar: ${formState.service || 'Consulta'}. Mi nombre es ${formState.nombre}`;
+    const whatsappUrl = `https://wa.me/51974637783?text=${encodeURIComponent(message)}`;
+
+    // Trackear evento Schedule
+    const serviceValue = SERVICE_VALUES[formState.service] || 300;
+    trackSchedule({
+      contentName: formState.service || 'Consulta General',
+      contentCategory: 'Reserva',
+      value: serviceValue,
+      currency: 'PEN'
+    });
+
+    // Abrir WhatsApp
+    window.open(whatsappUrl, '_blank');
+    setSubmitted(true);
+  };
+
+  const handleDirectWhatsApp = () => {
+    // Trackear click en botón WhatsApp directo
+    trackWhatsAppClick('reserva-page-direct');
+    window.open('https://wa.me/51974637783', '_blank');
+  };
+
+  if (submitted) {
+    return (
+      <div>
+        <h2>¡Reserva Iniciada!</h2>
+        <p>Te hemos redirigido a WhatsApp para confirmar tu cita.</p>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      {/* Campos del formulario */}
+      <button type="submit">Reservar por WhatsApp</button>
+      <button type="button" onClick={handleDirectWhatsApp}>
+        Contactar Directamente
+      </button>
+    </form>
+  );
+};
+```
+
+### ServiciosPage.jsx - Catálogo de Servicios
+
+**Eventos a trackear:**
+1. ViewContent por cada servicio que el usuario visualiza
+2. Click en "Probar Asesor Virtual"
+
+**Implementación:**
+
+```javascript
+import { trackViewContent, trackCustomEvent } from '../utils/metaPixelHelper';
+
+const ServiciosPage = ({ openAdvisor }) => {
+  const services = [
+    { name: 'HIFU 12D', value: 600, category: 'Lifting' },
+    { name: 'Hollywood Peel', value: 400, category: 'Rejuvenecimiento' },
+    { name: 'Borrado de Manchas', value: 450, category: 'Despigmentación' },
+    // ... más servicios
+  ];
+
+  const handleServiceClick = (service) => {
+    // Trackear interés en servicio específico
+    trackViewContent({
+      contentName: service.name,
+      contentCategory: service.category,
+      contentIds: [service.name.replace(/\s+/g, '-').toUpperCase()],
+      value: service.value,
+      currency: 'PEN'
+    });
+
+    // Scroll o navegación al detalle del servicio
+    // ...
+  };
+
+  const handleAdvisorClick = () => {
+    // Trackear que usuario quiere usar asesor desde servicios
+    trackCustomEvent('AsesorDesdeServicios', {
+      page: 'servicios',
+      trigger: 'cta_button'
+    });
+
+    openAdvisor();
+  };
+
+  return (
+    <div>
+      <h1>Nuestros Servicios</h1>
+      {services.map(service => (
+        <div key={service.name} onClick={() => handleServiceClick(service)}>
+          <h3>{service.name}</h3>
+          {/* Detalles del servicio */}
+        </div>
+      ))}
+      <button onClick={handleAdvisorClick}>
+        Probar Asesor Virtual
+      </button>
+    </div>
+  );
+};
+```
+
+### App.jsx - Inicialización Global del Pixel
+
+**Implementación centralizada:**
+
+```javascript
+import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+import { initMetaPixel, trackPageView } from './utils/metaPixelHelper';
+
+const META_PIXEL_ID = 'TU_PIXEL_ID_AQUI'; // Reemplazar con Pixel ID real
+
+function App() {
+  const location = useLocation();
+  const [isAdvisorOpen, setIsAdvisorOpen] = useState(false);
+
+  // Inicializar Meta Pixel una sola vez al montar la app
+  useEffect(() => {
+    initMetaPixel(META_PIXEL_ID);
+  }, []);
+
+  // Trackear PageView en cada cambio de ruta (SPA)
+  useEffect(() => {
+    // Trackear vista de página con información de la ruta
+    const pageInfo = {
+      content_name: location.pathname,
+      content_category: 'Página Web'
+    };
+
+    trackPageView(pageInfo);
+  }, [location.pathname]);
+
+  return (
+    <div className="App">
+      {/* Resto de la app */}
+    </div>
+  );
+}
+```
+
+### Integración con n8n Webhook (Landing Pages)
+
+**Enviar datos de Meta Pixel junto con formulario:**
+
+```javascript
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  // Capturar cookies de Meta Pixel para CAPI
+  const fbp = getCookie('_fbp');
+  const fbc = getCookie('_fbc');
+
+  // Preparar payload completo
+  const payload = {
+    // Datos del formulario
+    nombre: formData.nombre,
+    whatsapp: formData.whatsapp,
+    email: formData.email,
+
+    // Datos UTM de campaña
+    ...utmData,
+
+    // Datos de Meta Pixel para atribución
+    fbp: fbp,
+    fbc: fbc,
+    fbclid: utmData.fbclid,
+
+    // Metadatos
+    landing_page: 'HIFU 12D',
+    timestamp: new Date().toISOString(),
+    user_agent: navigator.userAgent
+  };
+
+  try {
+    // Enviar a n8n webhook
+    const response = await fetch(webhookURL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (response.ok) {
+      // Trackear conversión en Meta Pixel (client-side)
+      trackTreatmentLead('HIFU 12D', utmData);
+
+      // Opcionalmente, trackear server-side (CAPI)
+      await trackServerSideEvent('Lead', {
+        email: formData.email,
+        phone: formData.whatsapp,
+        firstName: formData.nombre.split(' ')[0],
+        lastName: formData.nombre.split(' ').slice(1).join(' ')
+      });
+
+      setShowModal(true);
+    }
+  } catch (error) {
+    console.error('Error:', error);
+  }
+};
+
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+}
+```
+
+## Resumen de Eventos por Funnel de Conversión
+
+```
+┌─────────────────────────────────────────────────────────┐
+│ FUNNEL DE CONVERSIÓN CON META PIXEL                    │
+└─────────────────────────────────────────────────────────┘
+
+1. AWARENESS (Conciencia)
+   ├─ PageView → Usuario llega al sitio desde Meta Ad
+   │  └─ Parámetros: content_name, fbclid, utm_campaign
+   │
+   ├─ ViewContent → Usuario ve servicio específico
+   │  └─ Parámetros: content_name, content_category, value
+   │
+   └─ ConsultaAsesorIA → Usuario abre asesor de IA
+      └─ Parámetros: engagement_type, feature
+
+2. CONSIDERATION (Consideración)
+   ├─ ScrollToForm → Usuario hace scroll al formulario
+   │  └─ Parámetros: form_name, engagement_type
+   │
+   ├─ InitiateCheckout → Usuario comienza a llenar form
+   │  └─ Parámetros: content_name, value
+   │
+   └─ Contact → Usuario interactúa con WhatsApp
+      └─ Parámetros: contact_method
+
+3. CONVERSION (Conversión)
+   ├─ Lead → Formulario enviado exitosamente
+   │  └─ Parámetros: content_name, value, currency
+   │
+   └─ Schedule → Cita confirmada
+      └─ Parámetros: content_name, value, currency
+
+4. POST-CONVERSION (Retención)
+   └─ Purchase → Pago realizado (futuro)
+      └─ Parámetros: value, currency, content_ids
+```
 
 ## Formato de Salida
 

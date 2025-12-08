@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { trackViewContent, trackLead, saveMetaUTM } from '../utils/metaPixelHelper';
+import { trackViewContent as trackTikTokViewContent, trackSubmitForm, saveTikTokUTM } from '../utils/tiktokPixelHelper';
 
 // Este es el componente de React que contiene tu landing page.
 function HifuLandingPage() {
@@ -20,71 +21,21 @@ function HifuLandingPage() {
 
     // Captura los parámetros de TikTok Ads y Meta Ads para tracking
     useEffect(() => {
-        const urlParams = new URLSearchParams(window.location.search);
-
-        // Función de sanitización para prevenir XSS
-        const sanitizeParam = (value) => {
-            if (!value || value === 'N/A') return 'N/A';
-            // Eliminar caracteres peligrosos y limitar longitud
-            return value
-                .replace(/[<>"'`]/g, '') // Eliminar chars XSS
-                .substring(0, 100); // Limitar longitud máxima
-        };
-
-        // Capturar parámetros de Meta Ads y TikTok Ads
-        setUtmData({
-            // Parámetros de Meta Ads (Facebook/Instagram)
-            fbclid: sanitizeParam(urlParams.get('fbclid')),
-            utm_source: sanitizeParam(urlParams.get('utm_source')),
-            utm_medium: sanitizeParam(urlParams.get('utm_medium')),
-            utm_campaign: sanitizeParam(urlParams.get('utm_campaign')),
-            utm_content: sanitizeParam(urlParams.get('utm_content')),
-            utm_term: sanitizeParam(urlParams.get('utm_term')),
-            // Parámetros de TikTok Ads
-            ttclid: sanitizeParam(urlParams.get('ttclid')),
-            tt_medium: sanitizeParam(urlParams.get('tt_medium')),
-            tt_campaign_id: sanitizeParam(urlParams.get('tt_campaign_id')),
-            tt_adgroup_id: sanitizeParam(urlParams.get('tt_adgroup_id')),
-            tt_ad_id: sanitizeParam(urlParams.get('tt_ad_id')),
-        });
-
         // Capturar parámetros de Meta Ads (Facebook/Instagram)
         saveMetaUTM();
 
+        // Capturar parámetros de TikTok Ads
+        const tiktokUTM = saveTikTokUTM();
+        setUtmData(tiktokUTM);
+
         // Track ViewContent en Meta Pixel al cargar la landing
         trackViewContent('HIFU 12D Landing Page', 'landing_page');
+
+        // Track ViewContent en TikTok Pixel al cargar la landing
+        trackTikTokViewContent('HIFU 12D Landing Page', 'landing_page');
     }, []);
 
-    // Inyecta el Píxel de TikTok una sola vez.
-    useEffect(() => {
-        const existingScript = document.getElementById('tiktok-pixel-script');
-        if (existingScript) {
-            return;
-        }
-
-        const script = document.createElement('script');
-        script.id = 'tiktok-pixel-script';
-        script.innerHTML = `
-            !function (w, d, t) {
-              w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(
-            var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js",o=n&&n.partner;ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=r,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};var s=document.createElement("script")
-            ;s.type="text/javascript",s.async=!0,s.src=r+"?sdkid="+e+"&lib="+t;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(s,a)};
-
-              ttq.load('D19VBFJC77UDOT6CAUF0');
-              ttq.page();
-            }(window, document, 'ttq');
-        `;
-        document.head.appendChild(script);
-
-        return () => {
-            const scriptToRemove = document.getElementById('tiktok-pixel-script');
-            if (scriptToRemove) {
-                document.head.removeChild(scriptToRemove);
-            }
-        };
-    }, []);
-
-     // Lógica para el scroll suave
+    // Lógica para el scroll suave
     useEffect(() => {
         const scrollToFormButtons = document.querySelectorAll('a[href="#hero-form-container"]');
         const heroFormContainer = document.getElementById('hero-form-container');
@@ -196,9 +147,11 @@ function HifuLandingPage() {
 
                 if (response.ok) {
                     // TikTok Pixel Event: Registra la conversión
-                    if (window.ttq) {
-                        window.ttq.track('SubmitForm');
-                    }
+                    trackSubmitForm({
+                        contentName: 'HIFU 12D',
+                        value: 200,
+                        currency: 'PEN'
+                    });
 
                     // Meta Pixel Event: Registra el Lead
                     trackLead({
