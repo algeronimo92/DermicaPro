@@ -242,11 +242,7 @@ export const TRATAMIENTOS = {
 export const LANDINGS = {
   HIFU: 'hifu-landing',
   BOTOX: 'botox-landing',
-  HOLLYWOOD_PEEL: 'hollywood-peel-landing',
-  RESERVAS: 'reservas',
-  HIFU_RESERVAS: 'hf-reservas',
-  BOTOX_RESERVAS: 'btx-reservas',
-  HOLLYWOOD_PEEL_RESERVAS: 'hp-reservas'
+  HOLLYWOOD_PEEL: 'hollywood-peel-landing'
 };
 
 export default {
