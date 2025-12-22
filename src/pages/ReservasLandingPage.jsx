@@ -115,12 +115,10 @@ function ReservasLandingPage() {
                 ...utmData
             };
 
-            const isProduction = process.env.NODE_ENV === 'production';
-            const webhookUrl = isProduction
-                ? 'https://dermica-pro-n8n.rcsgeg.easypanel.host/webhook/reservas'
-                : 'https://dermica-pro-n8n.rcsgeg.easypanel.host/webhook-test/reservas';
+            // Webhook único para todas las landings
+            const webhookUrl = 'https://dermica-pro-n8n.rcsgeg.easypanel.host/webhook/landing';
 
-            console.log(`🔗 Enviando a webhook ${isProduction ? 'PRODUCCIÓN' : 'TEST'}:`, webhookUrl);
+            console.log(`🔗 Enviando a webhook:`, webhookUrl);
 
             try {
                 const response = await fetch(webhookUrl, {

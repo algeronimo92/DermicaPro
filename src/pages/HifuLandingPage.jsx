@@ -128,13 +128,10 @@ function HifuLandingPage() {
             };
 
 
-            // Detectar si está en producción o desarrollo
-            const isProduction = process.env.NODE_ENV === 'production';
-            const webhookUrl = isProduction
-                ? 'https://dermica-pro-n8n.rcsgeg.easypanel.host/webhook/hifu'
-                : 'https://dermica-pro-n8n.rcsgeg.easypanel.host/webhook-test/hifu';
+            // Webhook único para todas las landings
+            const webhookUrl = 'https://dermica-pro-n8n.rcsgeg.easypanel.host/webhook/landing';
 
-            console.log(`🔗 Enviando a webhook ${isProduction ? 'PRODUCCIÓN' : 'TEST'}:`, webhookUrl);
+            console.log(`🔗 Enviando a webhook:`, webhookUrl);
 
             try {
                 const response = await fetch(webhookUrl, {

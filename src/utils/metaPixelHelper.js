@@ -214,13 +214,13 @@ export const getCookie = (name) => {
  * Valores estimados de leads por tratamiento (en PEN - Soles Peruanos)
  */
 export const LEAD_VALUES = {
-  'HIFU 12D': 200,
-  'Hollywood Peel': 150,
-  'Borrado de Manchas': 180,
-  'Pico Láser': 180,
-  'Hydrafacial': 120,
-  'Peeling Químico': 100,
-  'Consulta General': 50
+  'HIFU 12D': 0,
+  'Hollywood Peel': 0,
+  'Borrado de Manchas': 0,
+  'Pico Láser': 0,
+  'Hydrafacial': 0,
+  'Peeling Químico': 0,
+  'Consulta General': 0
 };
 
 /**
@@ -228,7 +228,7 @@ export const LEAD_VALUES = {
  * @param {string} treatment - Nombre del tratamiento
  */
 export const trackTreatmentLead = (treatment) => {
-  const value = LEAD_VALUES[treatment] || 50;
+  const value = LEAD_VALUES[treatment] || 0;
 
   trackLead({
     contentName: treatment,

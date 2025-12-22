@@ -105,12 +105,10 @@ function HifuReservasPage() {
                 ...utmData
             };
 
-            const isProduction = process.env.NODE_ENV === 'production';
-            const webhookUrl = isProduction
-                ? 'https://dermica-pro-n8n.rcsgeg.easypanel.host/webhook/hifu-reservas'
-                : 'https://dermica-pro-n8n.rcsgeg.easypanel.host/webhook-test/hifu-reservas';
+            // Webhook único para todas las landings
+            const webhookUrl = 'https://dermica-pro-n8n.rcsgeg.easypanel.host/webhook/landing';
 
-            console.log(`🔗 Enviando a webhook HIFU ${isProduction ? 'PRODUCCIÓN' : 'TEST'}:`, webhookUrl);
+            console.log(`🔗 Enviando a webhook:`, webhookUrl);
 
             try {
                 const response = await fetch(webhookUrl, {
