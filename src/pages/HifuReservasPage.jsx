@@ -100,7 +100,7 @@ function HifuReservasPage() {
                 nombre: formData.nombre,
                 whatsapp: `+51${formData.whatsapp}`,
                 email: formData.email,
-                servicio: 'HIFU',
+                tratamiento: 'HIFU 12D',
                 landing: 'hf-reservas',
                 ...utmData
             };

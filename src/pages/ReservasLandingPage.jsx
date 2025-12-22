@@ -111,6 +111,7 @@ function ReservasLandingPage() {
                 nombre: formData.nombre,
                 whatsapp: `+51${formData.whatsapp}`,
                 email: formData.email,
+                tratamiento: 'Consulta General',
                 landing: 'reservas',
                 ...utmData
             };

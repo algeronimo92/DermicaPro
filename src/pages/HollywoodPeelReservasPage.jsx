@@ -100,7 +100,7 @@ function HollywoodPeelReservasPage() {
                 nombre: formData.nombre,
                 whatsapp: `+51${formData.whatsapp}`,
                 email: formData.email,
-                servicio: 'Hollywood Peel',
+                tratamiento: 'Hollywood Peel',
                 landing: 'hp-reservas',
                 ...utmData
             };

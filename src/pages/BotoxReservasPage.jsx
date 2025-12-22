@@ -100,7 +100,7 @@ function BotoxReservasPage() {
                 nombre: formData.nombre,
                 whatsapp: `+51${formData.whatsapp}`,
                 email: formData.email,
-                servicio: 'Botox',
+                tratamiento: 'Botox',
                 landing: 'btx-reservas',
                 ...utmData
             };
