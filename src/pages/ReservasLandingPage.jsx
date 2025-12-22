@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { trackViewContent, trackLead, saveMetaUTM } from '../utils/metaPixelHelper';
+import { trackViewContent, saveMetaUTM } from '../utils/metaPixelHelper';
+import { trackViewContent as trackTikTokViewContent, saveTikTokUTM } from '../utils/tiktokPixelHelper';
+import { handleFormSubmission, TRATAMIENTOS, LANDINGS } from '../services/webhookService';
 
 // Landing Page NEUTRA para evitar restricciones de Meta
 // Sin palabras médicas, sin tratamientos, sin antes/después
@@ -45,7 +47,9 @@ function ReservasLandingPage() {
         });
 
         saveMetaUTM();
+        saveTikTokUTM();
         trackViewContent('Reservas Landing Page', 'landing_page');
+        trackTikTokViewContent('Reservas Landing Page', 'landing_page');
     }, []);
 
     useEffect(() => {
@@ -106,39 +110,12 @@ function ReservasLandingPage() {
         setErrors(validationErrors);
 
         if (Object.keys(validationErrors).length === 0) {
-            setIsSubmitting(true);
-            const payload = {
-                nombre: formData.nombre,
-                whatsapp: `+51${formData.whatsapp}`,
-                email: formData.email,
-                tratamiento: 'Consulta General',
-                landing: 'reservas',
-                ...utmData
-            };
-
-            // Webhook único para todas las landings
-            const webhookUrl = 'https://dermica-pro-n8n.rcsgeg.easypanel.host/webhook/landing';
-
-            console.log(`🔗 Enviando a webhook:`, webhookUrl);
-
-            try {
-                const response = await fetch(webhookUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(payload)
-                });
-
-                if (response.ok) {
-                    // Meta Pixel Lead Event
-                    trackLead({
-                        contentName: 'Reserva Evaluación',
-                        contentCategory: 'Lead Generation',
-                        value: 50,
-                        currency: 'PEN'
-                    });
-
+            await handleFormSubmission({
+                formData,
+                tratamiento: TRATAMIENTOS.CONSULTA,
+                landing: LANDINGS.RESERVAS,
+                utmData,
+                onSuccess: () => {
                     setModal({
                         show: true,
                         type: 'success',
@@ -147,20 +124,17 @@ function ReservasLandingPage() {
                     });
                     setFormData({ nombre: '', whatsapp: '', email: '' });
                     setErrors({});
-                } else {
-                    throw new Error('Error en servidor');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                setModal({
-                    show: true,
-                    type: 'error',
-                    title: 'Error al Enviar',
-                    message: 'Por favor, intenta nuevamente o contáctanos directamente al WhatsApp.'
-                });
-            } finally {
-                setIsSubmitting(false);
-            }
+                },
+                onError: (errorMessage) => {
+                    setModal({
+                        show: true,
+                        type: 'error',
+                        title: 'Error al Enviar',
+                        message: errorMessage
+                    });
+                },
+                setIsSubmitting
+            });
         }
     };
 

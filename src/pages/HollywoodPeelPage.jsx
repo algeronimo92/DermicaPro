@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { trackViewContent, trackLead, saveMetaUTM } from '../utils/metaPixelHelper';
+import { trackViewContent, saveMetaUTM } from '../utils/metaPixelHelper';
+import { trackViewContent as trackTikTokViewContent, saveTikTokUTM } from '../utils/tiktokPixelHelper';
+import { handleFormSubmission, TRATAMIENTOS } from '../services/webhookService';
 
 // Hollywood Peel Landing Page
 function HollywoodPeelPage() {
@@ -10,6 +12,7 @@ function HollywoodPeelPage() {
     });
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [utmData, setUtmData] = useState({});
     const [modal, setModal] = useState({
         show: false,
         type: '', // 'success' or 'error'
@@ -17,13 +20,32 @@ function HollywoodPeelPage() {
         message: '',
     });
 
-    // Captura los parámetros de Meta Ads para tracking (NO TikTok)
+    // Captura los parámetros UTM para tracking
     useEffect(() => {
-        // Capturar parámetros de Meta Ads (Facebook/Instagram)
-        saveMetaUTM();
+        const urlParams = new URLSearchParams(window.location.search);
+        const sanitizeParam = (value) => {
+            if (!value || value === 'N/A') return 'N/A';
+            return value.replace(/[<>"'`]/g, '').substring(0, 100);
+        };
 
-        // Track ViewContent en Meta Pixel al cargar la landing
+        setUtmData({
+            fbclid: sanitizeParam(urlParams.get('fbclid')),
+            utm_source: sanitizeParam(urlParams.get('utm_source')),
+            utm_medium: sanitizeParam(urlParams.get('utm_medium')),
+            utm_campaign: sanitizeParam(urlParams.get('utm_campaign')),
+            utm_content: sanitizeParam(urlParams.get('utm_content')),
+            utm_term: sanitizeParam(urlParams.get('utm_term')),
+            ttclid: sanitizeParam(urlParams.get('ttclid')),
+            tt_campaign_id: sanitizeParam(urlParams.get('tt_campaign_id')),
+        });
+
+        // Guardar UTM en cookies
+        saveMetaUTM();
+        saveTikTokUTM();
+
+        // Track ViewContent en ambos pixels al cargar la landing
         trackViewContent('Hollywood Peel Landing Page', 'landing_page');
+        trackTikTokViewContent('Hollywood Peel Landing Page', 'landing_page');
     }, []);
 
      // Lógica para el scroll suave
@@ -98,7 +120,7 @@ function HollywoodPeelPage() {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        
+
         const validationErrors = Object.keys(formData).reduce((acc, key) => {
             const error = validateField(key, formData[key]);
             if (error) acc[key] = error;
@@ -108,37 +130,11 @@ function HollywoodPeelPage() {
         setErrors(validationErrors);
 
         if (Object.keys(validationErrors).length === 0) {
-            setIsSubmitting(true);
-            const payload = {
-                nombre: formData.nombre,
-                whatsapp: `+51${formData.whatsapp}`,
-                email: formData.email,
-                tratamiento: 'Hollywood Peel'
-            };
-
-            // Webhook único para todas las landings
-            const webhookUrl = 'https://dermica-pro-n8n.rcsgeg.easypanel.host/webhook/landing';
-
-            console.log(`🔗 Enviando a webhook:`, webhookUrl);
-
-            try {
-                const response = await fetch(webhookUrl, {
-                    method: 'POST',
-                    headers: {
-                    'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(payload)
-                });
-
-                if (response.ok) {
-                    // Meta Pixel Event: Registra el Lead
-                    trackLead({
-                        contentName: 'Hollywood Peel',
-                        contentCategory: 'Tratamiento Facial',
-                        value: 150,
-                        currency: 'PEN'
-                    });
-
+            await handleFormSubmission({
+                formData,
+                tratamiento: TRATAMIENTOS.HOLLYWOOD_PEEL,
+                utmData,
+                onSuccess: () => {
                     setModal({
                         show: true,
                         type: 'success',
@@ -147,20 +143,17 @@ function HollywoodPeelPage() {
                     });
                     setFormData({ nombre: '', whatsapp: '', email: '' });
                     setErrors({});
-                } else {
-                    throw new Error('Server response was not ok.');
-                }
-            } catch (error) {
-                console.error('Fetch error:', error);
-                setModal({
-                    show: true,
-                    type: 'error',
-                    title: '¡Ups! Algo salió mal',
-                    message: 'No pudimos enviar tu información en este momento. Por favor, verifica tu conexión a internet e inténtalo de nuevo más tarde.'
-                });
-            } finally {
-                setIsSubmitting(false);
-            }
+                },
+                onError: (errorMessage) => {
+                    setModal({
+                        show: true,
+                        type: 'error',
+                        title: '¡Ups! Algo salió mal',
+                        message: errorMessage
+                    });
+                },
+                setIsSubmitting
+            });
         }
     };
 

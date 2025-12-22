@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { trackViewContent, trackLead, saveMetaUTM } from '../utils/metaPixelHelper';
+import { trackViewContent, saveMetaUTM } from '../utils/metaPixelHelper';
+import { trackViewContent as trackTikTokViewContent, saveTikTokUTM } from '../utils/tiktokPixelHelper';
+import { handleFormSubmission, TRATAMIENTOS, LANDINGS } from '../services/webhookService';
 
 // Landing Page NEUTRA para Hollywood Peel - hp-reservas.dermicapro.com
 function HollywoodPeelReservasPage() {
@@ -38,7 +40,9 @@ function HollywoodPeelReservasPage() {
         });
 
         saveMetaUTM();
+        saveTikTokUTM();
         trackViewContent('Hollywood Peel Reservas Landing', 'landing_page');
+        trackTikTokViewContent('Hollywood Peel Reservas Landing', 'landing_page');
         window.scrollTo(0, 0);
     }, []);
 
@@ -95,36 +99,12 @@ function HollywoodPeelReservasPage() {
         setErrors(validationErrors);
 
         if (Object.keys(validationErrors).length === 0) {
-            setIsSubmitting(true);
-            const payload = {
-                nombre: formData.nombre,
-                whatsapp: `+51${formData.whatsapp}`,
-                email: formData.email,
-                tratamiento: 'Hollywood Peel',
-                landing: 'hp-reservas',
-                ...utmData
-            };
-
-            // Webhook único para todas las landings
-            const webhookUrl = 'https://dermica-pro-n8n.rcsgeg.easypanel.host/webhook/landing';
-
-            console.log(`🔗 Enviando a webhook:`, webhookUrl);
-
-            try {
-                const response = await fetch(webhookUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (response.ok) {
-                    trackLead({
-                        contentName: 'Hollywood Peel Reserva',
-                        contentCategory: 'Reserva Evaluación',
-                        value: 150,
-                        currency: 'PEN'
-                    });
-
+            await handleFormSubmission({
+                formData,
+                tratamiento: TRATAMIENTOS.HOLLYWOOD_PEEL,
+                landing: LANDINGS.HOLLYWOOD_PEEL_RESERVAS,
+                utmData,
+                onSuccess: () => {
                     setModal({
                         show: true,
                         type: 'success',
@@ -133,20 +113,17 @@ function HollywoodPeelReservasPage() {
                     });
                     setFormData({ nombre: '', whatsapp: '', email: '' });
                     setErrors({});
-                } else {
-                    throw new Error('Error en servidor');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                setModal({
-                    show: true,
-                    type: 'error',
-                    title: 'Error al Enviar',
-                    message: 'Por favor, intenta nuevamente o contáctanos al WhatsApp.'
-                });
-            } finally {
-                setIsSubmitting(false);
-            }
+                },
+                onError: (errorMessage) => {
+                    setModal({
+                        show: true,
+                        type: 'error',
+                        title: 'Error al Enviar',
+                        message: errorMessage
+                    });
+                },
+                setIsSubmitting
+            });
         }
     };
 
