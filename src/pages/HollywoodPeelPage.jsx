@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { trackViewContent, saveMetaUTM } from '../utils/metaPixelHelper';
-import { trackViewContent as trackTikTokViewContent, saveTikTokUTM } from '../utils/tiktokPixelHelper';
+import { saveMetaUTM } from '../utils/metaPixelHelper';
+import { saveTikTokUTM } from '../utils/tiktokPixelHelper';
+import { trackPageViewConditional } from '../utils/trackingHelper';
 import { handleFormSubmission, TRATAMIENTOS } from '../services/webhookService';
 
 // Hollywood Peel Landing Page
@@ -43,9 +44,8 @@ function HollywoodPeelPage() {
         saveMetaUTM();
         saveTikTokUTM();
 
-        // Track ViewContent en ambos pixels al cargar la landing
-        trackViewContent('Hollywood Peel Landing Page', 'landing_page');
-        trackTikTokViewContent('Hollywood Peel Landing Page', 'landing_page');
+        // Track PageView SOLO en el pixel correspondiente según la fuente
+        trackPageViewConditional('Hollywood Peel Landing Page', 'landing_page');
     }, []);
 
      // Lógica para el scroll suave

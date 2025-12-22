@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { trackViewContent, saveMetaUTM } from '../utils/metaPixelHelper';
-import { trackViewContent as trackTikTokViewContent, saveTikTokUTM } from '../utils/tiktokPixelHelper';
+import { saveMetaUTM } from '../utils/metaPixelHelper';
+import { saveTikTokUTM } from '../utils/tiktokPixelHelper';
+import { trackPageViewConditional } from '../utils/trackingHelper';
 import { handleFormSubmission, TRATAMIENTOS, LANDINGS } from '../services/webhookService';
 
 // Este es el componente de React que contiene tu landing page.
@@ -29,11 +30,8 @@ function HifuLandingPage() {
         const tiktokUTM = saveTikTokUTM();
         setUtmData(tiktokUTM);
 
-        // Track ViewContent en Meta Pixel al cargar la landing
-        trackViewContent('HIFU 12D Landing Page', 'landing_page');
-
-        // Track ViewContent en TikTok Pixel al cargar la landing
-        trackTikTokViewContent('HIFU 12D Landing Page', 'landing_page');
+        // Track PageView SOLO en el pixel correspondiente según la fuente
+        trackPageViewConditional('HIFU 12D Landing Page', 'landing_page');
     }, []);
 
     // Lógica para el scroll suave

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { trackViewContent, saveMetaUTM } from '../utils/metaPixelHelper';
-import { trackViewContent as trackTikTokViewContent, saveTikTokUTM } from '../utils/tiktokPixelHelper';
+import { saveMetaUTM } from '../utils/metaPixelHelper';
+import { saveTikTokUTM } from '../utils/tiktokPixelHelper';
+import { trackPageViewConditional } from '../utils/trackingHelper';
 import { handleFormSubmission, TRATAMIENTOS, LANDINGS } from '../services/webhookService';
 
 // Landing Page NEUTRA para Botox - btx-reservas.dermicapro.com
@@ -41,8 +42,10 @@ function BotoxReservasPage() {
 
         saveMetaUTM();
         saveTikTokUTM();
-        trackViewContent('Botox Reservas Landing', 'landing_page');
-        trackTikTokViewContent('Botox Reservas Landing', 'landing_page');
+
+        // Track PageView SOLO en el pixel correspondiente según la fuente
+        trackPageViewConditional('Botox Reservas Landing', 'landing_page');
+
         window.scrollTo(0, 0);
     }, []);
 

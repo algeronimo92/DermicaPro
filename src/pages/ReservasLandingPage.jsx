@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { trackViewContent, saveMetaUTM } from '../utils/metaPixelHelper';
-import { trackViewContent as trackTikTokViewContent, saveTikTokUTM } from '../utils/tiktokPixelHelper';
+import { saveMetaUTM } from '../utils/metaPixelHelper';
+import { saveTikTokUTM } from '../utils/tiktokPixelHelper';
+import { trackPageViewConditional } from '../utils/trackingHelper';
 import { handleFormSubmission, TRATAMIENTOS, LANDINGS } from '../services/webhookService';
 
 // Landing Page NEUTRA para evitar restricciones de Meta
@@ -48,8 +49,9 @@ function ReservasLandingPage() {
 
         saveMetaUTM();
         saveTikTokUTM();
-        trackViewContent('Reservas Landing Page', 'landing_page');
-        trackTikTokViewContent('Reservas Landing Page', 'landing_page');
+
+        // Track PageView SOLO en el pixel correspondiente según la fuente
+        trackPageViewConditional('Reservas Landing Page', 'landing_page');
     }, []);
 
     useEffect(() => {
