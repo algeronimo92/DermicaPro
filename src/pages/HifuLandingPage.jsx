@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { trackViewContent, trackLead, saveMetaUTM } from '../utils/metaPixelHelper';
-import { trackViewContent as trackTikTokViewContent, trackSubmitForm, saveTikTokUTM } from '../utils/tiktokPixelHelper';
+import { trackViewContent, saveMetaUTM } from '../utils/metaPixelHelper';
+import { trackViewContent as trackTikTokViewContent, saveTikTokUTM } from '../utils/tiktokPixelHelper';
+import { handleFormSubmission, TRATAMIENTOS, LANDINGS } from '../services/webhookService';
 
 // Este es el componente de React que contiene tu landing page.
 function HifuLandingPage() {
@@ -107,7 +108,7 @@ function HifuLandingPage() {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        
+
         const validationErrors = Object.keys(formData).reduce((acc, key) => {
             const error = validateField(key, formData[key]);
             if (error) acc[key] = error;
@@ -117,47 +118,12 @@ function HifuLandingPage() {
         setErrors(validationErrors);
 
         if (Object.keys(validationErrors).length === 0) {
-            setIsSubmitting(true);
-            const payload = {
-                nombre: formData.nombre,
-                whatsapp: `+51${formData.whatsapp}`,
-                email: formData.email,
-                tratamiento: 'HIFU 12D',
-                landing: "hifu-landing",
-                ...utmData
-            };
-
-
-            // Webhook único para todas las landings
-            const webhookUrl = 'https://dermica-pro-n8n.rcsgeg.easypanel.host/webhook/landing';
-
-            console.log(`🔗 Enviando a webhook:`, webhookUrl);
-
-            try {
-                const response = await fetch(webhookUrl, {
-                    method: 'POST',
-                    headers: {
-                    'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(payload)
-                });
-
-                if (response.ok) {
-                    // TikTok Pixel Event: Registra la conversión
-                    trackSubmitForm({
-                        contentName: 'HIFU 12D',
-                        value: 200,
-                        currency: 'PEN'
-                    });
-
-                    // Meta Pixel Event: Registra el Lead
-                    trackLead({
-                        contentName: 'HIFU 12D',
-                        contentCategory: 'Tratamiento Facial',
-                        value: 200,
-                        currency: 'PEN'
-                    });
-
+            await handleFormSubmission({
+                formData,
+                tratamiento: TRATAMIENTOS.HIFU,
+                landing: LANDINGS.HIFU,
+                utmData,
+                onSuccess: () => {
                     setModal({
                         show: true,
                         type: 'success',
@@ -166,20 +132,17 @@ function HifuLandingPage() {
                     });
                     setFormData({ nombre: '', whatsapp: '', email: '' });
                     setErrors({});
-                } else {
-                    throw new Error('Server response was not ok.');
-                }
-            } catch (error) {
-                console.error('Fetch error:', error);
-                setModal({
-                    show: true,
-                    type: 'error',
-                    title: '¡Ups! Algo salió mal',
-                    message: 'No pudimos enviar tu información en este momento. Por favor, verifica tu conexión a internet e inténtalo de nuevo más tarde.'
-                });
-            } finally {
-                setIsSubmitting(false);
-            }
+                },
+                onError: (errorMessage) => {
+                    setModal({
+                        show: true,
+                        type: 'error',
+                        title: '¡Ups! Algo salió mal',
+                        message: errorMessage || 'No pudimos enviar tu información en este momento. Por favor, verifica tu conexión a internet e inténtalo de nuevo más tarde.'
+                    });
+                },
+                setIsSubmitting
+            });
         }
     };
 

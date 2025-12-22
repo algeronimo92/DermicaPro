@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { trackViewContent, trackLead, saveMetaUTM } from '../utils/metaPixelHelper';
+import { trackViewContent, saveMetaUTM } from '../utils/metaPixelHelper';
+import { trackViewContent as trackTikTokViewContent, saveTikTokUTM } from '../utils/tiktokPixelHelper';
+import { handleFormSubmission, TRATAMIENTOS } from '../services/webhookService';
 
 // Este es el componente de React que contiene tu landing page de Botox.
 function BotoxLandingPage() {
@@ -43,40 +45,17 @@ function BotoxLandingPage() {
         // Capturar parámetros de Meta Ads (Facebook/Instagram)
         saveMetaUTM();
 
+        // Capturar parámetros de TikTok Ads
+        saveTikTokUTM();
+
         // Track ViewContent en Meta Pixel al cargar la landing
         trackViewContent('Botox Landing Page', 'landing_page');
+
+        // Track ViewContent en TikTok Pixel al cargar la landing
+        trackTikTokViewContent('Botox Landing Page', 'landing_page');
     }, []);
 
-    // Inyecta el Píxel de TikTok una sola vez.
-    useEffect(() => {
-        const existingScript = document.getElementById('tiktok-pixel-script');
-        if (existingScript) {
-            return;
-        }
-
-        const script = document.createElement('script');
-        script.id = 'tiktok-pixel-script';
-        script.innerHTML = `
-            !function (w, d, t) {
-              w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(
-            var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js",o=n&&n.partner;ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=r,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};var s=document.createElement("script")
-            ;s.type="text/javascript",s.async=!0,s.src=r+"?sdkid="+e+"&lib="+t;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(s,a)};
-
-              ttq.load('D19VBFJC77UDOT6CAUF0');
-              ttq.page();
-            }(window, document, 'ttq');
-        `;
-        document.head.appendChild(script);
-
-        return () => {
-            const scriptToRemove = document.getElementById('tiktok-pixel-script');
-            if (scriptToRemove) {
-                document.head.removeChild(scriptToRemove);
-            }
-        };
-    }, []);
-
-     // Lógica para el scroll suave
+    // Lógica para el scroll suave
     useEffect(() => {
         const scrollToFormButtons = document.querySelectorAll('a[href="#hero-form-container"]');
         const heroFormContainer = document.getElementById('hero-form-container');
@@ -158,43 +137,11 @@ function BotoxLandingPage() {
         setErrors(validationErrors);
 
         if (Object.keys(validationErrors).length === 0) {
-            setIsSubmitting(true);
-            const payload = {
-                nombre: formData.nombre,
-                whatsapp: `+51${formData.whatsapp}`,
-                email: formData.email,
-                tratamiento: 'Botox',
-                ...utmData
-            };
-
-            // Webhook único para todas las landings
-            const webhookUrl = 'https://dermica-pro-n8n.rcsgeg.easypanel.host/webhook/landing';
-
-            console.log(`🔗 Enviando a webhook:`, webhookUrl);
-
-            try {
-                const response = await fetch(webhookUrl, {
-                    method: 'POST',
-                    headers: {
-                    'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(payload)
-                });
-
-                if (response.ok) {
-                    // TikTok Pixel Event: Registra la conversión
-                    if (window.ttq) {
-                        window.ttq.track('SubmitForm');
-                    }
-
-                    // Meta Pixel Event: Registra el Lead
-                    trackLead({
-                        contentName: 'Botox',
-                        contentCategory: 'Tratamiento Facial',
-                        value: 180,
-                        currency: 'PEN'
-                    });
-
+            await handleFormSubmission({
+                formData,
+                tratamiento: TRATAMIENTOS.BOTOX,
+                utmData,
+                onSuccess: () => {
                     setModal({
                         show: true,
                         type: 'success',
@@ -203,20 +150,17 @@ function BotoxLandingPage() {
                     });
                     setFormData({ nombre: '', whatsapp: '', email: '' });
                     setErrors({});
-                } else {
-                    throw new Error('Server response was not ok.');
-                }
-            } catch (error) {
-                console.error('Fetch error:', error);
-                setModal({
-                    show: true,
-                    type: 'error',
-                    title: 'Algo no funcionó como esperábamos',
-                    message: 'No pudimos procesar tu solicitud ahora mismo. Por favor, verifica tu conexión a internet e intenta nuevamente. Si el problema persiste, escríbenos directamente al WhatsApp: +51 974 637 783'
-                });
-            } finally {
-                setIsSubmitting(false);
-            }
+                },
+                onError: (errorMessage) => {
+                    setModal({
+                        show: true,
+                        type: 'error',
+                        title: 'Algo no funcionó como esperábamos',
+                        message: errorMessage || 'No pudimos procesar tu solicitud ahora mismo. Por favor, verifica tu conexión a internet e intenta nuevamente.'
+                    });
+                },
+                setIsSubmitting
+            });
         }
     };
 
