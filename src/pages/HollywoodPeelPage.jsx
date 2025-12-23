@@ -48,7 +48,7 @@ function HollywoodPeelPage() {
         trackPageViewConditional('Hollywood Peel Landing Page', 'landing_page');
     }, []);
 
-     // Lógica para el scroll suave
+     // Lógica para el scroll suave - enfocado en formulario en móviles
     useEffect(() => {
         const scrollToFormButtons = document.querySelectorAll('a[href="#hero-form-container"]');
         const heroFormContainer = document.getElementById('hero-form-container');
@@ -56,10 +56,27 @@ function HollywoodPeelPage() {
         const handleScrollToForm = (e) => {
             e.preventDefault();
             if (heroFormContainer) {
-                heroFormContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                // En móvil (pantallas < 768px), hacer scroll al inicio del formulario
+                // En desktop, mantener centrado
+                const isMobile = window.innerWidth < 768;
+                const scrollBehavior = isMobile ? 'start' : 'center';
+
+                heroFormContainer.scrollIntoView({ behavior: 'smooth', block: scrollBehavior });
+
+                // Animación de highlight
                 heroFormContainer.classList.remove('form-highlight');
                 void heroFormContainer.offsetWidth;
                 heroFormContainer.classList.add('form-highlight');
+
+                // En móvil, hacer focus en el primer input después del scroll
+                if (isMobile) {
+                    setTimeout(() => {
+                        const firstInput = heroFormContainer.querySelector('input[name="nombre"]');
+                        if (firstInput) {
+                            firstInput.focus();
+                        }
+                    }, 600); // Esperar a que termine la animación de scroll
+                }
             }
         };
 
