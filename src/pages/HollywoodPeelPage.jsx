@@ -46,6 +46,25 @@ function HollywoodPeelPage() {
 
         // Track PageView SOLO en el pixel correspondiente según la fuente
         trackPageViewConditional('Hollywood Peel Landing Page', 'landing_page');
+
+        // Scroll automático al formulario en móviles al cargar la página
+        const isMobile = window.innerWidth < 768;
+        if (isMobile) {
+            setTimeout(() => {
+                const heroFormContainer = document.getElementById('hero-form-container');
+                if (heroFormContainer) {
+                    heroFormContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+                    // Focus en el primer input después del scroll
+                    setTimeout(() => {
+                        const firstInput = heroFormContainer.querySelector('input[name="nombre"]');
+                        if (firstInput) {
+                            firstInput.focus();
+                        }
+                    }, 600);
+                }
+            }, 500); // Pequeño delay para que la página cargue completamente
+        }
     }, []);
 
      // Lógica para el scroll suave - enfocado en formulario en móviles
