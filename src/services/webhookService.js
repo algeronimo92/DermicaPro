@@ -3,8 +3,6 @@
  * Implementa patrón Service + Factory para estandarizar el comportamiento
  */
 
-import { trackLead } from '../utils/metaPixelHelper';
-import { trackSubmitForm } from '../utils/tiktokPixelHelper';
 
 /**
  * Configuración del webhook
@@ -15,15 +13,6 @@ const WEBHOOK_CONFIG = {
   timeout: 10000 // 10 segundos
 };
 
-/**
- * Valores de conversión por tratamiento (en PEN)
- */
-const CONVERSION_VALUES = {
-  'HIFU 12D': 200,
-  'Botox': 180,
-  'Hollywood Peel': 150,
-  'Consulta General': 50
-};
 
 /**
  * Factory: Crea payload estandarizado para webhook
@@ -56,76 +45,6 @@ export const createWebhookPayload = (formData, tratamiento, landing = null, utmD
   return payload;
 };
 
-/**
- * Detecta la fuente de tráfico basándose en parámetros UTM
- * @param {Object} utmData - Datos UTM capturados
- * @returns {string} 'tiktok', 'meta', o 'organic'
- */
-const detectTrafficSource = (utmData = {}) => {
-  // TikTok: ttclid presente
-  if (utmData.ttclid) {
-    return 'tiktok';
-  }
-
-  // Meta: fbclid presente O utm_source contiene facebook/instagram
-  if (utmData.fbclid ||
-      utmData.utm_source?.toLowerCase().includes('facebook') ||
-      utmData.utm_source?.toLowerCase().includes('instagram') ||
-      utmData.utm_source?.toLowerCase().includes('fb') ||
-      utmData.utm_source?.toLowerCase().includes('ig')) {
-    return 'meta';
-  }
-
-  // Si no se detecta fuente específica, disparar ambos (tráfico orgánico)
-  return 'organic';
-};
-
-/**
- * Strategy: Dispara eventos de tracking de conversión según la fuente
- * @param {string} tratamiento - Nombre del tratamiento
- * @param {Object} utmData - Datos UTM para detectar fuente
- */
-const trackConversionEvents = (tratamiento, utmData = {}) => {
-  const value = CONVERSION_VALUES[tratamiento] || 0;
-  const source = detectTrafficSource(utmData);
-
-  console.log(`📊 Fuente detectada: ${source}`);
-
-  // TikTok: solo disparar TikTok Pixel
-  if (source === 'tiktok') {
-    console.log('🎵 Disparando TikTok Pixel');
-    trackSubmitForm({
-      contentName: tratamiento,
-      value: value,
-      currency: 'PEN'
-    });
-  }
-  // Meta: solo disparar Meta Pixel
-  else if (source === 'meta') {
-    console.log('👤 Disparando Meta Pixel');
-    trackLead({
-      contentName: tratamiento,
-      contentCategory: 'Tratamiento Facial',
-      value: value,
-      currency: 'PEN'
-    });
-  }
-  // Orgánico: disparar ambos para atribución
-  else {
-    console.log('🌐 Tráfico orgánico - Disparando ambos pixels');
-    trackSubmitForm({
-      contentName: tratamiento,
-      value: value,
-      currency: 'PEN'
-    });
-    trackLead({
-      contentName: tratamiento,
-      contentCategory: 'Tratamiento Facial',
-      value: value,
-      currency: 'PEN'
-    });
-  }
-};
 
 /**
  * Servicio principal: Envía datos al webhook
@@ -158,9 +77,6 @@ export const sendToWebhook = async (formData, tratamiento, landing = null, utmDa
     clearTimeout(timeoutId);
 
     if (response.ok) {
-      // Disparar eventos de tracking solo si el webhook fue exitoso
-      trackConversionEvents(tratamiento, utmData);
-
       console.log('✅ Webhook enviado exitosamente');
       return { success: true };
     } else {
@@ -254,6 +170,5 @@ export default {
   handleFormSubmission,
   createWebhookPayload,
   TRATAMIENTOS,
-  LANDINGS,
-  CONVERSION_VALUES
+  LANDINGS
 };
