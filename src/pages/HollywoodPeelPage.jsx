@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { saveMetaUTM } from '../utils/metaPixelHelper';
-import { saveTikTokUTM } from '../utils/tiktokPixelHelper';
-import { trackPageViewConditional } from '../utils/trackingHelper';
-import { handleFormSubmission, TRATAMIENTOS } from '../services/webhookService';
+import { trackPageViewConditional, captureAllUTM } from '../utils/trackingHelper';
+import { handleFormSubmission, TRATAMIENTOS, LANDINGS } from '../services/webhookService';
 
 // Hollywood Peel Landing Page
 function HollywoodPeelPage() {
@@ -23,26 +21,8 @@ function HollywoodPeelPage() {
 
     // Captura los parámetros UTM para tracking
     useEffect(() => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const sanitizeParam = (value) => {
-            if (!value || value === 'N/A') return 'N/A';
-            return value.replace(/[<>"'`]/g, '').substring(0, 100);
-        };
-
-        setUtmData({
-            fbclid: sanitizeParam(urlParams.get('fbclid')),
-            utm_source: sanitizeParam(urlParams.get('utm_source')),
-            utm_medium: sanitizeParam(urlParams.get('utm_medium')),
-            utm_campaign: sanitizeParam(urlParams.get('utm_campaign')),
-            utm_content: sanitizeParam(urlParams.get('utm_content')),
-            utm_term: sanitizeParam(urlParams.get('utm_term')),
-            ttclid: sanitizeParam(urlParams.get('ttclid')),
-            tt_campaign_id: sanitizeParam(urlParams.get('tt_campaign_id')),
-        });
-
-        // Guardar UTM en cookies
-        saveMetaUTM();
-        saveTikTokUTM();
+        // Capturar todos los parámetros UTM (TikTok + Meta + estándar)
+        setUtmData(captureAllUTM());
 
         // Track PageView SOLO en el pixel correspondiente según la fuente
         trackPageViewConditional('Hollywood Peel Landing Page', 'landing_page');
@@ -169,6 +149,7 @@ function HollywoodPeelPage() {
             await handleFormSubmission({
                 formData,
                 tratamiento: TRATAMIENTOS.HOLLYWOOD_PEEL,
+                landing: LANDINGS.HOLLYWOOD_PEEL,
                 utmData,
                 onSuccess: () => {
                     setModal({

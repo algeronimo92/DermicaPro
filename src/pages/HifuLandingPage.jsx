@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { saveMetaUTM } from '../utils/metaPixelHelper';
-import { saveTikTokUTM } from '../utils/tiktokPixelHelper';
-import { trackPageViewConditional } from '../utils/trackingHelper';
+import { trackPageViewConditional, captureAllUTM } from '../utils/trackingHelper';
 import { handleFormSubmission, TRATAMIENTOS, LANDINGS } from '../services/webhookService';
 
 // Este es el componente de React que contiene tu landing page.
@@ -23,12 +21,8 @@ function HifuLandingPage() {
 
     // Captura los parámetros de TikTok Ads y Meta Ads para tracking
     useEffect(() => {
-        // Capturar parámetros de Meta Ads (Facebook/Instagram)
-        saveMetaUTM();
-
-        // Capturar parámetros de TikTok Ads
-        const tiktokUTM = saveTikTokUTM();
-        setUtmData(tiktokUTM);
+        // Capturar todos los parámetros UTM (TikTok + Meta + estándar)
+        setUtmData(captureAllUTM());
 
         // Track PageView SOLO en el pixel correspondiente según la fuente
         trackPageViewConditional('HIFU 12D Landing Page', 'landing_page');

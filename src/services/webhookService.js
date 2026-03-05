@@ -34,6 +34,11 @@ const CONVERSION_VALUES = {
  * @returns {Object} Payload estandarizado
  */
 export const createWebhookPayload = (formData, tratamiento, landing = null, utmData = {}) => {
+  // Filtrar campos UTM vacíos para no enviar nulls a n8n
+  const filteredUTM = Object.fromEntries(
+    Object.entries(utmData).filter(([, v]) => v !== null && v !== undefined && v !== '')
+  );
+
   const payload = {
     nombre: formData.nombre,
     whatsapp: formData.whatsapp.startsWith('+51')
@@ -41,10 +46,9 @@ export const createWebhookPayload = (formData, tratamiento, landing = null, utmD
       : `+51${formData.whatsapp}`,
     email: formData.email,
     tratamiento: tratamiento,
-    ...utmData
+    ...filteredUTM
   };
 
-  // Agregar landing si existe
   if (landing) {
     payload.landing = landing;
   }
@@ -58,8 +62,8 @@ export const createWebhookPayload = (formData, tratamiento, landing = null, utmD
  * @returns {string} 'tiktok', 'meta', o 'organic'
  */
 const detectTrafficSource = (utmData = {}) => {
-  // TikTok: ttclid o tt_campaign_id presentes
-  if (utmData.ttclid || utmData.tt_campaign_id) {
+  // TikTok: ttclid presente
+  if (utmData.ttclid) {
     return 'tiktok';
   }
 

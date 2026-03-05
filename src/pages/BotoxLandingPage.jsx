@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { saveMetaUTM } from '../utils/metaPixelHelper';
-import { saveTikTokUTM } from '../utils/tiktokPixelHelper';
-import { trackPageViewConditional } from '../utils/trackingHelper';
-import { handleFormSubmission, TRATAMIENTOS } from '../services/webhookService';
+import { trackPageViewConditional, captureAllUTM } from '../utils/trackingHelper';
+import { handleFormSubmission, TRATAMIENTOS, LANDINGS } from '../services/webhookService';
 
 // Este es el componente de React que contiene tu landing page de Botox.
 function BotoxLandingPage() {
@@ -23,31 +21,8 @@ function BotoxLandingPage() {
 
     // Captura los parámetros de TikTok Ads y Meta Ads para tracking
     useEffect(() => {
-        const urlParams = new URLSearchParams(window.location.search);
-
-        // Función de sanitización para prevenir XSS
-        const sanitizeParam = (value) => {
-            if (!value || value === 'N/A') return 'N/A';
-            // Eliminar caracteres peligrosos y limitar longitud
-            return value
-                .replace(/[<>"'`]/g, '') // Eliminar chars XSS
-                .substring(0, 100); // Limitar longitud máxima
-        };
-
-        // Capturar parámetros de TikTok
-        setUtmData({
-            ttclid: sanitizeParam(urlParams.get('ttclid')),
-            tt_medium: sanitizeParam(urlParams.get('tt_medium')),
-            tt_campaign_id: sanitizeParam(urlParams.get('tt_campaign_id')),
-            tt_adgroup_id: sanitizeParam(urlParams.get('tt_adgroup_id')),
-            tt_ad_id: sanitizeParam(urlParams.get('tt_ad_id')),
-        });
-
-        // Capturar parámetros de Meta Ads (Facebook/Instagram)
-        saveMetaUTM();
-
-        // Capturar parámetros de TikTok Ads
-        saveTikTokUTM();
+        // Capturar todos los parámetros UTM (TikTok + Meta + estándar)
+        setUtmData(captureAllUTM());
 
         // Track PageView SOLO en el pixel correspondiente según la fuente
         trackPageViewConditional('Botox Landing Page', 'landing_page');
@@ -174,6 +149,7 @@ function BotoxLandingPage() {
             await handleFormSubmission({
                 formData,
                 tratamiento: TRATAMIENTOS.BOTOX,
+                landing: LANDINGS.BOTOX,
                 utmData,
                 onSuccess: () => {
                     setModal({

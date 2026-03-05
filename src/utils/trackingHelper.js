@@ -2,8 +2,8 @@
  * Helper centralizado para tracking condicional basado en fuente de tráfico
  */
 
-import { trackViewContent as trackMetaViewContent } from './metaPixelHelper';
-import { trackViewContent as trackTikTokViewContent } from './tiktokPixelHelper';
+import { trackViewContent as trackMetaViewContent, saveMetaUTM } from './metaPixelHelper';
+import { trackViewContent as trackTikTokViewContent, saveTikTokUTM } from './tiktokPixelHelper';
 
 /**
  * Detecta la fuente de tráfico basándose en parámetros URL
@@ -13,12 +13,11 @@ export const detectTrafficSource = () => {
   const urlParams = new URLSearchParams(window.location.search);
 
   const ttclid = urlParams.get('ttclid');
-  const tt_campaign_id = urlParams.get('tt_campaign_id');
   const fbclid = urlParams.get('fbclid');
   const utm_source = urlParams.get('utm_source');
 
-  // TikTok: ttclid o tt_campaign_id presentes
-  if (ttclid || tt_campaign_id) {
+  // TikTok: ttclid presente
+  if (ttclid) {
     return 'tiktok';
   }
 
@@ -58,7 +57,41 @@ export const trackPageViewConditional = (contentName, contentType = 'landing_pag
   }
 };
 
+/**
+ * Captura todos los parámetros UTM de TikTok Ads, Meta Ads y UTM estándar.
+ * Guarda en sessionStorage y retorna objeto unificado para enviar a n8n.
+ * @returns {object} Objeto con todos los parámetros UTM capturados
+ */
+export const captureAllUTM = () => {
+  // Guardar en sessionStorage para uso de los pixels
+  saveMetaUTM();
+  saveTikTokUTM();
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const sanitize = (value) => {
+    if (!value) return null;
+    return value.replace(/[<>"'`]/g, '').substring(0, 100);
+  };
+
+  return {
+    // TikTok Ads
+    ttclid: sanitize(urlParams.get('ttclid')),
+    // Meta Ads
+    fbclid: sanitize(urlParams.get('fbclid')),
+    ad_id: sanitize(urlParams.get('ad_id')),
+    adset_id: sanitize(urlParams.get('adset_id')),
+    campaign_id: sanitize(urlParams.get('campaign_id')),
+    // UTM estándar
+    utm_source: sanitize(urlParams.get('utm_source')),
+    utm_medium: sanitize(urlParams.get('utm_medium')),
+    utm_campaign: sanitize(urlParams.get('utm_campaign')),
+    utm_content: sanitize(urlParams.get('utm_content')),
+    utm_term: sanitize(urlParams.get('utm_term')),
+  };
+};
+
 export default {
   detectTrafficSource,
-  trackPageViewConditional
+  trackPageViewConditional,
+  captureAllUTM
 };
