@@ -213,7 +213,7 @@ const PoliticaPrivacidadPage = () => {
                   reservas, automatizando notificaciones y almacenamiento de datos.
                 </p>
                 <p className="text-gray-600 text-sm mt-2">
-                  • Servidor: dermica-pro-n8n.rcsgeg.easypanel.host<br />
+                  • Servidor: n8n.dermicapro.online<br />
                   • Los datos se envían de forma segura mediante HTTPS
                 </p>
               </div>

@@ -8,7 +8,7 @@
  * Configuración del webhook
  */
 const WEBHOOK_CONFIG = {
-  baseUrl: 'https://dermica-pro-n8n.rcsgeg.easypanel.host',
+  baseUrl: 'https://n8n.dermicapro.online',
   endpoint: '/webhook/landing',
   timeout: 10000 // 10 segundos
 };
