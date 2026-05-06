@@ -47,29 +47,29 @@ const ContactoPage = () => {
             </h2>
             <div className="space-y-4 text-lg text-gray-700">
               <p className="flex items-center">
-                <MapPinIcon className="w-6 h-6 mr-3 text-[#ea899a]" />
+                <MapPinIcon className="w-6 h-6 mr-3 text-brand-500" />
                 Av. Larco 877, San Andres V etapa, Trujillo, Perú
               </p>
               <p className="flex items-center">
-                <PhoneIcon className="w-6 h-6 mr-3 text-[#ea899a]" />
-                <a href="tel:+51974637783" className="hover:text-[#ea899a]">
+                <PhoneIcon className="w-6 h-6 mr-3 text-brand-500" />
+                <a href="tel:+51974637783" className="hover:text-brand-500">
                   +51 974 637 783
                 </a>
               </p>
               <p className="flex items-center">
-                <i className="fab fa-whatsapp w-6 h-6 mr-3 text-[#ea899a] text-xl"></i>
+                <i className="fab fa-whatsapp w-6 h-6 mr-3 text-brand-500 text-xl"></i>
                 <button
                   onClick={handleWhatsAppClick}
-                  className="hover:text-[#ea899a] text-left"
+                  className="hover:text-brand-500 text-left"
                 >
                   +51 974 637 783
                 </button>
               </p>
               <p className="flex items-center">
-                <MailIcon className="w-6 h-6 mr-3 text-[#ea899a]" />
+                <MailIcon className="w-6 h-6 mr-3 text-brand-500" />
                 <a
                   href="mailto:contacto@dermicapro.com"
-                  className="hover:text-[#ea899a]"
+                  className="hover:text-brand-500"
                 >
                   contacto@dermicapro.com
                 </a>

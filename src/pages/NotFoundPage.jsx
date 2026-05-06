@@ -16,7 +16,7 @@ const NotFoundPage = () => {
           <div className="mb-8 flex justify-center">
             <div className="bg-white rounded-full p-8 shadow-lg">
               <svg
-                className="w-32 h-32 text-[#ea899a]"
+                className="w-32 h-32 text-brand-500"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -32,7 +32,7 @@ const NotFoundPage = () => {
           </div>
 
           {/* 404 Number */}
-          <h1 className="text-8xl md:text-9xl font-bold text-[#ea899a] mb-8">
+          <h1 className="text-8xl md:text-9xl font-bold text-brand-500 mb-8">
             404
           </h1>
 
@@ -53,13 +53,13 @@ const NotFoundPage = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
             <Link
               to="/"
-              className="bg-[#ea899a] text-white px-8 py-3 rounded-full font-semibold hover:bg-[#d77889] transition-colors duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 w-full sm:w-auto"
+              className="bg-brand-500 text-white px-8 py-3 rounded-full font-semibold hover:bg-brand-600 transition-colors duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 w-full sm:w-auto"
             >
               Volver al Inicio
             </Link>
             <Link
               to="/servicios"
-              className="bg-white text-[#ea899a] px-8 py-3 rounded-full font-semibold border-2 border-[#ea899a] hover:bg-pink-50 transition-colors duration-300 w-full sm:w-auto"
+              className="bg-white text-brand-500 px-8 py-3 rounded-full font-semibold border-2 border-brand-500 hover:bg-brand-50 transition-colors duration-300 w-full sm:w-auto"
             >
               Ver Tratamientos
             </Link>
@@ -73,25 +73,25 @@ const NotFoundPage = () => {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <Link
                 to="/servicios"
-                className="text-[#ea899a] hover:text-[#d77889] font-medium transition-colors"
+                className="text-brand-500 hover:text-brand-600 font-medium transition-colors"
               >
                 Servicios
               </Link>
               <Link
                 to="/resultados"
-                className="text-[#ea899a] hover:text-[#d77889] font-medium transition-colors"
+                className="text-brand-500 hover:text-brand-600 font-medium transition-colors"
               >
                 Resultados
               </Link>
               <Link
                 to="/testimonios"
-                className="text-[#ea899a] hover:text-[#d77889] font-medium transition-colors"
+                className="text-brand-500 hover:text-brand-600 font-medium transition-colors"
               >
                 Testimonios
               </Link>
               <Link
                 to="/contacto"
-                className="text-[#ea899a] hover:text-[#d77889] font-medium transition-colors"
+                className="text-brand-500 hover:text-brand-600 font-medium transition-colors"
               >
                 Contacto
               </Link>
@@ -99,7 +99,7 @@ const NotFoundPage = () => {
           </div>
 
           {/* Contact CTA */}
-          <div className="bg-gradient-to-r from-[#ea899a] to-[#f5a8b5] rounded-2xl shadow-lg p-6 text-white">
+          <div className="bg-gradient-to-r from-brand-500 to-brand-300 rounded-2xl shadow-lg p-6 text-white">
             <h3 className="text-xl font-semibold mb-2">
               ¿Necesitas ayuda?
             </h3>
@@ -110,7 +110,7 @@ const NotFoundPage = () => {
               href="https://wa.me/51974637783?text=Hola,%20necesito%20ayuda%20navegando%20el%20sitio"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center bg-white text-[#ea899a] px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors duration-300"
+              className="inline-flex items-center bg-white text-brand-500 px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors duration-300"
             >
               <svg
                 className="w-5 h-5 mr-2"

@@ -212,7 +212,7 @@ const HomePage = ({ setPage, openAdvisor }) => {
           <div className="mt-8 flex flex-col sm:flex-row justify-center items-center gap-4">
             <button
               onClick={openAdvisor}
-              className="inline-block bg-[#ea899a] text-white font-bold py-3 px-8 rounded-full text-lg hover:bg-[#d37989] transition-transform transform hover:scale-105 flex items-center"
+              className="inline-block bg-brand-500 text-white font-bold py-3 px-8 rounded-full text-lg hover:bg-brand-600 transition-transform transform hover:scale-105 flex items-center"
             >
               {" "}
               <SparklesIcon className="w-5 h-5 mr-2" /> Recibir orientación
@@ -220,7 +220,7 @@ const HomePage = ({ setPage, openAdvisor }) => {
             </button>
             <Link
               to="/servicios"
-              className="inline-block bg-white text-[#ea899a] font-bold py-3 px-8 rounded-full text-lg hover:bg-gray-100 transition-transform transform hover:scale-105"
+              className="inline-block bg-white text-brand-500 font-bold py-3 px-8 rounded-full text-lg hover:bg-gray-100 transition-transform transform hover:scale-105"
             >
               {" "}
               Conoce tu tratamiento ideal{" "}
@@ -272,7 +272,7 @@ const HomePage = ({ setPage, openAdvisor }) => {
                   <p className="mt-2 text-gray-600">{service.desc}</p>{" "}
                   <Link
                     to="/servicios"
-                    className="mt-4 text-[#ea899a] hover:text-[#d37989] font-semibold"
+                    className="mt-4 text-brand-500 hover:text-brand-600 font-semibold"
                   >
                     Descubre si es para ti &rarr;
                   </Link>{" "}
@@ -303,7 +303,7 @@ const HomePage = ({ setPage, openAdvisor }) => {
                 <div className="flex items-center mb-4">
                   {" "}
                   {[...Array(testimonial.rating)].map((_, i) => (
-                    <StarIcon key={i} className="w-5 h-5 text-[#ea899a]" />
+                    <StarIcon key={i} className="w-5 h-5 text-brand-500" />
                   ))}{" "}
                 </div>{" "}
                 <blockquote className="text-gray-600 italic">
@@ -319,7 +319,7 @@ const HomePage = ({ setPage, openAdvisor }) => {
             {" "}
             <Link
               to="/testimonios"
-              className="text-[#ea899a] hover:text-[#d37989] font-semibold"
+              className="text-brand-500 hover:text-brand-600 font-semibold"
             >
               Leer más historias de confianza &rarr;
             </Link>{" "}

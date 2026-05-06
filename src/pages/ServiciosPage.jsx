@@ -111,14 +111,14 @@ const ServiciosPage = ({ openAdvisor }) => {
             <p className="mt-4 text-xl text-gray-600">Te explicamos con claridad cada opción para que tomes la mejor decisión, sin presiones.</p>
           </div>
         <div className="bg-gray-50 rounded-lg p-8 mb-12 text-center shadow-sm">
-            <h2 className="text-2xl font-bold text-gray-800 flex items-center justify-center"><SparklesIcon className="w-6 h-6 mr-2 text-[#ea899a]" />¿No sabes por dónde empezar?</h2>
+            <h2 className="text-2xl font-bold text-gray-800 flex items-center justify-center"><SparklesIcon className="w-6 h-6 mr-2 text-brand-500" />¿No sabes por dónde empezar?</h2>
             <p className="text-gray-600 mt-2 mb-4">Nuestro asesor virtual te dará una orientación honesta y sin compromiso. Es el primer paso.</p>
-            <button onClick={openAdvisor} className="inline-block bg-[#ea899a] text-white font-bold py-3 px-8 rounded-full text-lg hover:bg-[#d37989] transition-transform transform hover:scale-105">✨ Probar Asesor Virtual</button>
+            <button onClick={openAdvisor} className="inline-block bg-brand-500 text-white font-bold py-3 px-8 rounded-full text-lg hover:bg-brand-600 transition-transform transform hover:scale-105">✨ Probar Asesor Virtual</button>
         </div>
         <div className="space-y-12">
           {services.map((service, index) => (
             <div key={index} className="bgå-gray-50 rounded-lg p-6 shadow-md hover:shadow-xl transition-shadow duration-300 flex flex-col md:flex-row items-center text-center md:text-left gap-6">
-              <div className="bg-[#ea899a] text-white rounded-full p-5 flex-shrink-0"><i className={`${service.icon} fa-2x w-8 h-8`}></i></div>
+              <div className="bg-brand-500 text-white rounded-full p-5 flex-shrink-0"><i className={`${service.icon} fa-2x w-8 h-8`}></i></div>
               <div className="flex-grow">
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">{service.title}</h3>
                 <p className="text-gray-700 mb-3">{service.description}</p>

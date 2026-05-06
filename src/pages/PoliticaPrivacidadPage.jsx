@@ -109,7 +109,7 @@ const PoliticaPrivacidadPage = () => {
             </h2>
 
             <div className="space-y-5">
-              <div className="border-l-4 border-[#ea899a] pl-4">
+              <div className="border-l-4 border-brand-500 pl-4">
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">
                   4.1 Google Gemini AI (Inteligencia Artificial)
                 </h3>
@@ -124,14 +124,14 @@ const PoliticaPrivacidadPage = () => {
                     href="https://policies.google.com/privacy"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[#ea899a] hover:underline"
+                    className="text-brand-500 hover:underline"
                   >
                     https://policies.google.com/privacy
                   </a>
                 </p>
               </div>
 
-              <div className="border-l-4 border-[#ea899a] pl-4">
+              <div className="border-l-4 border-brand-500 pl-4">
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">
                   4.2 Meta Pixel (Facebook Pixel - Análisis y Publicidad)
                 </h3>
@@ -166,7 +166,7 @@ const PoliticaPrivacidadPage = () => {
                     href="https://www.facebook.com/privacy/policy"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[#ea899a] hover:underline"
+                    className="text-brand-500 hover:underline"
                   >
                     https://www.facebook.com/privacy/policy
                   </a><br />
@@ -174,14 +174,14 @@ const PoliticaPrivacidadPage = () => {
                     href="https://www.facebook.com/adpreferences"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[#ea899a] hover:underline"
+                    className="text-brand-500 hover:underline"
                   >
                     https://www.facebook.com/adpreferences
                   </a>
                 </p>
               </div>
 
-              <div className="border-l-4 border-[#ea899a] pl-4">
+              <div className="border-l-4 border-brand-500 pl-4">
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">
                   4.3 TikTok Pixel (Análisis y Publicidad)
                 </h3>
@@ -197,14 +197,14 @@ const PoliticaPrivacidadPage = () => {
                     href="https://www.tiktok.com/legal/privacy-policy"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[#ea899a] hover:underline"
+                    className="text-brand-500 hover:underline"
                   >
                     https://www.tiktok.com/legal/privacy-policy
                   </a>
                 </p>
               </div>
 
-              <div className="border-l-4 border-[#ea899a] pl-4">
+              <div className="border-l-4 border-brand-500 pl-4">
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">
                   4.4 n8n (Automatización de Formularios)
                 </h3>
@@ -218,7 +218,7 @@ const PoliticaPrivacidadPage = () => {
                 </p>
               </div>
 
-              <div className="border-l-4 border-[#ea899a] pl-4">
+              <div className="border-l-4 border-brand-500 pl-4">
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">
                   4.5 WhatsApp Business API
                 </h3>
@@ -233,7 +233,7 @@ const PoliticaPrivacidadPage = () => {
                     href="https://www.whatsapp.com/legal/privacy-policy"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[#ea899a] hover:underline"
+                    className="text-brand-500 hover:underline"
                   >
                     https://www.whatsapp.com/legal/privacy-policy
                   </a>
@@ -278,9 +278,9 @@ const PoliticaPrivacidadPage = () => {
               Puedes optar por no recibir anuncios personalizados:
             </p>
             <ul className="list-disc list-inside text-gray-700 space-y-2 ml-4 mt-3">
-              <li><strong>Meta (Facebook/Instagram):</strong> <a href="https://www.facebook.com/adpreferences" target="_blank" rel="noopener noreferrer" className="text-[#ea899a] hover:underline">Configuración de anuncios</a></li>
+              <li><strong>Meta (Facebook/Instagram):</strong> <a href="https://www.facebook.com/adpreferences" target="_blank" rel="noopener noreferrer" className="text-brand-500 hover:underline">Configuración de anuncios</a></li>
               <li><strong>TikTok:</strong> Configuración → Privacidad → Anuncios → Anuncios personalizados</li>
-              <li><strong>Google:</strong> <a href="https://adssettings.google.com" target="_blank" rel="noopener noreferrer" className="text-[#ea899a] hover:underline">Configuración de anuncios</a></li>
+              <li><strong>Google:</strong> <a href="https://adssettings.google.com" target="_blank" rel="noopener noreferrer" className="text-brand-500 hover:underline">Configuración de anuncios</a></li>
             </ul>
 
             <p className="text-gray-700 leading-relaxed mt-4 bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-400">
@@ -357,12 +357,12 @@ const PoliticaPrivacidadPage = () => {
             </p>
             <div className="bg-gray-100 p-4 rounded-md mt-3">
               <p className="text-gray-800">
-                📧 Email: <a href="mailto:contacto@dermicapro.com" className="text-[#ea899a] hover:underline">
+                📧 Email: <a href="mailto:contacto@dermicapro.com" className="text-brand-500 hover:underline">
                   contacto@dermicapro.com
                 </a>
               </p>
               <p className="text-gray-800 mt-1">
-                📱 WhatsApp: <a href="https://wa.me/51974637783" className="text-[#ea899a] hover:underline">
+                📱 WhatsApp: <a href="https://wa.me/51974637783" className="text-brand-500 hover:underline">
                   +51 974 637 783
                 </a>
               </p>
@@ -459,7 +459,7 @@ const PoliticaPrivacidadPage = () => {
               Si tienes preguntas, inquietudes o solicitudes sobre esta Política de Privacidad
               o el manejo de tus datos personales, contáctanos:
             </p>
-            <div className="bg-[#ea899a] bg-opacity-10 p-6 rounded-lg">
+            <div className="bg-brand-500 bg-opacity-10 p-6 rounded-lg">
               <h3 className="text-xl font-bold text-gray-900 mb-3">DermicaPro</h3>
               <p className="text-gray-700">
                 📍 <strong>Dirección:</strong> Av. Larco 877, Trujillo, Perú
@@ -467,7 +467,7 @@ const PoliticaPrivacidadPage = () => {
               <p className="text-gray-700 mt-2">
                 📧 <strong>Email:</strong> <a
                   href="mailto:contacto@dermicapro.com"
-                  className="text-[#ea899a] hover:underline font-semibold"
+                  className="text-brand-500 hover:underline font-semibold"
                 >
                   contacto@dermicapro.com
                 </a>
@@ -475,7 +475,7 @@ const PoliticaPrivacidadPage = () => {
               <p className="text-gray-700 mt-2">
                 📱 <strong>WhatsApp:</strong> <a
                   href="https://wa.me/51974637783"
-                  className="text-[#ea899a] hover:underline font-semibold"
+                  className="text-brand-500 hover:underline font-semibold"
                 >
                   +51 974 637 783
                 </a>
@@ -483,7 +483,7 @@ const PoliticaPrivacidadPage = () => {
               <p className="text-gray-700 mt-2">
                 🌐 <strong>Sitio web:</strong> <a
                   href="https://dermicapro.com"
-                  className="text-[#ea899a] hover:underline font-semibold"
+                  className="text-brand-500 hover:underline font-semibold"
                 >
                   dermicapro.com
                 </a>
@@ -505,7 +505,7 @@ const PoliticaPrivacidadPage = () => {
         <div className="text-center mt-8">
           <a
             href="/"
-            className="inline-flex items-center text-[#ea899a] font-semibold hover:text-[#d37989] transition-colors"
+            className="inline-flex items-center text-brand-500 font-semibold hover:text-brand-600 transition-colors"
           >
             ← Volver al inicio
           </a>

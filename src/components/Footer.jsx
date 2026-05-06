@@ -80,15 +80,15 @@ const Footer = () => {
             <ul className="mt-4 space-y-2 text-gray-300">
               {" "}
               <li className="flex items-start">
-                <MapPinIcon className="w-5 h-5 mr-2 mt-1 text-[#ea899a]" />
+                <MapPinIcon className="w-5 h-5 mr-2 mt-1 text-brand-500" />
                 <span>Av. Larco 877, Trujillo, Perú</span>
               </li>{" "}
               <li className="flex items-center">
-                <PhoneIcon className="w-5 h-5 mr-2 text-[#ea899a]" />
+                <PhoneIcon className="w-5 h-5 mr-2 text-brand-500" />
                 <span>+51 974 637 783</span>
               </li>{" "}
               <li className="flex items-center">
-                <MailIcon className="w-5 h-5 mr-2 text-[#ea899a]" />
+                <MailIcon className="w-5 h-5 mr-2 text-brand-500" />
                 <span>contacto@dermicapro.com</span>
               </li>{" "}
             </ul>{" "}
@@ -104,7 +104,7 @@ const Footer = () => {
                 <a
                   key={link.name}
                   href={link.url}
-                  className="text-gray-400 hover:text-[#ea899a]"
+                  className="text-gray-400 hover:text-brand-500 transition-colors"
                 >
                   {" "}
                   <span className="sr-only">{link.name}</span>{" "}

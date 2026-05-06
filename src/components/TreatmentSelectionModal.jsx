@@ -52,7 +52,7 @@ const TreatmentSelectionModal = ({ isOpen, onClose, treatments, userConcern }) =
                     {treatments.map((treatment, index) => (
                         <div
                             key={index}
-                            className="bg-gradient-to-br from-pink-50 to-white border-2 border-[#ea899a] rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 flex flex-col"
+                            className="bg-gradient-to-br from-brand-50 to-white border-2 border-brand-500 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 flex flex-col"
                         >
                             {/* Imagen del tratamiento */}
                             {treatment.image && (
@@ -78,13 +78,13 @@ const TreatmentSelectionModal = ({ isOpen, onClose, treatments, userConcern }) =
                             {/* Beneficios clave */}
                             {treatment.benefits && (
                                 <div className="mb-4">
-                                    <p className="text-xs font-semibold text-[#ea899a] mb-2">
+                                    <p className="text-xs font-semibold text-brand-500 mb-2">
                                         ✓ Beneficios principales:
                                     </p>
                                     <ul className="text-xs text-gray-600 space-y-1">
                                         {treatment.benefits.map((benefit, idx) => (
                                             <li key={idx} className="flex items-start">
-                                                <span className="text-[#ea899a] mr-2">•</span>
+                                                <span className="text-brand-500 mr-2">•</span>
                                                 {benefit}
                                             </li>
                                         ))}

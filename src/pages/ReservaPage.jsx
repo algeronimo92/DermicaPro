@@ -115,7 +115,7 @@ const ReservaPage = () => {
         {" "}
         <div className="text-center bg-white p-10 rounded-lg shadow-xl">
           {" "}
-          <h1 className="text-3xl font-bold text-[#ea899a] mb-4">
+          <h1 className="text-3xl font-bold text-brand-500 mb-4">
             ¡Gracias, {formState.name}!
           </h1>{" "}
           <p className="text-lg text-gray-700">Hemos recibido tu solicitud.</p>{" "}
@@ -171,7 +171,7 @@ const ReservaPage = () => {
                 value={formState.name}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                className={`mt-1 block w-full px-3 py-2 bg-white border rounded-md shadow-sm focus:outline-none focus:ring-[#ea899a] focus:border-[#ea899a] ${
+                className={`mt-1 block w-full px-3 py-2 bg-white border rounded-md shadow-sm focus:outline-none focus:ring-brand-500 focus:border-brand-500 ${
                   errors.name ? 'border-red-500' : 'border-gray-300'
                 }`}
               />
@@ -208,7 +208,7 @@ const ReservaPage = () => {
                 onBlur={handleBlur}
                 maxLength="9"
                 placeholder="987654321"
-                className={`mt-1 block w-full px-3 py-2 bg-white border rounded-md shadow-sm focus:outline-none focus:ring-[#ea899a] focus:border-[#ea899a] ${
+                className={`mt-1 block w-full px-3 py-2 bg-white border rounded-md shadow-sm focus:outline-none focus:ring-brand-500 focus:border-brand-500 ${
                   errors.phone ? 'border-red-500' : 'border-gray-300'
                 }`}
               />
@@ -229,7 +229,7 @@ const ReservaPage = () => {
                 name="service"
                 value={formState.service}
                 onChange={handleChange}
-                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-[#ea899a] focus:border-[#ea899a] sm:text-sm rounded-md"
+                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-brand-500 focus:border-brand-500 sm:text-sm rounded-md"
               >
                 {" "}
                 <option value="">Selecciona un tratamiento</option>{" "}
@@ -244,7 +244,7 @@ const ReservaPage = () => {
               {" "}
               <button
                 type="submit"
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-full shadow-sm text-lg font-medium text-white bg-[#ea899a] hover:bg-[#d37989] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#ea899a] transition-transform transform hover:scale-105"
+                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-full shadow-sm text-lg font-medium text-white bg-brand-500 hover:bg-brand-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition-transform transform hover:scale-105"
               >
                 {" "}
                 Agendar mi Evaluación de Honestidad{" "}

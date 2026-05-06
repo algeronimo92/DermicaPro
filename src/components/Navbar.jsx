@@ -21,6 +21,7 @@ const Navbar = ({ openAdvisor }) => {
     { name: "Nuestra Filosofía", page: "/nosotros" },
     { name: "Testimonios", page: "/testimonios" },
     { name: "Contacto", page: "/contacto" },
+    { name: "Trabaja con Nosotros", page: "/trabaja-con-nosotros" },
   ];
 
   return (
@@ -50,8 +51,8 @@ const Navbar = ({ openAdvisor }) => {
                   to={link.page}
                   className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                     isScrolled
-                      ? "text-gray-700 hover:bg-[#ea899a] hover:text-white"
-                      : "text-gray-500 hover:bg-[#ea899a] hover:text-white"
+                      ? "text-gray-700 hover:bg-brand-500 hover:text-white"
+                      : "text-gray-500 hover:bg-brand-500 hover:text-white"
                   }`}
                 >
                   {link.name}
@@ -59,7 +60,7 @@ const Navbar = ({ openAdvisor }) => {
               ))}
               <Link
                 to="/reserva"
-                className="ml-4 px-4 py-2 rounded-full text-sm font-medium text-white bg-[#ea899a] hover:bg-[#d37989] transition-transform transform hover:scale-105"
+                className="ml-4 px-4 py-2 rounded-full text-sm font-medium text-white bg-brand-500 hover:bg-brand-600 transition-transform transform hover:scale-105"
               >
                 Agendar Evaluación
               </Link>
@@ -108,7 +109,7 @@ const Navbar = ({ openAdvisor }) => {
                 key={link.name}
                 to={link.page}
                 onClick={() => setIsOpen(false)}
-                className="text-gray-700 hover:bg-[#ea899a] hover:text-white block px-3 py-2 rounded-md text-base font-medium"
+                className="text-gray-700 hover:bg-brand-500 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
               >
                 {link.name}
               </Link>
@@ -118,14 +119,14 @@ const Navbar = ({ openAdvisor }) => {
                 openAdvisor();
                 setIsOpen(false);
               }}
-              className="w-full text-left text-gray-700 hover:bg-[#ea899a] hover:text-white block px-3 py-2 rounded-md text-base font-medium"
+              className="w-full text-left text-gray-700 hover:bg-brand-500 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
             >
               ✨ Asesor Virtual
             </button>
             <Link
               to="/reserva"
               onClick={() => setIsOpen(false)}
-              className="mt-2 block w-full text-center px-4 py-2 rounded-full text-sm font-medium text-white bg-[#ea899a] hover:bg-[#d37989]"
+              className="mt-2 block w-full text-center px-4 py-2 rounded-full text-sm font-medium text-white bg-brand-500 hover:bg-brand-600"
             >
               Agendar Evaluación
             </Link>

@@ -62,7 +62,7 @@ const NosotrosPage = () => {
             {values.map((value) => (
               <div key={value.title} className="bg-gray-50 p-6 rounded-lg">
                 {" "}
-                <h3 className="text-xl font-semibold text-[#ea899a] mb-2">
+                <h3 className="text-xl font-semibold text-brand-500 mb-2">
                   {value.title}
                 </h3>{" "}
                 <p className="text-gray-600">{value.text}</p>{" "}

@@ -283,10 +283,10 @@ ${concern.trim()}
                 <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex justify-center items-center p-4 animate-fade-in">
                     <div ref={modalRef} className="bg-white rounded-lg shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col">
                         {/* Header fijo */}
-                        <div className="flex justify-between items-center p-6 md:p-8 pb-4 border-b border-gray-200 bg-gradient-to-r from-pink-50 to-white">
+                        <div className="flex justify-between items-center p-6 md:p-8 pb-4 border-b border-gray-200 bg-gradient-to-r from-brand-50 to-white">
                             <div>
                                 <h2 className="text-2xl font-bold text-gray-800 flex items-center">
-                                    <SparklesIcon className="w-6 h-6 mr-2 text-[#ea899a]" />
+                                    <SparklesIcon className="w-6 h-6 mr-2 text-brand-500" />
                                     Dr. Virtual de DermicaPro
                                 </h2>
                                 <p className="text-xs text-gray-500 mt-1 ml-8">Experto en Dermatología Estética</p>
@@ -313,7 +313,7 @@ ${concern.trim()}
                                         </div>
                                         <button
                                             onClick={() => { setRecommendation(''); setRecommendedTreatments([]); setError(''); }}
-                                            className="flex-shrink-0 text-xs text-[#ea899a] hover:text-[#d37989] font-semibold underline transition-colors"
+                                            className="flex-shrink-0 text-xs text-brand-500 hover:text-brand-600 font-semibold underline transition-colors"
                                         >
                                             Nueva consulta
                                         </button>
@@ -321,10 +321,10 @@ ${concern.trim()}
                                 </div>
                             ) : (
                                 <>
-                                    <div className="bg-gradient-to-br from-blue-50 to-pink-50 rounded-xl p-5 mb-6 border-l-4 border-[#ea899a]">
+                                    <div className="bg-gradient-to-br from-blue-50 to-pink-50 rounded-xl p-5 mb-6 border-l-4 border-brand-500">
                                         <div className="flex items-start gap-3">
                                             <div className="flex-shrink-0 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md">
-                                                <svg className="w-6 h-6 text-[#ea899a]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <svg className="w-6 h-6 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                                                 </svg>
                                             </div>
@@ -343,7 +343,7 @@ ${concern.trim()}
                                     <textarea
                                         value={concern}
                                         onChange={(e) => setConcern(e.target.value)}
-                                        className="w-full h-40 p-4 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-[#ea899a] focus:border-[#ea899a] transition resize-none text-sm"
+                                        className="w-full h-40 p-4 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition resize-none text-sm"
                                         placeholder="Ejemplo: Tengo 35 años y he notado manchas oscuras en mis mejillas que empeoran con el sol. También siento que mi piel ha perdido firmeza y tengo líneas finas alrededor de los ojos. Me gustaría lucir más fresca pero con resultados naturales..."
                                         disabled={loading}
                                     />
@@ -353,7 +353,7 @@ ${concern.trim()}
                                     <button
                                         onClick={handleGetRecommendation}
                                         disabled={loading}
-                                        className="w-full mt-6 bg-gradient-to-r from-[#ea899a] to-[#d37989] text-white font-bold py-4 px-6 rounded-full text-lg hover:shadow-2xl transition-all duration-300 flex items-center justify-center disabled:bg-gray-400 disabled:cursor-not-allowed shadow-lg transform hover:scale-[1.02]"
+                                        className="w-full mt-6 bg-gradient-to-r from-brand-500 to-brand-600 text-white font-bold py-4 px-6 rounded-full text-lg hover:shadow-2xl transition-all duration-300 flex items-center justify-center disabled:bg-gray-400 disabled:cursor-not-allowed shadow-lg transform hover:scale-[1.02]"
                                     >
                                         {loading ? (
                                             <>
@@ -378,9 +378,9 @@ ${concern.trim()}
                             {/* Recomendación */}
                             {recommendation && (
                                 <div ref={recommendationRef} className="mt-8 animate-fade-in">
-                                    <div className="bg-gradient-to-br from-pink-50 via-white to-pink-50 border-2 border-[#ea899a] rounded-2xl p-6 md:p-8 shadow-lg">
+                                    <div className="bg-gradient-to-br from-pink-50 via-white to-pink-50 border-2 border-brand-500 rounded-2xl p-6 md:p-8 shadow-lg">
                                         <div className="flex items-start gap-3 mb-5">
-                                            <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-[#ea899a] to-[#d37989] rounded-full flex items-center justify-center shadow-md">
+                                            <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-brand-500 to-brand-600 rounded-full flex items-center justify-center shadow-md">
                                                 <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                 </svg>
@@ -400,7 +400,7 @@ ${concern.trim()}
 
                                         {/* Badge de confianza */}
                                         <div className="mt-6 pt-4 border-t border-gray-200 flex items-center gap-2 text-xs text-gray-500">
-                                            <svg className="w-4 h-4 text-[#ea899a]" fill="currentColor" viewBox="0 0 20 20">
+                                            <svg className="w-4 h-4 text-brand-500" fill="currentColor" viewBox="0 0 20 20">
                                                 <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                             </svg>
                                             <span>Respuesta generada por IA entrenada en dermatología estética. Consulta presencial recomendada para evaluación final.</span>
@@ -411,7 +411,7 @@ ${concern.trim()}
                                     {recommendedTreatments.length > 0 && (
                                         <button
                                             onClick={() => setShowTreatmentModal(true)}
-                                            className="w-full mt-6 bg-gradient-to-r from-[#ea899a] to-[#d37989] text-white font-bold py-5 px-6 rounded-2xl text-lg hover:shadow-2xl transition-all duration-300 flex items-center justify-center gap-3 transform hover:scale-[1.02] shadow-xl"
+                                            className="w-full mt-6 bg-gradient-to-r from-brand-500 to-brand-600 text-white font-bold py-5 px-6 rounded-2xl text-lg hover:shadow-2xl transition-all duration-300 flex items-center justify-center gap-3 transform hover:scale-[1.02] shadow-xl"
                                         >
                                             <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
