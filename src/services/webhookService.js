@@ -165,10 +165,12 @@ export const LANDINGS = {
   HOLLYWOOD_PEEL: 'hollywood-peel-landing'
 };
 
-export default {
+const webhookService = {
   sendToWebhook,
   handleFormSubmission,
   createWebhookPayload,
   TRATAMIENTOS,
   LANDINGS
 };
+
+export default webhookService;
