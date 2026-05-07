@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { captureAllUTM } from '../utils/trackingHelper';
+import SearchableSelect from '../components/SearchableSelect';
+import countriesData from '../data/countriesCities.json';
 
 const NOMBRE_PUESTO = 'Editor de Videos';
-const WEBHOOK_URL = 'https://dermica-pro-n8n.rcsgeg.easypanel.host/webhook/postulacion-editor-video';
+const WEBHOOK_URL = 'https://n8n.dermicapro.online/webhook-test/cc4dda80-a015-463b-b922-d04c2fa42d8e';
 const WHATSAPP_ERROR = '+51974637783';
 
 const customCss = `
@@ -41,13 +43,15 @@ const validateField = (name, value) => {
     case 'dni':
       return !/^[0-9]{8}$/.test(value.trim()) ? '8 dígitos requeridos' : '';
     case 'curriculum':
-      if (!value.trim()) return 'Ingresa el link de tu CV';
-      try { new URL(value.trim()); return ''; } catch { return 'Ingresa un link válido (Google Drive, etc.)'; }
-    case 'portafolio':
-      if (!value.trim()) return 'Ingresa el link de tu reel / portafolio';
-      try { new URL(value.trim()); return ''; } catch { return 'Ingresa un link válido'; }
-    case 'pretensiones':
-      return !value.trim() ? 'Ingresa tus pretensiones salariales' : '';
+      if (!value) return 'Selecciona un archivo PDF';
+      if (!(value instanceof File)) return 'Debes cargar un archivo';
+      if (value.type !== 'application/pdf') return 'Solo se permite archivos PDF';
+      if (value.size > 5 * 1024 * 1024) return 'El archivo no puede superar 5 MB';
+      return '';
+    case 'ciudad':
+      return !value ? 'Selecciona tu ciudad' : '';
+    case 'país':
+      return !value ? 'Selecciona tu país' : '';
     default:
       return '';
   }
@@ -60,28 +64,32 @@ function EditorVideoPostulacionPage() {
     telefono: '',
     email: '',
     dni: '',
-    curriculum: '',
-    portafolio: '',
-    pretensiones: '',
-  });
-  const [clasificacion, setClasificacion] = useState({
-    anios_experiencia: '',
-    software_dominado: [],
-    sector_belleza: '',
-    motion_graphics: '',
-    modalidad: '',
-    proyectos_activos: '',
-    flujo_trabajo: '',
-    manejo_feedback_negativo: '',
-    experiencia_redes_detalle: '',
-    gestion_multiples_proyectos: '',
-    contenido_favorito: '',
+    curriculum: null,
+    ciudad: '',
+    país: '',
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [utmData, setUtmData] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState('');
+  const [dragActive, setDragActive] = useState(false);
+  const [availableCities, setAvailableCities] = useState([]);
+
+  // Cargar ciudades cuando cambia el país
+  useEffect(() => {
+    if (formData.país) {
+      const country = countriesData.countries.find(c => c.name === formData.país);
+      setAvailableCities(country ? country.cities : []);
+      // Resetear ciudad cuando cambia país
+      if (formData.ciudad) {
+        setFormData(prev => ({ ...prev, ciudad: '' }));
+        setErrors(prev => ({ ...prev, ciudad: '' }));
+      }
+    } else {
+      setAvailableCities([]);
+    }
+  }, [formData.país]);
 
   useEffect(() => {
     setUtmData(captureAllUTM());
@@ -106,59 +114,47 @@ function EditorVideoPostulacionPage() {
   }, []);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, files } = e.target;
     let processed = value;
-    if (name === 'nombre' || name === 'apellido') {
+    
+    if (type === 'file') {
+      processed = files?.[0] || null;
+      setDragActive(false);
+    } else if (name === 'nombre' || name === 'apellido') {
       processed = value.toLowerCase().replace(/(^|\s)\S/g, c => c.toUpperCase());
     } else if (name === 'telefono' || name === 'dni') {
       processed = value.replace(/[^0-9]/g, '');
     }
+    
     setFormData(prev => ({ ...prev, [name]: processed }));
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: validateField(name, processed) }));
     }
   };
 
-  const handleBlur = (e) => {
-    const { name, value } = e.target;
-    setErrors(prev => ({ ...prev, [name]: validateField(name, value) }));
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === 'dragenter' || e.type === 'dragover') {
+      setDragActive(true);
+    } else if (e.type === 'dragleave') {
+      setDragActive(false);
+    }
   };
 
-  const handleRadio = (group, value) => {
-    setClasificacion(prev => ({ ...prev, [group]: value }));
-    if (errors[group]) setErrors(prev => ({ ...prev, [group]: '' }));
-  };
-
-  const handleCheckbox = (group, value) => {
-    setClasificacion(prev => {
-      const current = prev[group];
-      const updated = current.includes(value)
-        ? current.filter(v => v !== value)
-        : [...current, value];
-      return { ...prev, [group]: updated };
-    });
-    if (errors[group]) setErrors(prev => ({ ...prev, [group]: '' }));
-  };
-
-  const handlePregunta = (name, value) => {
-    setClasificacion(prev => ({ ...prev, [name]: value }));
-    if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
-  };
-
-  const validateClasificacion = () => {
-    const errs = {};
-    if (!clasificacion.anios_experiencia) errs.anios_experiencia = 'Selecciona una opción';
-    if (clasificacion.software_dominado.length === 0) errs.software_dominado = 'Selecciona al menos una opción';
-    if (!clasificacion.sector_belleza) errs.sector_belleza = 'Selecciona una opción';
-    if (!clasificacion.motion_graphics) errs.motion_graphics = 'Selecciona una opción';
-    if (!clasificacion.modalidad) errs.modalidad = 'Selecciona una opción';
-    if (!clasificacion.proyectos_activos) errs.proyectos_activos = 'Selecciona una opción';
-    if (!clasificacion.flujo_trabajo || clasificacion.flujo_trabajo.trim().length < 20) errs.flujo_trabajo = 'Por favor desarrolla tu respuesta (mín. 20 caracteres)';
-    if (!clasificacion.manejo_feedback_negativo || clasificacion.manejo_feedback_negativo.trim().length < 20) errs.manejo_feedback_negativo = 'Por favor desarrolla tu respuesta (mín. 20 caracteres)';
-    if (!clasificacion.experiencia_redes_detalle || clasificacion.experiencia_redes_detalle.trim().length < 20) errs.experiencia_redes_detalle = 'Por favor desarrolla tu respuesta (mín. 20 caracteres)';
-    if (!clasificacion.gestion_multiples_proyectos || clasificacion.gestion_multiples_proyectos.trim().length < 20) errs.gestion_multiples_proyectos = 'Por favor desarrolla tu respuesta (mín. 20 caracteres)';
-    if (!clasificacion.contenido_favorito || clasificacion.contenido_favorito.trim().length < 20) errs.contenido_favorito = 'Por favor desarrolla tu respuesta (mín. 20 caracteres)';
-    return errs;
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    
+    const files = e.dataTransfer?.files;
+    if (files && files[0]) {
+      const file = files[0];
+      setFormData(prev => ({ ...prev, curriculum: file }));
+      if (errors.curriculum) {
+        setErrors(prev => ({ ...prev, curriculum: validateField('curriculum', file) }));
+      }
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -169,36 +165,41 @@ function EditorVideoPostulacionPage() {
       if (err) acc[key] = err;
       return acc;
     }, {});
-    const clasifErrors = validateClasificacion();
-    const allErrors = { ...fieldErrors, ...clasifErrors };
+    const allErrors = { ...fieldErrors};
     setErrors(allErrors);
 
     if (Object.keys(allErrors).length > 0) return;
 
     setIsSubmitting(true);
     try {
-      const payload = {
-        ...formData,
-        telefono: `+51${formData.telefono}`,
-        ...Object.fromEntries(
-          Object.entries(clasificacion).map(([k, v]) => [
-            k,
-            Array.isArray(v) ? v.join(', ') : v,
-          ])
-        ),
-        puesto: NOMBRE_PUESTO,
-        landing_url: window.location.href,
-        timestamp: new Date().toISOString(),
-        ...Object.fromEntries(Object.entries(utmData).filter(([, v]) => v)),
-      };
+      const formDataPayload = new FormData();
+      formDataPayload.append('nombre', formData.nombre);
+      formDataPayload.append('apellido', formData.apellido);
+      formDataPayload.append('telefono', `+51${formData.telefono}`);
+      formDataPayload.append('email', formData.email);
+      formDataPayload.append('dni', formData.dni);
+      formDataPayload.append('ciudad', formData.ciudad);
+      formDataPayload.append('país', formData.país);
+      if (formData.curriculum instanceof File) {
+        formDataPayload.append('curriculum', formData.curriculum);
+      }
+      formDataPayload.append('puesto', NOMBRE_PUESTO);
+      formDataPayload.append('landing_url', window.location.href);
+      formDataPayload.append('timestamp', new Date().toISOString());
+      // Enviar tracking data (UTM y click IDs)
+      const trackingFields = ['ttclid', 'fbclid', 'ad_id', 'adset_id', 'campaign_id', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
+      trackingFields.forEach(field => {
+        formDataPayload.append(field, utmData[field] || '');
+      });
+      // Debug
+      console.log('📊 FormData UTM:', utmData);
 
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 12000);
 
       const response = await fetch(WEBHOOK_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: formDataPayload,
         signal: controller.signal,
       });
       clearTimeout(timeoutId);
@@ -206,8 +207,7 @@ function EditorVideoPostulacionPage() {
       if (response.ok) {
         setModalType('success');
         setShowModal(true);
-        setFormData({ nombre: '', apellido: '', telefono: '', email: '', dni: '', curriculum: '', portafolio: '', pretensiones: '' });
-        setClasificacion({ anios_experiencia: '', software_dominado: [], sector_belleza: '', motion_graphics: '', modalidad: '', proyectos_activos: '', flujo_trabajo: '', manejo_feedback_negativo: '', experiencia_redes_detalle: '', gestion_multiples_proyectos: '', contenido_favorito: '' });
+        setFormData({ nombre: '', apellido: '', telefono: '', email: '', dni: '', curriculum: null, ciudad: '', país: '' });
         setErrors({});
       } else {
         setModalType('error');
@@ -363,12 +363,12 @@ function EditorVideoPostulacionPage() {
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium dp-text-secondary mb-1">Nombre *</label>
-                  <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} onBlur={handleBlur} placeholder="Ej: Andrés" className={inputClass('nombre')} />
+                  <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} placeholder="Ej: Andrés" className={inputClass('nombre')} />
                   {errors.nombre && <p className="text-red-500 text-xs mt-1">{errors.nombre}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium dp-text-secondary mb-1">Apellido *</label>
-                  <input type="text" name="apellido" value={formData.apellido} onChange={handleChange} onBlur={handleBlur} placeholder="Ej: Castillo" className={inputClass('apellido')} />
+                  <input type="text" name="apellido" value={formData.apellido} onChange={handleChange} placeholder="Ej: Castillo" className={inputClass('apellido')} />
                   {errors.apellido && <p className="text-red-500 text-xs mt-1">{errors.apellido}</p>}
                 </div>
               </div>
@@ -379,13 +379,13 @@ function EditorVideoPostulacionPage() {
                   <label className="block text-sm font-medium dp-text-secondary mb-1">Teléfono (WhatsApp) *</label>
                   <div className="flex">
                     <span className="inline-flex items-center px-3 border border-r-0 border-gray-300 bg-gray-50 text-gray-500 rounded-l-lg text-sm">+51</span>
-                    <input type="tel" name="telefono" value={formData.telefono} onChange={handleChange} onBlur={handleBlur} placeholder="987 654 321" maxLength="9" className={`w-full px-4 py-2 border rounded-r-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition ${errors.telefono ? 'border-red-500' : formData.telefono ? 'border-green-500' : 'border-gray-300'}`} />
+                    <input type="tel" name="telefono" value={formData.telefono} onChange={handleChange} placeholder="987 654 321" maxLength="9" className={`w-full px-4 py-2 border rounded-r-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition ${errors.telefono ? 'border-red-500' : formData.telefono ? 'border-green-500' : 'border-gray-300'}`} />
                   </div>
                   {errors.telefono && <p className="text-red-500 text-xs mt-1">{errors.telefono}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium dp-text-secondary mb-1">DNI *</label>
-                  <input type="text" name="dni" value={formData.dni} onChange={handleChange} onBlur={handleBlur} placeholder="12345678" maxLength="8" className={inputClass('dni')} />
+                  <input type="text" name="dni" value={formData.dni} onChange={handleChange} placeholder="12345678" maxLength="8" className={inputClass('dni')} />
                   {errors.dni && <p className="text-red-500 text-xs mt-1">{errors.dni}</p>}
                 </div>
               </div>
@@ -393,155 +393,82 @@ function EditorVideoPostulacionPage() {
               {/* Email */}
               <div>
                 <label className="block text-sm font-medium dp-text-secondary mb-1">Correo electrónico *</label>
-                <input type="email" name="email" value={formData.email} onChange={handleChange} onBlur={handleBlur} placeholder="ejemplo@correo.com" className={inputClass('email')} />
+                <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="ejemplo@correo.com" className={inputClass('email')} />
                 {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
               </div>
 
               {/* Curriculum */}
               <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-1">Link de CV (Google Drive, Dropbox, etc.) *</label>
-                <input type="url" name="curriculum" value={formData.curriculum} onChange={handleChange} onBlur={handleBlur} placeholder="https://drive.google.com/..." className={inputClass('curriculum')} />
-                {errors.curriculum && <p className="text-red-500 text-xs mt-1">{errors.curriculum}</p>}
-              </div>
-
-              {/* Portafolio - prominente para editor */}
-              <div className="border-2 border-yellow-300 bg-yellow-50 rounded-xl p-4">
-                <label className="block text-sm font-semibold dp-text-main mb-1">
-                  Reel / Portafolio de edición *
-                  <span className="ml-2 text-xs font-normal dp-text-secondary">(Este campo es lo más importante de tu postulación)</span>
-                </label>
-                <input type="url" name="portafolio" value={formData.portafolio} onChange={handleChange} onBlur={handleBlur} placeholder="https://youtube.com/... o link de Drive / Vimeo" className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition ${errors.portafolio ? 'border-red-500' : formData.portafolio ? 'border-green-500' : 'border-yellow-300'}`} />
-                {errors.portafolio && <p className="text-red-500 text-xs mt-1">{errors.portafolio}</p>}
-              </div>
-
-              {/* Pretensiones */}
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-1">Pretensiones salariales *</label>
-                <input type="text" name="pretensiones" value={formData.pretensiones} onChange={handleChange} onBlur={handleBlur} placeholder="Ej: S/ 1,500 mensuales" className={inputClass('pretensiones')} />
-                {errors.pretensiones && <p className="text-red-500 text-xs mt-1">{errors.pretensiones}</p>}
-              </div>
-
-              <hr className="border-gray-200" />
-              <p className="text-sm font-semibold dp-text-main">Preguntas de clasificación</p>
-
-              {/* Años de experiencia */}
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-2">¿Cuántos años de experiencia profesional tienes? *</label>
-                <div className="grid grid-cols-2 gap-2">
-                  {['Menos de 1 año', '1-2 años', '3-5 años', 'Más de 5 años'].map(opt => (
-                    <label key={opt} className={`flex items-center gap-2 p-3 rounded-lg border cursor-pointer transition ${clasificacion.anios_experiencia === opt ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200 hover:border-gray-300'}`}>
-                      <input type="radio" name="anios_experiencia" checked={clasificacion.anios_experiencia === opt} onChange={() => handleRadio('anios_experiencia', opt)} className="accent-yellow-500" />
-                      <span className="text-sm dp-text-main">{opt}</span>
-                    </label>
-                  ))}
+                <label className="block text-sm font-medium dp-text-secondary mb-2">Cargar CV (PDF) *</label>
+                <div
+                  onDragEnter={handleDrag}
+                  onDragLeave={handleDrag}
+                  onDragOver={handleDrag}
+                  onDrop={handleDrop}
+                  className={`relative w-full px-6 py-8 border-2 border-dashed rounded-lg transition-all text-center cursor-pointer ${
+                    dragActive
+                      ? 'border-yellow-400 bg-yellow-50'
+                      : errors.curriculum
+                      ? 'border-red-300 bg-red-50'
+                      : formData.curriculum
+                      ? 'border-green-300 bg-green-50'
+                      : 'border-gray-300 bg-gray-50 hover:border-yellow-300'
+                  }`}
+                >
+                  <input
+                    type="file"
+                    name="curriculum"
+                    accept=".pdf"
+                    onChange={handleChange}
+                    className="hidden"
+                    id="curriculum-input"
+                  />
+                  <label htmlFor="curriculum-input" className="cursor-pointer">
+                    {formData.curriculum ? (
+                      <div>
+                        <svg className="w-12 h-12 text-green-600 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <p className="text-sm font-medium dp-text-main mb-1">✓ {formData.curriculum.name}</p>
+                        <p className="text-xs dp-text-secondary">{(formData.curriculum.size / 1024).toFixed(2)} KB</p>
+                      </div>
+                    ) : (
+                      <div>
+                        <svg className="w-12 h-12 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        <p className="text-sm font-medium dp-text-main">Arrastra tu PDF aquí o haz clic</p>
+                        <p className="text-xs dp-text-secondary mt-1">Máximo 5 MB</p>
+                      </div>
+                    )}
+                  </label>
                 </div>
-                {errors.anios_experiencia && <p className="text-red-500 text-xs mt-1">{errors.anios_experiencia}</p>}
+                {errors.curriculum && <p className="text-red-500 text-xs mt-2">{errors.curriculum}</p>}
               </div>
 
-              {/* Software dominado */}
+              {/* País */}
               <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-2">¿Qué software dominas? (puedes marcar varios) *</label>
-                <div className="grid grid-cols-2 gap-2">
-                  {['Premiere Pro', 'DaVinci Resolve', 'After Effects', 'Final Cut', 'CapCut avanzado'].map(opt => (
-                    <label key={opt} className={`flex items-center gap-2 p-3 rounded-lg border cursor-pointer transition ${clasificacion.software_dominado.includes(opt) ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200 hover:border-gray-300'}`}>
-                      <input type="checkbox" checked={clasificacion.software_dominado.includes(opt)} onChange={() => handleCheckbox('software_dominado', opt)} className="accent-yellow-500" />
-                      <span className="text-sm dp-text-main">{opt}</span>
-                    </label>
-                  ))}
-                </div>
-                {errors.software_dominado && <p className="text-red-500 text-xs mt-1">{errors.software_dominado}</p>}
+                <SearchableSelect
+                  label="País *"
+                  options={countriesData.countries.map(c => c.name)}
+                  value={formData.país}
+                  onChange={(value) => setFormData(prev => ({ ...prev, país: value }))}
+                  placeholder="Busca tu país..."
+                  error={errors.país}
+                />
               </div>
 
-              {/* Sector belleza */}
+              {/* Ciudad */}
               <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-2">¿Has editado para marcas de salud o estética? *</label>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                  {['Sí', 'No, pero en otras marcas', 'No'].map(opt => (
-                    <label key={opt} className={`flex items-center gap-2 p-3 rounded-lg border cursor-pointer transition ${clasificacion.sector_belleza === opt ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200 hover:border-gray-300'}`}>
-                      <input type="radio" name="sector_belleza" checked={clasificacion.sector_belleza === opt} onChange={() => handleRadio('sector_belleza', opt)} className="accent-yellow-500" />
-                      <span className="text-sm dp-text-main">{opt}</span>
-                    </label>
-                  ))}
-                </div>
-                {errors.sector_belleza && <p className="text-red-500 text-xs mt-1">{errors.sector_belleza}</p>}
-              </div>
-
-              {/* Motion graphics */}
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-2">¿Haces motion graphics o animaciones? *</label>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                  {['Sí, avanzado', 'Sí, básico', 'No'].map(opt => (
-                    <label key={opt} className={`flex items-center gap-2 p-3 rounded-lg border cursor-pointer transition ${clasificacion.motion_graphics === opt ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200 hover:border-gray-300'}`}>
-                      <input type="radio" name="motion_graphics" checked={clasificacion.motion_graphics === opt} onChange={() => handleRadio('motion_graphics', opt)} className="accent-yellow-500" />
-                      <span className="text-sm dp-text-main">{opt}</span>
-                    </label>
-                  ))}
-                </div>
-                {errors.motion_graphics && <p className="text-red-500 text-xs mt-1">{errors.motion_graphics}</p>}
-              </div>
-
-              {/* Modalidad */}
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-2">¿Modalidad de trabajo preferida? *</label>
-                <div className="grid grid-cols-3 gap-2">
-                  {['Remoto', 'Híbrido', 'Presencial'].map(opt => (
-                    <label key={opt} className={`flex items-center gap-2 p-3 rounded-lg border cursor-pointer transition ${clasificacion.modalidad === opt ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200 hover:border-gray-300'}`}>
-                      <input type="radio" name="modalidad" checked={clasificacion.modalidad === opt} onChange={() => handleRadio('modalidad', opt)} className="accent-yellow-500" />
-                      <span className="text-sm dp-text-main">{opt}</span>
-                    </label>
-                  ))}
-                </div>
-                {errors.modalidad && <p className="text-red-500 text-xs mt-1">{errors.modalidad}</p>}
-              </div>
-
-              {/* Proyectos activos */}
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-2">¿Cuántos proyectos activos tienes actualmente? *</label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {['Ninguno (disponibilidad completa)', '1-2 proyectos', '3-5 proyectos', 'Más de 5'].map(opt => (
-                    <label key={opt} className={`flex items-center gap-2 p-3 rounded-lg border cursor-pointer transition ${clasificacion.proyectos_activos === opt ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200 hover:border-gray-300'}`}>
-                      <input type="radio" name="proyectos_activos" checked={clasificacion.proyectos_activos === opt} onChange={() => handleRadio('proyectos_activos', opt)} className="accent-yellow-500" />
-                      <span className="text-sm dp-text-main">{opt}</span>
-                    </label>
-                  ))}
-                </div>
-                {errors.proyectos_activos && <p className="text-red-500 text-xs mt-1">{errors.proyectos_activos}</p>}
-              </div>
-
-              <hr className="border-gray-200" />
-              <div>
-                <p className="text-sm font-semibold dp-text-main">Preguntas de evaluación</p>
-                <p className="text-xs dp-text-secondary mt-1">Tómate tu tiempo. Estas respuestas son lo más importante para nosotros.</p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-1">1. ¿Qué software dominas y cuál es tu flujo de trabajo desde que recibes el material en bruto hasta entregar el video? *</label>
-                <textarea rows={3} value={clasificacion.flujo_trabajo} onChange={e => handlePregunta('flujo_trabajo', e.target.value)} placeholder="Describe paso a paso tu proceso de edición habitual..." className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition resize-none ${errors.flujo_trabajo ? 'border-red-500' : clasificacion.flujo_trabajo ? 'border-green-500' : 'border-gray-300'}`} />
-                {errors.flujo_trabajo && <p className="text-red-500 text-xs mt-1">{errors.flujo_trabajo}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-1">2. Cuando el cliente pide cambios en algo que tú considerabas bien hecho, ¿cómo reaccionas? *</label>
-                <textarea rows={3} value={clasificacion.manejo_feedback_negativo} onChange={e => handlePregunta('manejo_feedback_negativo', e.target.value)} placeholder="Sé honesto/a. ¿Qué sientes y qué haces en ese momento?" className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition resize-none ${errors.manejo_feedback_negativo ? 'border-red-500' : clasificacion.manejo_feedback_negativo ? 'border-green-500' : 'border-gray-300'}`} />
-                {errors.manejo_feedback_negativo && <p className="text-red-500 text-xs mt-1">{errors.manejo_feedback_negativo}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-1">3. ¿Has editado contenido para redes sociales? ¿Qué formatos y plataformas manejas mejor? *</label>
-                <textarea rows={3} value={clasificacion.experiencia_redes_detalle} onChange={e => handlePregunta('experiencia_redes_detalle', e.target.value)} placeholder="Ej: Reels de Instagram de 15-30s, TikToks educativos, Shorts de YouTube..." className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition resize-none ${errors.experiencia_redes_detalle ? 'border-red-500' : clasificacion.experiencia_redes_detalle ? 'border-green-500' : 'border-gray-300'}`} />
-                {errors.experiencia_redes_detalle && <p className="text-red-500 text-xs mt-1">{errors.experiencia_redes_detalle}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-1">4. ¿Cómo gestionas cuando tienes varios proyectos con fechas de entrega al mismo tiempo? *</label>
-                <textarea rows={3} value={clasificacion.gestion_multiples_proyectos} onChange={e => handlePregunta('gestion_multiples_proyectos', e.target.value)} placeholder="Cuéntanos tu método para organizarte y no perder calidad bajo presión..." className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition resize-none ${errors.gestion_multiples_proyectos ? 'border-red-500' : clasificacion.gestion_multiples_proyectos ? 'border-green-500' : 'border-gray-300'}`} />
-                {errors.gestion_multiples_proyectos && <p className="text-red-500 text-xs mt-1">{errors.gestion_multiples_proyectos}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-1">5. ¿Qué tipo de contenido te genera más energía creativa y por qué? *</label>
-                <textarea rows={3} value={clasificacion.contenido_favorito} onChange={e => handlePregunta('contenido_favorito', e.target.value)} placeholder="Ej: testimonios reales, tutoriales, antes/después, contenido emocional..." className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition resize-none ${errors.contenido_favorito ? 'border-red-500' : clasificacion.contenido_favorito ? 'border-green-500' : 'border-gray-300'}`} />
-                {errors.contenido_favorito && <p className="text-red-500 text-xs mt-1">{errors.contenido_favorito}</p>}
+                <SearchableSelect
+                  label="Ciudad *"
+                  options={availableCities}
+                  value={formData.ciudad}
+                  onChange={(value) => setFormData(prev => ({ ...prev, ciudad: value }))}
+                  placeholder={formData.país ? "Busca tu ciudad..." : "Selecciona un país primero"}
+                  error={errors.ciudad}
+                  className={!formData.país ? 'opacity-50 pointer-events-none' : ''}
+                />
               </div>
 
               <button type="submit" disabled={isSubmitting} className="w-full dp-bg-cta  font-bold py-4 px-6 rounded-lg transition-all duration-300 hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed text-base mt-2">

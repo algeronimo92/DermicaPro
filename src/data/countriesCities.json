@@ -1,0 +1,233 @@
+{
+  "countries": [
+    {
+      "name": "Perú",
+      "code": "PE",
+      "cities": [
+        "Trujillo",
+        "Lima",
+        "Cusco",
+        "Arequipa",
+        "Tacna",
+        "Ica",
+        "Ancash",
+        "Puno",
+        "Junín",
+        "Ayacucho",
+        "Huancavelica",
+        "Apurímac",
+        "Huánuco",
+        "Ucayali",
+        "Loreto",
+        "Piura",
+        "Lambayeque",
+        "La Libertad",
+        "Moquegua",
+        "Madre de Dios"
+      ]
+    },
+    {
+      "name": "Colombia",
+      "code": "CO",
+      "cities": [
+        "Bogotá",
+        "Medellín",
+        "Cali",
+        "Barranquilla",
+        "Cartagena",
+        "Santa Marta",
+        "Cúcuta",
+        "Bucaramanga",
+        "Manizales",
+        "Armenia",
+        "Pereira",
+        "Ibagué",
+        "Villavicencio",
+        "Montería",
+        "Valledupar"
+      ]
+    },
+    {
+      "name": "Chile",
+      "code": "CL",
+      "cities": [
+        "Santiago",
+        "Valparaíso",
+        "Viña del Mar",
+        "Concepción",
+        "La Serena",
+        "Temuco",
+        "Valdivia",
+        "Puerto Montt",
+        "Iquique",
+        "Antofagasta",
+        "Calama",
+        "Copiapó",
+        "Coyhaique",
+        "Punta Arenas"
+      ]
+    },
+    {
+      "name": "Argentina",
+      "code": "AR",
+      "cities": [
+        "Buenos Aires",
+        "Córdoba",
+        "Rosario",
+        "Mendoza",
+        "La Plata",
+        "Tucumán",
+        "Salta",
+        "Jujuy",
+        "Catamarca",
+        "Formosa",
+        "Corrientes",
+        "Misiones",
+        "San Juan",
+        "La Rioja",
+        "Santiago del Estero"
+      ]
+    },
+    {
+      "name": "Ecuador",
+      "code": "EC",
+      "cities": [
+        "Quito",
+        "Guayaquil",
+        "Cuenca",
+        "Santo Domingo",
+        "Ambato",
+        "Manta",
+        "Portoviejo",
+        "Riobamba",
+        "Latacunga",
+        "Ibarra",
+        "Loja",
+        "Esmeraldas"
+      ]
+    },
+    {
+      "name": "Bolivia",
+      "code": "BO",
+      "cities": [
+        "La Paz",
+        "Santa Cruz",
+        "Cochabamba",
+        "Potosí",
+        "Sucre",
+        "Oruro",
+        "Trinidad",
+        "Tarija",
+        "Cobija"
+      ]
+    },
+    {
+      "name": "Paraguay",
+      "code": "PY",
+      "cities": [
+        "Asunción",
+        "Ciudad del Este",
+        "Encarnación",
+        "Villarrica",
+        "Caaguazú",
+        "Coronel Oviedo",
+        "Pedro Juan Caballero",
+        "Iguazú"
+      ]
+    },
+    {
+      "name": "Uruguay",
+      "code": "UY",
+      "cities": [
+        "Montevideo",
+        "Salto",
+        "Paysandú",
+        "Melo",
+        "Florida",
+        "Tacuarembó",
+        "Mercedes",
+        "Rocha"
+      ]
+    },
+    {
+      "name": "Venezuela",
+      "code": "VE",
+      "cities": [
+        "Caracas",
+        "Maracaibo",
+        "Valencia",
+        "Barquisimeto",
+        "Mérida",
+        "Ciudad Guayana",
+        "Maracay",
+        "Barcelona",
+        "Puerto La Cruz"
+      ]
+    },
+    {
+      "name": "México",
+      "code": "MX",
+      "cities": [
+        "Ciudad de México",
+        "Guadalajara",
+        "Monterrey",
+        "Puebla",
+        "Cancún",
+        "Playa del Carmen",
+        "León",
+        "Toluca",
+        "Querétaro",
+        "Acapulco",
+        "Veracruz",
+        "Mérida",
+        "Chihuahua"
+      ]
+    },
+    {
+      "name": "España",
+      "code": "ES",
+      "cities": [
+        "Madrid",
+        "Barcelona",
+        "Valencia",
+        "Sevilla",
+        "Bilbao",
+        "Málaga",
+        "Palma de Mallorca",
+        "Las Palmas",
+        "Córdoba",
+        "Zaragoza"
+      ]
+    },
+    {
+      "name": "Estados Unidos",
+      "code": "US",
+      "cities": [
+        "Nueva York",
+        "Los Ángeles",
+        "Chicago",
+        "Houston",
+        "Phoenix",
+        "Miami",
+        "San Francisco",
+        "Seattle",
+        "Denver",
+        "Boston"
+      ]
+    },
+    {
+      "name": "Canadá",
+      "code": "CA",
+      "cities": [
+        "Toronto",
+        "Vancouver",
+        "Montreal",
+        "Calgary",
+        "Ottawa",
+        "Winnipeg",
+        "Quebec",
+        "Edmonton"
+      ]
+    }
+  ]
+}
