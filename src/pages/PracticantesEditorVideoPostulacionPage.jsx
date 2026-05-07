@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { captureAllUTM } from '../utils/trackingHelper';
+import SearchableSelect from '../components/SearchableSelect';
+import countriesData from '../data/countriesCities.json';
 
 const NOMBRE_PUESTO = 'Practicante Editor de Videos';
-const WEBHOOK_URL = 'https://dermica-pro-n8n.rcsgeg.easypanel.host/webhook/postulacion-editor-practicante';
+const WEBHOOK_URL = 'https://n8n.dermicapro.online/webhook-test/cc4dda80-a015-463b-b922-d04c2fa42d8e';
 const WHATSAPP_ERROR = '+51974637783';
 
 const customCss = `
@@ -41,13 +43,15 @@ const validateField = (name, value) => {
     case 'dni':
       return !/^[0-9]{8}$/.test(value.trim()) ? '8 dígitos requeridos' : '';
     case 'curriculum':
-      if (!value.trim()) return 'Ingresa el link de tu CV';
-      try { new URL(value.trim()); return ''; } catch { return 'Ingresa un link válido (Google Drive, etc.)'; }
-    case 'portafolio':
-      if (!value.trim()) return 'Ingresa el link de tus trabajos de edición';
-      try { new URL(value.trim()); return ''; } catch { return 'Ingresa un link válido'; }
-    case 'pretensiones':
-      return !value.trim() ? 'Ingresa tus pretensiones salariales' : '';
+      if (!value) return 'Selecciona un archivo PDF';
+      if (!(value instanceof File)) return 'Debes cargar un archivo';
+      if (value.type !== 'application/pdf') return 'Solo se permite archivos PDF';
+      if (value.size > 5 * 1024 * 1024) return 'El archivo no puede superar 5 MB';
+      return '';
+    case 'ciudad':
+      return !value ? 'Selecciona tu ciudad' : '';
+    case 'país':
+      return !value ? 'Selecciona tu país' : '';
     default:
       return '';
   }
@@ -60,27 +64,32 @@ function PracticantesEditorVideoPostulacionPage() {
     telefono: '',
     email: '',
     dni: '',
-    curriculum: '',
-    portafolio: '',
-    pretensiones: '',
-  });
-  const [clasificacion, setClasificacion] = useState({
-    software_edicion: [],
-    ciclo_estudios: '',
-    videos_semana: '',
-    experiencia_marcas: '',
-    disponibilidad: '',
-    software_detalle: '',
-    video_personal: '',
-    horas_disponibles: '',
-    expectativa_aprendizaje: '',
-    accion_instrucciones_incompletas: '',
+    curriculum: null,
+    ciudad: '',
+    país: '',
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [utmData, setUtmData] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState('');
+  const [dragActive, setDragActive] = useState(false);
+  const [availableCities, setAvailableCities] = useState([]);
+
+  // Cargar ciudades cuando cambia el país
+  useEffect(() => {
+    if (formData.país) {
+      const country = countriesData.countries.find(c => c.name === formData.país);
+      setAvailableCities(country ? country.cities : []);
+      // Resetear ciudad cuando cambia país
+      if (formData.ciudad) {
+        setFormData(prev => ({ ...prev, ciudad: '' }));
+        setErrors(prev => ({ ...prev, ciudad: '' }));
+      }
+    } else {
+      setAvailableCities([]);
+    }
+  }, [formData.país]);
 
   useEffect(() => {
     setUtmData(captureAllUTM());
@@ -105,58 +114,47 @@ function PracticantesEditorVideoPostulacionPage() {
   }, []);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, files } = e.target;
     let processed = value;
-    if (name === 'nombre' || name === 'apellido') {
+    
+    if (type === 'file') {
+      processed = files?.[0] || null;
+      setDragActive(false);
+    } else if (name === 'nombre' || name === 'apellido') {
       processed = value.toLowerCase().replace(/(^|\s)\S/g, c => c.toUpperCase());
     } else if (name === 'telefono' || name === 'dni') {
       processed = value.replace(/[^0-9]/g, '');
     }
+    
     setFormData(prev => ({ ...prev, [name]: processed }));
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: validateField(name, processed) }));
     }
   };
 
-  const handleBlur = (e) => {
-    const { name, value } = e.target;
-    setErrors(prev => ({ ...prev, [name]: validateField(name, value) }));
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === 'dragenter' || e.type === 'dragover') {
+      setDragActive(true);
+    } else if (e.type === 'dragleave') {
+      setDragActive(false);
+    }
   };
 
-  const handleRadio = (group, value) => {
-    setClasificacion(prev => ({ ...prev, [group]: value }));
-    if (errors[group]) setErrors(prev => ({ ...prev, [group]: '' }));
-  };
-
-  const handleCheckbox = (group, value) => {
-    setClasificacion(prev => {
-      const current = prev[group];
-      const updated = current.includes(value)
-        ? current.filter(v => v !== value)
-        : [...current, value];
-      return { ...prev, [group]: updated };
-    });
-    if (errors[group]) setErrors(prev => ({ ...prev, [group]: '' }));
-  };
-
-  const handlePregunta = (name, value) => {
-    setClasificacion(prev => ({ ...prev, [name]: value }));
-    if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
-  };
-
-  const validateClasificacion = () => {
-    const errs = {};
-    if (clasificacion.software_edicion.length === 0) errs.software_edicion = 'Selecciona al menos una opción';
-    if (!clasificacion.ciclo_estudios) errs.ciclo_estudios = 'Selecciona una opción';
-    if (!clasificacion.videos_semana) errs.videos_semana = 'Selecciona una opción';
-    if (!clasificacion.experiencia_marcas) errs.experiencia_marcas = 'Selecciona una opción';
-    if (!clasificacion.disponibilidad) errs.disponibilidad = 'Selecciona una opción';
-    if (!clasificacion.software_detalle || clasificacion.software_detalle.trim().length < 20) errs.software_detalle = 'Por favor desarrolla tu respuesta (mín. 20 caracteres)';
-    if (!clasificacion.video_personal || clasificacion.video_personal.trim().length < 20) errs.video_personal = 'Por favor desarrolla tu respuesta (mín. 20 caracteres)';
-    if (!clasificacion.horas_disponibles || clasificacion.horas_disponibles.trim().length < 10) errs.horas_disponibles = 'Por favor indica tu disponibilidad';
-    if (!clasificacion.expectativa_aprendizaje || clasificacion.expectativa_aprendizaje.trim().length < 20) errs.expectativa_aprendizaje = 'Por favor desarrolla tu respuesta (mín. 20 caracteres)';
-    if (!clasificacion.accion_instrucciones_incompletas || clasificacion.accion_instrucciones_incompletas.trim().length < 20) errs.accion_instrucciones_incompletas = 'Por favor desarrolla tu respuesta (mín. 20 caracteres)';
-    return errs;
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    
+    const files = e.dataTransfer?.files;
+    if (files && files[0]) {
+      const file = files[0];
+      setFormData(prev => ({ ...prev, curriculum: file }));
+      if (errors.curriculum) {
+        setErrors(prev => ({ ...prev, curriculum: validateField('curriculum', file) }));
+      }
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -167,36 +165,41 @@ function PracticantesEditorVideoPostulacionPage() {
       if (err) acc[key] = err;
       return acc;
     }, {});
-    const clasifErrors = validateClasificacion();
-    const allErrors = { ...fieldErrors, ...clasifErrors };
-    setErrors(allErrors);
+    setErrors(fieldErrors);
 
-    if (Object.keys(allErrors).length > 0) return;
+    if (Object.keys(fieldErrors).length > 0) return;
 
     setIsSubmitting(true);
     try {
-      const payload = {
-        ...formData,
-        telefono: `+51${formData.telefono}`,
-        ...Object.fromEntries(
-          Object.entries(clasificacion).map(([k, v]) => [
-            k,
-            Array.isArray(v) ? v.join(', ') : v,
-          ])
-        ),
-        puesto: NOMBRE_PUESTO,
-        landing_url: window.location.href,
-        timestamp: new Date().toISOString(),
-        ...Object.fromEntries(Object.entries(utmData).filter(([, v]) => v)),
-      };
+      const formDataPayload = new FormData();
+      formDataPayload.append('nombre', formData.nombre);
+      formDataPayload.append('apellido', formData.apellido);
+      formDataPayload.append('telefono', `+51${formData.telefono}`);
+      formDataPayload.append('email', formData.email);
+      formDataPayload.append('dni', formData.dni);
+      formDataPayload.append('ciudad', formData.ciudad);
+      formDataPayload.append('país', formData.país);
+      if (formData.curriculum instanceof File) {
+        formDataPayload.append('curriculum', formData.curriculum);
+      }
+      formDataPayload.append('puesto', NOMBRE_PUESTO);
+      formDataPayload.append('tipo_postulacion', 'practicante');
+      formDataPayload.append('landing_url', window.location.href);
+      formDataPayload.append('timestamp', new Date().toISOString());
+      // Enviar tracking data (UTM y click IDs)
+      const trackingFields = ['ttclid', 'fbclid', 'ad_id', 'adset_id', 'campaign_id', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
+      trackingFields.forEach(field => {
+        formDataPayload.append(field, utmData[field] || '');
+      });
+      // Debug
+      console.log('📊 FormData UTM:', utmData);
 
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 12000);
 
       const response = await fetch(WEBHOOK_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: formDataPayload,
         signal: controller.signal,
       });
       clearTimeout(timeoutId);
@@ -204,8 +207,7 @@ function PracticantesEditorVideoPostulacionPage() {
       if (response.ok) {
         setModalType('success');
         setShowModal(true);
-        setFormData({ nombre: '', apellido: '', telefono: '', email: '', dni: '', curriculum: '', portafolio: '', pretensiones: '' });
-        setClasificacion({ software_edicion: [], ciclo_estudios: '', videos_semana: '', experiencia_marcas: '', disponibilidad: '', software_detalle: '', video_personal: '', horas_disponibles: '', expectativa_aprendizaje: '', accion_instrucciones_incompletas: '' });
+        setFormData({ nombre: '', apellido: '', telefono: '', email: '', dni: '', curriculum: null, ciudad: '', país: '' });
         setErrors({});
       } else {
         setModalType('error');
@@ -361,12 +363,12 @@ function PracticantesEditorVideoPostulacionPage() {
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium dp-text-secondary mb-1">Nombre *</label>
-                  <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} onBlur={handleBlur} placeholder="Ej: Lucía" className={inputClass('nombre')} />
+                  <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} placeholder="Ej: Lucía" className={inputClass('nombre')} />
                   {errors.nombre && <p className="text-red-500 text-xs mt-1">{errors.nombre}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium dp-text-secondary mb-1">Apellido *</label>
-                  <input type="text" name="apellido" value={formData.apellido} onChange={handleChange} onBlur={handleBlur} placeholder="Ej: Torres" className={inputClass('apellido')} />
+                  <input type="text" name="apellido" value={formData.apellido} onChange={handleChange} placeholder="Ej: Torres" className={inputClass('apellido')} />
                   {errors.apellido && <p className="text-red-500 text-xs mt-1">{errors.apellido}</p>}
                 </div>
               </div>
@@ -377,13 +379,13 @@ function PracticantesEditorVideoPostulacionPage() {
                   <label className="block text-sm font-medium dp-text-secondary mb-1">Teléfono (WhatsApp) *</label>
                   <div className="flex">
                     <span className="inline-flex items-center px-3 border border-r-0 border-gray-300 bg-gray-50 text-gray-500 rounded-l-lg text-sm">+51</span>
-                    <input type="tel" name="telefono" value={formData.telefono} onChange={handleChange} onBlur={handleBlur} placeholder="987 654 321" maxLength="9" className={`w-full px-4 py-2 border rounded-r-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition ${errors.telefono ? 'border-red-500' : formData.telefono ? 'border-green-500' : 'border-gray-300'}`} />
+                    <input type="tel" name="telefono" value={formData.telefono} onChange={handleChange} placeholder="987 654 321" maxLength="9" className={`w-full px-4 py-2 border rounded-r-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition ${errors.telefono ? 'border-red-500' : formData.telefono ? 'border-green-500' : 'border-gray-300'}`} />
                   </div>
                   {errors.telefono && <p className="text-red-500 text-xs mt-1">{errors.telefono}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium dp-text-secondary mb-1">DNI *</label>
-                  <input type="text" name="dni" value={formData.dni} onChange={handleChange} onBlur={handleBlur} placeholder="12345678" maxLength="8" className={inputClass('dni')} />
+                  <input type="text" name="dni" value={formData.dni} onChange={handleChange} placeholder="12345678" maxLength="8" className={inputClass('dni')} />
                   {errors.dni && <p className="text-red-500 text-xs mt-1">{errors.dni}</p>}
                 </div>
               </div>
@@ -391,141 +393,69 @@ function PracticantesEditorVideoPostulacionPage() {
               {/* Email */}
               <div>
                 <label className="block text-sm font-medium dp-text-secondary mb-1">Correo electrónico *</label>
-                <input type="email" name="email" value={formData.email} onChange={handleChange} onBlur={handleBlur} placeholder="ejemplo@correo.com" className={inputClass('email')} />
+                <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="ejemplo@correo.com" className={inputClass('email')} />
                 {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
               </div>
 
-              {/* Curriculum */}
+              {/* Curriculum PDF */}
               <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-1">Link de CV (Google Drive, Dropbox, etc.) *</label>
-                <input type="url" name="curriculum" value={formData.curriculum} onChange={handleChange} onBlur={handleBlur} placeholder="https://drive.google.com/..." className={inputClass('curriculum')} />
+                <label className="block text-sm font-medium dp-text-secondary mb-1">Curriculum (PDF) *</label>
+                <div 
+                  onDragEnter={handleDrag}
+                  onDragLeave={handleDrag}
+                  onDragOver={handleDrag}
+                  onDrop={handleDrop}
+                  className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+                    dragActive ? 'border-yellow-400 bg-yellow-50' : 'border-gray-300 hover:border-gray-400 bg-gray-50'
+                  } ${errors.curriculum ? 'border-red-500' : ''}`}
+                >
+                  {formData.curriculum ? (
+                    <div className="space-y-2">
+                      <svg className="w-10 h-10 mx-auto text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
+                      <p className="text-green-600 font-semibold">{formData.curriculum.name}</p>
+                      <p className="text-xs text-gray-500">{(formData.curriculum.size / 1024).toFixed(1)} KB</p>
+                    </div>
+                  ) : (
+                    <>
+                      <p className="dp-text-main font-semibold">Arrastra tu PDF aquí</p>
+                      <p className="text-xs dp-text-secondary mt-1">o</p>
+                      <label className="inline-block mt-2 cursor-pointer">
+                        <span className="text-yellow-500 font-semibold hover:underline">Selecciona un archivo</span>
+                        <input type="file" name="curriculum" accept=".pdf" onChange={handleChange} className="hidden" />
+                      </label>
+                      <p className="text-xs dp-text-secondary mt-2">Máximo 5 MB</p>
+                    </>
+                  )}
+                </div>
                 {errors.curriculum && <p className="text-red-500 text-xs mt-1">{errors.curriculum}</p>}
               </div>
 
-              {/* Portafolio */}
+              {/* País */}
               <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-1">Link a trabajos de edición *</label>
-                <input type="url" name="portafolio" value={formData.portafolio} onChange={handleChange} onBlur={handleBlur} placeholder="https://drive.google.com/... o link de YouTube/Vimeo" className={inputClass('portafolio')} />
-                {errors.portafolio && <p className="text-red-500 text-xs mt-1">{errors.portafolio}</p>}
+                <SearchableSelect
+                  label="País *"
+                  options={countriesData.countries.map(c => c.name)}
+                  value={formData.país}
+                  onChange={(value) => setFormData(prev => ({ ...prev, país: value }))}
+                  placeholder="Busca tu país..."
+                  error={errors.país}
+                />
               </div>
 
-              {/* Pretensiones */}
+              {/* Ciudad */}
               <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-1">Pretensiones salariales *</label>
-                <input type="text" name="pretensiones" value={formData.pretensiones} onChange={handleChange} onBlur={handleBlur} placeholder="Ej: S/ 700 mensuales" className={inputClass('pretensiones')} />
-                {errors.pretensiones && <p className="text-red-500 text-xs mt-1">{errors.pretensiones}</p>}
+                <SearchableSelect
+                  label="Ciudad *"
+                  options={availableCities}
+                  value={formData.ciudad}
+                  onChange={(value) => setFormData(prev => ({ ...prev, ciudad: value }))}
+                  placeholder={formData.país ? "Busca tu ciudad..." : "Selecciona un país primero"}
+                  error={errors.ciudad}
+                  className={!formData.país ? 'opacity-50 pointer-events-none' : ''}
+                />
               </div>
 
-              <hr className="border-gray-200" />
-              <p className="text-sm font-semibold dp-text-main">Preguntas de clasificación</p>
-
-              {/* Software de edición */}
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-2">¿Qué software de edición usas? (puedes marcar varios) *</label>
-                <div className="grid grid-cols-2 gap-2">
-                  {['Premiere Pro', 'DaVinci Resolve', 'CapCut', 'After Effects', 'Final Cut', 'Otro'].map(opt => (
-                    <label key={opt} className={`flex items-center gap-2 p-3 rounded-lg border cursor-pointer transition ${clasificacion.software_edicion.includes(opt) ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200 hover:border-gray-300'}`}>
-                      <input type="checkbox" checked={clasificacion.software_edicion.includes(opt)} onChange={() => handleCheckbox('software_edicion', opt)} className="accent-yellow-500" />
-                      <span className="text-sm dp-text-main">{opt}</span>
-                    </label>
-                  ))}
-                </div>
-                {errors.software_edicion && <p className="text-red-500 text-xs mt-1">{errors.software_edicion}</p>}
-              </div>
-
-              {/* Ciclo de estudios */}
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-2">¿En qué ciclo de estudios estás? *</label>
-                <div className="grid grid-cols-2 gap-2">
-                  {['1ro-4to ciclo', '5to-8vo ciclo', '9no-10mo ciclo', 'Egresado'].map(opt => (
-                    <label key={opt} className={`flex items-center gap-2 p-3 rounded-lg border cursor-pointer transition ${clasificacion.ciclo_estudios === opt ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200 hover:border-gray-300'}`}>
-                      <input type="radio" name="ciclo_estudios" checked={clasificacion.ciclo_estudios === opt} onChange={() => handleRadio('ciclo_estudios', opt)} className="accent-yellow-500" />
-                      <span className="text-sm dp-text-main">{opt}</span>
-                    </label>
-                  ))}
-                </div>
-                {errors.ciclo_estudios && <p className="text-red-500 text-xs mt-1">{errors.ciclo_estudios}</p>}
-              </div>
-
-              {/* Videos por semana */}
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-2">¿Cuántos videos editas por semana aprox.? *</label>
-                <div className="grid grid-cols-2 gap-2">
-                  {['Ninguno aún', '1-3 videos', '4-7 videos', 'Más de 7'].map(opt => (
-                    <label key={opt} className={`flex items-center gap-2 p-3 rounded-lg border cursor-pointer transition ${clasificacion.videos_semana === opt ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200 hover:border-gray-300'}`}>
-                      <input type="radio" name="videos_semana" checked={clasificacion.videos_semana === opt} onChange={() => handleRadio('videos_semana', opt)} className="accent-yellow-500" />
-                      <span className="text-sm dp-text-main">{opt}</span>
-                    </label>
-                  ))}
-                </div>
-                {errors.videos_semana && <p className="text-red-500 text-xs mt-1">{errors.videos_semana}</p>}
-              </div>
-
-              {/* Experiencia para marcas */}
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-2">¿Tienes experiencia editando para marcas? *</label>
-                <div className="grid grid-cols-2 gap-2">
-                  {['Sí', 'No'].map(opt => (
-                    <label key={opt} className={`flex items-center gap-2 p-3 rounded-lg border cursor-pointer transition ${clasificacion.experiencia_marcas === opt ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200 hover:border-gray-300'}`}>
-                      <input type="radio" name="experiencia_marcas" checked={clasificacion.experiencia_marcas === opt} onChange={() => handleRadio('experiencia_marcas', opt)} className="accent-yellow-500" />
-                      <span className="text-sm dp-text-main">{opt}</span>
-                    </label>
-                  ))}
-                </div>
-                {errors.experiencia_marcas && <p className="text-red-500 text-xs mt-1">{errors.experiencia_marcas}</p>}
-              </div>
-
-              {/* Disponibilidad */}
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-2">¿Disponibilidad horaria? *</label>
-                <div className="grid grid-cols-3 gap-2">
-                  {['Mañanas', 'Tardes', 'Tiempo completo'].map(opt => (
-                    <label key={opt} className={`flex items-center gap-2 p-3 rounded-lg border cursor-pointer transition ${clasificacion.disponibilidad === opt ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200 hover:border-gray-300'}`}>
-                      <input type="radio" name="disponibilidad" checked={clasificacion.disponibilidad === opt} onChange={() => handleRadio('disponibilidad', opt)} className="accent-yellow-500" />
-                      <span className="text-sm dp-text-main">{opt}</span>
-                    </label>
-                  ))}
-                </div>
-                {errors.disponibilidad && <p className="text-red-500 text-xs mt-1">{errors.disponibilidad}</p>}
-              </div>
-
-              <hr className="border-gray-200" />
-              <div>
-                <p className="text-sm font-semibold dp-text-main">Preguntas de evaluación</p>
-                <p className="text-xs dp-text-secondary mt-1">Tómate tu tiempo. Estas respuestas son lo más importante para nosotros.</p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-1">1. ¿Qué software de edición conoces, aunque sea a nivel básico? ¿Con cuál te sientes más cómodo/a? *</label>
-                <textarea rows={3} value={clasificacion.software_detalle} onChange={e => handlePregunta('software_detalle', e.target.value)} placeholder="Cuéntanos qué has usado, cuánto tiempo y qué tipo de proyectos has hecho con él..." className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition resize-none ${errors.software_detalle ? 'border-red-500' : clasificacion.software_detalle ? 'border-green-500' : 'border-gray-300'}`} />
-                {errors.software_detalle && <p className="text-red-500 text-xs mt-1">{errors.software_detalle}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-1">2. ¿Has editado algún video, aunque sea para uso personal o académico? Cuéntanos qué hiciste. *</label>
-                <textarea rows={3} value={clasificacion.video_personal} onChange={e => handlePregunta('video_personal', e.target.value)} placeholder="No importa si fue pequeño. Describe qué editaste y qué aprendiste en el proceso..." className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition resize-none ${errors.video_personal ? 'border-red-500' : clasificacion.video_personal ? 'border-green-500' : 'border-gray-300'}`} />
-                {errors.video_personal && <p className="text-red-500 text-xs mt-1">{errors.video_personal}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-1">3. ¿Cuántas horas semanales podrías dedicar a las prácticas y en qué horario? *</label>
-                <textarea rows={2} value={clasificacion.horas_disponibles} onChange={e => handlePregunta('horas_disponibles', e.target.value)} placeholder="Ej: Podría dedicar 20 horas semanales, de lunes a viernes de 2pm a 6pm..." className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition resize-none ${errors.horas_disponibles ? 'border-red-500' : clasificacion.horas_disponibles ? 'border-green-500' : 'border-gray-300'}`} />
-                {errors.horas_disponibles && <p className="text-red-500 text-xs mt-1">{errors.horas_disponibles}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-1">4. ¿Qué esperas aprender específicamente durante estas prácticas? *</label>
-                <textarea rows={3} value={clasificacion.expectativa_aprendizaje} onChange={e => handlePregunta('expectativa_aprendizaje', e.target.value)} placeholder="Sé específico/a. ¿Qué habilidades quieres llevarte al terminar?" className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition resize-none ${errors.expectativa_aprendizaje ? 'border-red-500' : clasificacion.expectativa_aprendizaje ? 'border-green-500' : 'border-gray-300'}`} />
-                {errors.expectativa_aprendizaje && <p className="text-red-500 text-xs mt-1">{errors.expectativa_aprendizaje}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-1">5. Si te dan un video para editar pero las instrucciones no quedaron claras, ¿qué haces? *</label>
-                <textarea rows={3} value={clasificacion.accion_instrucciones_incompletas} onChange={e => handlePregunta('accion_instrucciones_incompletas', e.target.value)} placeholder="Cuéntanos tu reacción y los pasos que seguirías..." className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition resize-none ${errors.accion_instrucciones_incompletas ? 'border-red-500' : clasificacion.accion_instrucciones_incompletas ? 'border-green-500' : 'border-gray-300'}`} />
-                {errors.accion_instrucciones_incompletas && <p className="text-red-500 text-xs mt-1">{errors.accion_instrucciones_incompletas}</p>}
-              </div>
-
-              <button type="submit" disabled={isSubmitting} className="w-full dp-bg-cta  font-bold py-4 px-6 rounded-lg transition-all duration-300 hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed text-base mt-2">
+              <button type="submit" disabled={isSubmitting} className="w-full dp-bg-cta font-bold py-4 px-6 rounded-lg transition-all duration-300 hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed text-base mt-2">
                 {isSubmitting ? 'Enviando postulación...' : 'Enviar mi postulación'}
               </button>
               <p className="text-xs text-gray-400 text-center">

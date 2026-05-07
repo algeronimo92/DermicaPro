@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { captureAllUTM } from '../utils/trackingHelper';
+import SearchableSelect from '../components/SearchableSelect';
+import countriesData from '../data/countriesCities.json';
 
 const NOMBRE_PUESTO = 'Especialista en Tratamientos Láser';
-const WEBHOOK_URL = 'https://dermica-pro-n8n.rcsgeg.easypanel.host/webhook/postulacion-especialista-laser';
+const WEBHOOK_URL = 'https://n8n.dermicapro.online/webhook-test/cc4dda80-a015-463b-b922-d04c2fa42d8e';
 const WHATSAPP_ERROR = '+51974637783';
 
 const customCss = `
@@ -41,14 +43,15 @@ const validateField = (name, value) => {
     case 'dni':
       return !/^[0-9]{8}$/.test(value.trim()) ? '8 dígitos requeridos' : '';
     case 'curriculum':
-      if (!value.trim()) return 'Ingresa el link de tu CV';
-      try { new URL(value.trim()); return ''; } catch { return 'Ingresa un link válido (Google Drive, etc.)'; }
-    case 'portafolio':
-      // Portafolio es opcional para este puesto
-      if (!value.trim()) return '';
-      try { new URL(value.trim()); return ''; } catch { return 'Ingresa un link válido'; }
-    case 'pretensiones':
-      return !value.trim() ? 'Ingresa tus pretensiones salariales' : '';
+      if (!value) return 'Selecciona un archivo PDF';
+      if (!(value instanceof File)) return 'Debes cargar un archivo';
+      if (value.type !== 'application/pdf') return 'Solo se permite archivos PDF';
+      if (value.size > 5 * 1024 * 1024) return 'El archivo no puede superar 5 MB';
+      return '';
+    case 'ciudad':
+      return !value ? 'Selecciona tu ciudad' : '';
+    case 'país':
+      return !value ? 'Selecciona tu país' : '';
     default:
       return '';
   }
@@ -61,28 +64,32 @@ function EspecialistaLaserPostulacionPage() {
     telefono: '',
     email: '',
     dni: '',
-    curriculum: '',
-    portafolio: '',
-    pretensiones: '',
-  });
-  const [clasificacion, setClasificacion] = useState({
-    certificacion: '',
-    equipos_experiencia: [],
-    anios_laser: '',
-    experiencia_ventas: '',
-    experiencia_clinica: '',
-    cartera_clientes: '',
-    equipos_detalle: '',
-    situacion_seguridad: '',
-    manejo_paciente_nervioso: '',
-    actualizacion_tecnica: '',
-    motivacion_estetica_avanzada: '',
+    curriculum: null,
+    ciudad: '',
+    pais: '',
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [utmData, setUtmData] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState('');
+  const [dragActive, setDragActive] = useState(false);
+  const [availableCities, setAvailableCities] = useState([]);
+
+  // Cargar ciudades cuando cambia el país
+  useEffect(() => {
+    if (formData.país) {
+      const country = countriesData.countries.find(c => c.name === formData.país);
+      setAvailableCities(country ? country.cities : []);
+      // Resetear ciudad cuando cambia país
+      if (formData.ciudad) {
+        setFormData(prev => ({ ...prev, ciudad: '' }));
+        setErrors(prev => ({ ...prev, ciudad: '' }));
+      }
+    } else {
+      setAvailableCities([]);
+    }
+  }, [formData.país]);
 
   useEffect(() => {
     setUtmData(captureAllUTM());
@@ -107,106 +114,92 @@ function EspecialistaLaserPostulacionPage() {
   }, []);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, files } = e.target;
     let processed = value;
-    if (name === 'nombre' || name === 'apellido') {
+    
+    if (type === 'file') {
+      processed = files?.[0] || null;
+      setDragActive(false);
+    } else if (name === 'nombre' || name === 'apellido') {
       processed = value.toLowerCase().replace(/(^|\s)\S/g, c => c.toUpperCase());
     } else if (name === 'telefono' || name === 'dni') {
       processed = value.replace(/[^0-9]/g, '');
     }
+    
     setFormData(prev => ({ ...prev, [name]: processed }));
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: validateField(name, processed) }));
     }
   };
 
-  const handleBlur = (e) => {
-    const { name, value } = e.target;
-    setErrors(prev => ({ ...prev, [name]: validateField(name, value) }));
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === 'dragenter' || e.type === 'dragover') {
+      setDragActive(true);
+    } else if (e.type === 'dragleave') {
+      setDragActive(false);
+    }
   };
 
-  const handleRadio = (group, value) => {
-    setClasificacion(prev => ({ ...prev, [group]: value }));
-    if (errors[group]) setErrors(prev => ({ ...prev, [group]: '' }));
-  };
-
-  const handleCheckbox = (group, value) => {
-    setClasificacion(prev => {
-      const current = prev[group];
-      const updated = current.includes(value)
-        ? current.filter(v => v !== value)
-        : [...current, value];
-      return { ...prev, [group]: updated };
-    });
-    if (errors[group]) setErrors(prev => ({ ...prev, [group]: '' }));
-  };
-
-  const handlePregunta = (name, value) => {
-    setClasificacion(prev => ({ ...prev, [name]: value }));
-    if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
-  };
-
-  const validateClasificacion = () => {
-    const errs = {};
-    if (!clasificacion.certificacion) errs.certificacion = 'Selecciona una opción';
-    if (clasificacion.equipos_experiencia.length === 0) errs.equipos_experiencia = 'Selecciona al menos una opción';
-    if (!clasificacion.anios_laser) errs.anios_laser = 'Selecciona una opción';
-    if (!clasificacion.experiencia_ventas) errs.experiencia_ventas = 'Selecciona una opción';
-    if (!clasificacion.experiencia_clinica) errs.experiencia_clinica = 'Selecciona una opción';
-    if (!clasificacion.cartera_clientes) errs.cartera_clientes = 'Selecciona una opción';
-    if (!clasificacion.equipos_detalle || clasificacion.equipos_detalle.trim().length < 20) errs.equipos_detalle = 'Por favor desarrolla tu respuesta (mín. 20 caracteres)';
-    if (!clasificacion.situacion_seguridad || clasificacion.situacion_seguridad.trim().length < 20) errs.situacion_seguridad = 'Por favor desarrolla tu respuesta (mín. 20 caracteres)';
-    if (!clasificacion.manejo_paciente_nervioso || clasificacion.manejo_paciente_nervioso.trim().length < 20) errs.manejo_paciente_nervioso = 'Por favor desarrolla tu respuesta (mín. 20 caracteres)';
-    if (!clasificacion.actualizacion_tecnica || clasificacion.actualizacion_tecnica.trim().length < 20) errs.actualizacion_tecnica = 'Por favor desarrolla tu respuesta (mín. 20 caracteres)';
-    if (!clasificacion.motivacion_estetica_avanzada || clasificacion.motivacion_estetica_avanzada.trim().length < 20) errs.motivacion_estetica_avanzada = 'Por favor desarrolla tu respuesta (mín. 20 caracteres)';
-    return errs;
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    
+    const files = e.dataTransfer?.files;
+    if (files && files[0]) {
+      const file = files[0];
+      setFormData(prev => ({ ...prev, curriculum: file }));
+      if (errors.curriculum) {
+        setErrors(prev => ({ ...prev, curriculum: validateField('curriculum', file) }));
+      }
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Para este puesto portafolio es opcional: validar solo campos requeridos
-    const requiredFields = ['nombre', 'apellido', 'telefono', 'email', 'dni', 'curriculum', 'pretensiones'];
-    const fieldErrors = requiredFields.reduce((acc, key) => {
+    const fieldErrors = Object.keys(formData).reduce((acc, key) => {
       const err = validateField(key, formData[key]);
       if (err) acc[key] = err;
       return acc;
     }, {});
-    // Validar portafolio solo si tiene contenido (opcional)
-    if (formData.portafolio.trim()) {
-      const portErr = validateField('portafolio', formData.portafolio);
-      if (portErr) fieldErrors.portafolio = portErr;
-    }
-    const clasifErrors = validateClasificacion();
-    const allErrors = { ...fieldErrors, ...clasifErrors };
+    const allErrors = { ...fieldErrors};
     setErrors(allErrors);
 
     if (Object.keys(allErrors).length > 0) return;
 
     setIsSubmitting(true);
     try {
-      const payload = {
-        ...formData,
-        telefono: `+51${formData.telefono}`,
-        ...Object.fromEntries(
-          Object.entries(clasificacion).map(([k, v]) => [
-            k,
-            Array.isArray(v) ? v.join(', ') : v,
-          ])
-        ),
-        puesto: NOMBRE_PUESTO,
-        landing_url: window.location.href,
-        timestamp: new Date().toISOString(),
-        ...Object.fromEntries(Object.entries(utmData).filter(([, v]) => v)),
-      };
+      const formDataPayload = new FormData();
+      formDataPayload.append('nombre', formData.nombre);
+      formDataPayload.append('apellido', formData.apellido);
+      formDataPayload.append('telefono', `+51${formData.telefono}`);
+      formDataPayload.append('email', formData.email);
+      formDataPayload.append('dni', formData.dni);
+      formDataPayload.append('ciudad', formData.ciudad);
+      formDataPayload.append('país', formData.país);
+      if (formData.curriculum instanceof File) {
+        formDataPayload.append('curriculum', formData.curriculum);
+      }
+      formDataPayload.append('puesto', NOMBRE_PUESTO);
+      formDataPayload.append('landing_url', window.location.href);
+      formDataPayload.append('timestamp', new Date().toISOString());
+      // Enviar tracking data (UTM y click IDs)
+      const trackingFields = ['ttclid', 'fbclid', 'ad_id', 'adset_id', 'campaign_id', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
+      trackingFields.forEach(field => {
+        formDataPayload.append(field, utmData[field] || '');
+      });
+      // Debug
+      console.log('📊 FormData UTM:', utmData);
 
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 12000);
 
       const response = await fetch(WEBHOOK_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: formDataPayload,
         signal: controller.signal,
       });
       clearTimeout(timeoutId);
@@ -214,8 +207,7 @@ function EspecialistaLaserPostulacionPage() {
       if (response.ok) {
         setModalType('success');
         setShowModal(true);
-        setFormData({ nombre: '', apellido: '', telefono: '', email: '', dni: '', curriculum: '', portafolio: '', pretensiones: '' });
-        setClasificacion({ certificacion: '', equipos_experiencia: [], anios_laser: '', experiencia_ventas: '', experiencia_clinica: '', cartera_clientes: '', equipos_detalle: '', situacion_seguridad: '', manejo_paciente_nervioso: '', actualizacion_tecnica: '', motivacion_estetica_avanzada: '' });
+        setFormData({ nombre: '', apellido: '', telefono: '', email: '', dni: '', curriculum: null, ciudad: '', pais: '' });
         setErrors({});
       } else {
         setModalType('error');
@@ -371,12 +363,12 @@ function EspecialistaLaserPostulacionPage() {
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium dp-text-secondary mb-1">Nombre *</label>
-                  <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} onBlur={handleBlur} placeholder="Ej: Valeria" className={inputClass('nombre')} />
+                  <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} placeholder="Ej: Valeria" className={inputClass('nombre')} />
                   {errors.nombre && <p className="text-red-500 text-xs mt-1">{errors.nombre}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium dp-text-secondary mb-1">Apellido *</label>
-                  <input type="text" name="apellido" value={formData.apellido} onChange={handleChange} onBlur={handleBlur} placeholder="Ej: Flores" className={inputClass('apellido')} />
+                  <input type="text" name="apellido" value={formData.apellido} onChange={handleChange} placeholder="Ej: Flores" className={inputClass('apellido')} />
                   {errors.apellido && <p className="text-red-500 text-xs mt-1">{errors.apellido}</p>}
                 </div>
               </div>
@@ -387,13 +379,13 @@ function EspecialistaLaserPostulacionPage() {
                   <label className="block text-sm font-medium dp-text-secondary mb-1">Teléfono (WhatsApp) *</label>
                   <div className="flex">
                     <span className="inline-flex items-center px-3 border border-r-0 border-gray-300 bg-gray-50 text-gray-500 rounded-l-lg text-sm">+51</span>
-                    <input type="tel" name="telefono" value={formData.telefono} onChange={handleChange} onBlur={handleBlur} placeholder="987 654 321" maxLength="9" className={`w-full px-4 py-2 border rounded-r-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition ${errors.telefono ? 'border-red-500' : formData.telefono ? 'border-green-500' : 'border-gray-300'}`} />
+                    <input type="tel" name="telefono" value={formData.telefono} onChange={handleChange} placeholder="987 654 321" maxLength="9" className={`w-full px-4 py-2 border rounded-r-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition ${errors.telefono ? 'border-red-500' : formData.telefono ? 'border-green-500' : 'border-gray-300'}`} />
                   </div>
                   {errors.telefono && <p className="text-red-500 text-xs mt-1">{errors.telefono}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium dp-text-secondary mb-1">DNI *</label>
-                  <input type="text" name="dni" value={formData.dni} onChange={handleChange} onBlur={handleBlur} placeholder="12345678" maxLength="8" className={inputClass('dni')} />
+                  <input type="text" name="dni" value={formData.dni} onChange={handleChange} placeholder="12345678" maxLength="8" className={inputClass('dni')} />
                   {errors.dni && <p className="text-red-500 text-xs mt-1">{errors.dni}</p>}
                 </div>
               </div>
@@ -401,155 +393,82 @@ function EspecialistaLaserPostulacionPage() {
               {/* Email */}
               <div>
                 <label className="block text-sm font-medium dp-text-secondary mb-1">Correo electrónico *</label>
-                <input type="email" name="email" value={formData.email} onChange={handleChange} onBlur={handleBlur} placeholder="ejemplo@correo.com" className={inputClass('email')} />
+                <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="ejemplo@correo.com" className={inputClass('email')} />
                 {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
               </div>
 
               {/* Curriculum */}
               <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-1">Link de CV (Google Drive, Dropbox, etc.) *</label>
-                <input type="url" name="curriculum" value={formData.curriculum} onChange={handleChange} onBlur={handleBlur} placeholder="https://drive.google.com/..." className={inputClass('curriculum')} />
-                {errors.curriculum && <p className="text-red-500 text-xs mt-1">{errors.curriculum}</p>}
-              </div>
-
-              {/* Portafolio - Opcional */}
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-1">
-                  Link de certificaciones o antes/después{' '}
-                  <span className="text-xs text-gray-400">(Opcional)</span>
-                </label>
-                <input type="url" name="portafolio" value={formData.portafolio} onChange={handleChange} onBlur={handleBlur} placeholder="https://drive.google.com/... (opcional)" className={inputClass('portafolio')} />
-                {errors.portafolio && <p className="text-red-500 text-xs mt-1">{errors.portafolio}</p>}
-              </div>
-
-              {/* Pretensiones */}
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-1">Pretensiones salariales *</label>
-                <input type="text" name="pretensiones" value={formData.pretensiones} onChange={handleChange} onBlur={handleBlur} placeholder="Ej: S/ 2,000 mensuales" className={inputClass('pretensiones')} />
-                {errors.pretensiones && <p className="text-red-500 text-xs mt-1">{errors.pretensiones}</p>}
-              </div>
-
-              <hr className="border-gray-200" />
-              <p className="text-sm font-semibold dp-text-main">Preguntas de clasificación</p>
-
-              {/* Certificación */}
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-2">¿Tienes título o certificación en estética/cosmetología? *</label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {['Sí, título técnico', 'Sí, certificaciones internacionales', 'En curso', 'No aún'].map(opt => (
-                    <label key={opt} className={`flex items-center gap-2 p-3 rounded-lg border cursor-pointer transition ${clasificacion.certificacion === opt ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200 hover:border-gray-300'}`}>
-                      <input type="radio" name="certificacion" checked={clasificacion.certificacion === opt} onChange={() => handleRadio('certificacion', opt)} className="accent-yellow-500" />
-                      <span className="text-sm dp-text-main">{opt}</span>
-                    </label>
-                  ))}
+                <label className="block text-sm font-medium dp-text-secondary mb-2">Cargar CV (PDF) *</label>
+                <div
+                  onDragEnter={handleDrag}
+                  onDragLeave={handleDrag}
+                  onDragOver={handleDrag}
+                  onDrop={handleDrop}
+                  className={`relative w-full px-6 py-8 border-2 border-dashed rounded-lg transition-all text-center cursor-pointer ${
+                    dragActive
+                      ? 'border-yellow-400 bg-yellow-50'
+                      : errors.curriculum
+                      ? 'border-red-300 bg-red-50'
+                      : formData.curriculum
+                      ? 'border-green-300 bg-green-50'
+                      : 'border-gray-300 bg-gray-50 hover:border-yellow-300'
+                  }`}
+                >
+                  <input
+                    type="file"
+                    name="curriculum"
+                    accept=".pdf"
+                    onChange={handleChange}
+                    className="hidden"
+                    id="curriculum-input"
+                  />
+                  <label htmlFor="curriculum-input" className="cursor-pointer">
+                    {formData.curriculum ? (
+                      <div>
+                        <svg className="w-12 h-12 text-green-600 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <p className="text-sm font-medium dp-text-main mb-1">✓ {formData.curriculum.name}</p>
+                        <p className="text-xs dp-text-secondary">{(formData.curriculum.size / 1024).toFixed(2)} KB</p>
+                      </div>
+                    ) : (
+                      <div>
+                        <svg className="w-12 h-12 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        <p className="text-sm font-medium dp-text-main">Arrastra tu PDF aquí o haz clic</p>
+                        <p className="text-xs dp-text-secondary mt-1">Máximo 5 MB</p>
+                      </div>
+                    )}
+                  </label>
                 </div>
-                {errors.certificacion && <p className="text-red-500 text-xs mt-1">{errors.certificacion}</p>}
+                {errors.curriculum && <p className="text-red-500 text-xs mt-2">{errors.curriculum}</p>}
               </div>
 
-              {/* Equipos con experiencia */}
+              {/* País */}
               <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-2">¿Con qué equipos tienes experiencia? (puedes marcar varios) *</label>
-                <div className="grid grid-cols-2 gap-2">
-                  {['Pico Láser', 'IPL / Luz Pulsada', 'Láser CO2', 'HIFU', 'Radiofrecuencia', 'Dermapen', 'Ninguno aún'].map(opt => (
-                    <label key={opt} className={`flex items-center gap-2 p-3 rounded-lg border cursor-pointer transition ${clasificacion.equipos_experiencia.includes(opt) ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200 hover:border-gray-300'}`}>
-                      <input type="checkbox" checked={clasificacion.equipos_experiencia.includes(opt)} onChange={() => handleCheckbox('equipos_experiencia', opt)} className="accent-yellow-500" />
-                      <span className="text-sm dp-text-main">{opt}</span>
-                    </label>
-                  ))}
-                </div>
-                {errors.equipos_experiencia && <p className="text-red-500 text-xs mt-1">{errors.equipos_experiencia}</p>}
+                <SearchableSelect
+                  label="País *"
+                  options={countriesData.countries.map(c => c.name)}
+                  value={formData.país}
+                  onChange={(value) => setFormData(prev => ({ ...prev, país: value }))}
+                  placeholder="Busca tu país..."
+                  error={errors.país}
+                />
               </div>
 
-              {/* Años con láser */}
+              {/* Ciudad */}
               <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-2">¿Cuántos años usando equipos láser? *</label>
-                <div className="grid grid-cols-2 gap-2">
-                  {['Sin experiencia', 'Menos de 1 año', '1-3 años', 'Más de 3 años'].map(opt => (
-                    <label key={opt} className={`flex items-center gap-2 p-3 rounded-lg border cursor-pointer transition ${clasificacion.anios_laser === opt ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200 hover:border-gray-300'}`}>
-                      <input type="radio" name="anios_laser" checked={clasificacion.anios_laser === opt} onChange={() => handleRadio('anios_laser', opt)} className="accent-yellow-500" />
-                      <span className="text-sm dp-text-main">{opt}</span>
-                    </label>
-                  ))}
-                </div>
-                {errors.anios_laser && <p className="text-red-500 text-xs mt-1">{errors.anios_laser}</p>}
-              </div>
-
-              {/* Experiencia en ventas */}
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-2">¿Tienes experiencia en ventas de tratamientos? *</label>
-                <div className="grid grid-cols-1 gap-2">
-                  {['Sí, he vendido activamente', 'Sí, de forma casual', 'No, pero me interesa aprender'].map(opt => (
-                    <label key={opt} className={`flex items-center gap-2 p-3 rounded-lg border cursor-pointer transition ${clasificacion.experiencia_ventas === opt ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200 hover:border-gray-300'}`}>
-                      <input type="radio" name="experiencia_ventas_cli" checked={clasificacion.experiencia_ventas === opt} onChange={() => handleRadio('experiencia_ventas', opt)} className="accent-yellow-500" />
-                      <span className="text-sm dp-text-main">{opt}</span>
-                    </label>
-                  ))}
-                </div>
-                {errors.experiencia_ventas && <p className="text-red-500 text-xs mt-1">{errors.experiencia_ventas}</p>}
-              </div>
-
-              {/* Experiencia en clínicas */}
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-2">¿Has trabajado en clínicas estéticas? *</label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {['Sí, más de 2 años', 'Sí, menos de 2 años', 'No, pero en spa o salón', 'No'].map(opt => (
-                    <label key={opt} className={`flex items-center gap-2 p-3 rounded-lg border cursor-pointer transition ${clasificacion.experiencia_clinica === opt ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200 hover:border-gray-300'}`}>
-                      <input type="radio" name="experiencia_clinica" checked={clasificacion.experiencia_clinica === opt} onChange={() => handleRadio('experiencia_clinica', opt)} className="accent-yellow-500" />
-                      <span className="text-sm dp-text-main">{opt}</span>
-                    </label>
-                  ))}
-                </div>
-                {errors.experiencia_clinica && <p className="text-red-500 text-xs mt-1">{errors.experiencia_clinica}</p>}
-              </div>
-
-              {/* Cartera de clientes */}
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-2">¿Tienes cartera de clientes propios? *</label>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                  {['Sí, clientela fija', 'Algunos clientes', 'No'].map(opt => (
-                    <label key={opt} className={`flex items-center gap-2 p-3 rounded-lg border cursor-pointer transition ${clasificacion.cartera_clientes === opt ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200 hover:border-gray-300'}`}>
-                      <input type="radio" name="cartera_clientes" checked={clasificacion.cartera_clientes === opt} onChange={() => handleRadio('cartera_clientes', opt)} className="accent-yellow-500" />
-                      <span className="text-sm dp-text-main">{opt}</span>
-                    </label>
-                  ))}
-                </div>
-                {errors.cartera_clientes && <p className="text-red-500 text-xs mt-1">{errors.cartera_clientes}</p>}
-              </div>
-
-              <hr className="border-gray-200" />
-              <div>
-                <p className="text-sm font-semibold dp-text-main">Preguntas de evaluación</p>
-                <p className="text-xs dp-text-secondary mt-1">Tómate tu tiempo. Estas respuestas son lo más importante para nosotros.</p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-1">1. ¿Con qué equipos de estética o láser has trabajado y durante cuánto tiempo? *</label>
-                <textarea rows={3} value={clasificacion.equipos_detalle} onChange={e => handlePregunta('equipos_detalle', e.target.value)} placeholder="Ej: Usé Pico Láser durante 2 años en Clínica X, realizando tratamientos de manchas y borrado de tatuajes..." className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition resize-none ${errors.equipos_detalle ? 'border-red-500' : clasificacion.equipos_detalle ? 'border-green-500' : 'border-gray-300'}`} />
-                {errors.equipos_detalle && <p className="text-red-500 text-xs mt-1">{errors.equipos_detalle}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-1">2. Describe una situación en que tuviste que detener o posponer un tratamiento por seguridad del paciente. *</label>
-                <textarea rows={3} value={clasificacion.situacion_seguridad} onChange={e => handlePregunta('situacion_seguridad', e.target.value)} placeholder="Si no has vivido esta situación, cuéntanos cómo actuarías ante ella..." className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition resize-none ${errors.situacion_seguridad ? 'border-red-500' : clasificacion.situacion_seguridad ? 'border-green-500' : 'border-gray-300'}`} />
-                {errors.situacion_seguridad && <p className="text-red-500 text-xs mt-1">{errors.situacion_seguridad}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-1">3. ¿Cómo manejas a un paciente que está nervioso o que reacciona de forma inesperada durante una sesión? *</label>
-                <textarea rows={3} value={clasificacion.manejo_paciente_nervioso} onChange={e => handlePregunta('manejo_paciente_nervioso', e.target.value)} placeholder="Describe tu enfoque y qué técnicas usas para tranquilizar al paciente..." className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition resize-none ${errors.manejo_paciente_nervioso ? 'border-red-500' : clasificacion.manejo_paciente_nervioso ? 'border-green-500' : 'border-gray-300'}`} />
-                {errors.manejo_paciente_nervioso && <p className="text-red-500 text-xs mt-1">{errors.manejo_paciente_nervioso}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-1">4. ¿Cómo te mantienes actualizado/a sobre nuevas técnicas y equipos en estética avanzada? *</label>
-                <textarea rows={3} value={clasificacion.actualizacion_tecnica} onChange={e => handlePregunta('actualizacion_tecnica', e.target.value)} placeholder="Ej: sigo canales especializados, asisto a congresos, hago cursos cada X meses..." className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition resize-none ${errors.actualizacion_tecnica ? 'border-red-500' : clasificacion.actualizacion_tecnica ? 'border-green-500' : 'border-gray-300'}`} />
-                {errors.actualizacion_tecnica && <p className="text-red-500 text-xs mt-1">{errors.actualizacion_tecnica}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-1">5. ¿Por qué elegiste la estética avanzada como tu área de especialización? *</label>
-                <textarea rows={3} value={clasificacion.motivacion_estetica_avanzada} onChange={e => handlePregunta('motivacion_estetica_avanzada', e.target.value)} placeholder="Cuéntanos qué te atrajo de este campo y qué te apasiona de él..." className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition resize-none ${errors.motivacion_estetica_avanzada ? 'border-red-500' : clasificacion.motivacion_estetica_avanzada ? 'border-green-500' : 'border-gray-300'}`} />
-                {errors.motivacion_estetica_avanzada && <p className="text-red-500 text-xs mt-1">{errors.motivacion_estetica_avanzada}</p>}
+                <SearchableSelect
+                  label="Ciudad *"
+                  options={availableCities}
+                  value={formData.ciudad}
+                  onChange={(value) => setFormData(prev => ({ ...prev, ciudad: value }))}
+                  placeholder={formData.país ? "Busca tu ciudad..." : "Selecciona un país primero"}
+                  error={errors.ciudad}
+                  className={!formData.país ? 'opacity-50 pointer-events-none' : ''}
+                />
               </div>
 
               <button type="submit" disabled={isSubmitting} className="w-full dp-bg-cta  font-bold py-4 px-6 rounded-lg transition-all duration-300 hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed text-base mt-2">

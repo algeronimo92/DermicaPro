@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { captureAllUTM } from '../utils/trackingHelper';
+import SearchableSelect from '../components/SearchableSelect';
+import countriesData from '../data/countriesCities.json';
 
 const NOMBRE_PUESTO = 'Asesor Comercial';
-const WEBHOOK_URL = 'https://dermica-pro-n8n.rcsgeg.easypanel.host/webhook/postulacion-vendedor';
+const WEBHOOK_URL = 'https://n8n.dermicapro.online/webhook-test/cc4dda80-a015-463b-b922-d04c2fa42d8e';
 const WHATSAPP_ERROR = '+51974637783';
 
 const customCss = `
@@ -41,10 +43,15 @@ const validateField = (name, value) => {
     case 'dni':
       return !/^[0-9]{8}$/.test(value.trim()) ? '8 dígitos requeridos' : '';
     case 'curriculum':
-      if (!value.trim()) return 'Ingresa el link de tu CV';
-      try { new URL(value.trim()); return ''; } catch { return 'Ingresa un link válido (Google Drive, etc.)'; }
-    case 'pretensiones':
-      return !value.trim() ? 'Ingresa tus pretensiones salariales' : '';
+      if (!value) return 'Selecciona un archivo PDF';
+      if (!(value instanceof File)) return 'Debes cargar un archivo';
+      if (value.type !== 'application/pdf') return 'Solo se permite archivos PDF';
+      if (value.size > 5 * 1024 * 1024) return 'El archivo no puede superar 5 MB';
+      return '';
+    case 'ciudad':
+      return !value ? 'Selecciona tu ciudad' : '';
+    case 'país':
+      return !value ? 'Selecciona tu país' : '';
     default:
       return '';
   }
@@ -57,27 +64,32 @@ function VendedorPostulacionPage() {
     telefono: '',
     email: '',
     dni: '',
-    curriculum: '',
-    pretensiones: '',
-  });
-  const [clasificacion, setClasificacion] = useState({
-    experiencia_ventas: '',
-    sector_ventas: [],
-    esquema_salarial: '',
-    seguimiento_clientes: '',
-    estilo_venta: '',
-    disponibilidad: '',
-    logro_ventas: '',
-    manejo_rechazo: '',
-    criterio_prioridad: '',
-    motivacion_estetica: '',
-    ejemplo_persuasion: '',
+    curriculum: null,
+    ciudad: '',
+    pais: '',
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [utmData, setUtmData] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState('');
+  const [dragActive, setDragActive] = useState(false);
+  const [availableCities, setAvailableCities] = useState([]);
+
+  // Cargar ciudades cuando cambia el país
+  useEffect(() => {
+    if (formData.país) {
+      const country = countriesData.countries.find(c => c.name === formData.país);
+      setAvailableCities(country ? country.cities : []);
+      // Resetear ciudad cuando cambia país
+      if (formData.ciudad) {
+        setFormData(prev => ({ ...prev, ciudad: '' }));
+        setErrors(prev => ({ ...prev, ciudad: '' }));
+      }
+    } else {
+      setAvailableCities([]);
+    }
+  }, [formData.país]);
 
   useEffect(() => {
     setUtmData(captureAllUTM());
@@ -102,59 +114,47 @@ function VendedorPostulacionPage() {
   }, []);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, files } = e.target;
     let processed = value;
-    if (name === 'nombre' || name === 'apellido') {
+    
+    if (type === 'file') {
+      processed = files?.[0] || null;
+      setDragActive(false);
+    } else if (name === 'nombre' || name === 'apellido') {
       processed = value.toLowerCase().replace(/(^|\s)\S/g, c => c.toUpperCase());
     } else if (name === 'telefono' || name === 'dni') {
       processed = value.replace(/[^0-9]/g, '');
     }
+    
     setFormData(prev => ({ ...prev, [name]: processed }));
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: validateField(name, processed) }));
     }
   };
 
-  const handleBlur = (e) => {
-    const { name, value } = e.target;
-    setErrors(prev => ({ ...prev, [name]: validateField(name, value) }));
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === 'dragenter' || e.type === 'dragover') {
+      setDragActive(true);
+    } else if (e.type === 'dragleave') {
+      setDragActive(false);
+    }
   };
 
-  const handleRadio = (group, value) => {
-    setClasificacion(prev => ({ ...prev, [group]: value }));
-    if (errors[group]) setErrors(prev => ({ ...prev, [group]: '' }));
-  };
-
-  const handleCheckbox = (group, value) => {
-    setClasificacion(prev => {
-      const current = prev[group];
-      const updated = current.includes(value)
-        ? current.filter(v => v !== value)
-        : [...current, value];
-      return { ...prev, [group]: updated };
-    });
-    if (errors[group]) setErrors(prev => ({ ...prev, [group]: '' }));
-  };
-
-  const handlePregunta = (name, value) => {
-    setClasificacion(prev => ({ ...prev, [name]: value }));
-    if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
-  };
-
-  const validateClasificacion = () => {
-    const errs = {};
-    if (!clasificacion.experiencia_ventas) errs.experiencia_ventas = 'Selecciona una opción';
-    if (clasificacion.sector_ventas.length === 0) errs.sector_ventas = 'Selecciona al menos una opción';
-    if (!clasificacion.esquema_salarial) errs.esquema_salarial = 'Selecciona una opción';
-    if (!clasificacion.seguimiento_clientes) errs.seguimiento_clientes = 'Selecciona una opción';
-    if (!clasificacion.estilo_venta) errs.estilo_venta = 'Selecciona una opción';
-    if (!clasificacion.disponibilidad) errs.disponibilidad = 'Selecciona una opción';
-    if (!clasificacion.logro_ventas || clasificacion.logro_ventas.trim().length < 20) errs.logro_ventas = 'Por favor desarrolla tu respuesta (mín. 20 caracteres)';
-    if (!clasificacion.manejo_rechazo || clasificacion.manejo_rechazo.trim().length < 20) errs.manejo_rechazo = 'Por favor desarrolla tu respuesta (mín. 20 caracteres)';
-    if (!clasificacion.criterio_prioridad || clasificacion.criterio_prioridad.trim().length < 20) errs.criterio_prioridad = 'Por favor desarrolla tu respuesta (mín. 20 caracteres)';
-    if (!clasificacion.motivacion_estetica || clasificacion.motivacion_estetica.trim().length < 20) errs.motivacion_estetica = 'Por favor desarrolla tu respuesta (mín. 20 caracteres)';
-    if (!clasificacion.ejemplo_persuasion || clasificacion.ejemplo_persuasion.trim().length < 20) errs.ejemplo_persuasion = 'Por favor desarrolla tu respuesta (mín. 20 caracteres)';
-    return errs;
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    
+    const files = e.dataTransfer?.files;
+    if (files && files[0]) {
+      const file = files[0];
+      setFormData(prev => ({ ...prev, curriculum: file }));
+      if (errors.curriculum) {
+        setErrors(prev => ({ ...prev, curriculum: validateField('curriculum', file) }));
+      }
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -165,36 +165,41 @@ function VendedorPostulacionPage() {
       if (err) acc[key] = err;
       return acc;
     }, {});
-    const clasifErrors = validateClasificacion();
-    const allErrors = { ...fieldErrors, ...clasifErrors };
+    const allErrors = { ...fieldErrors};
     setErrors(allErrors);
 
     if (Object.keys(allErrors).length > 0) return;
 
     setIsSubmitting(true);
     try {
-      const payload = {
-        ...formData,
-        telefono: `+51${formData.telefono}`,
-        ...Object.fromEntries(
-          Object.entries(clasificacion).map(([k, v]) => [
-            k,
-            Array.isArray(v) ? v.join(', ') : v,
-          ])
-        ),
-        puesto: NOMBRE_PUESTO,
-        landing_url: window.location.href,
-        timestamp: new Date().toISOString(),
-        ...Object.fromEntries(Object.entries(utmData).filter(([, v]) => v)),
-      };
+      const formDataPayload = new FormData();
+      formDataPayload.append('nombre', formData.nombre);
+      formDataPayload.append('apellido', formData.apellido);
+      formDataPayload.append('telefono', `+51${formData.telefono}`);
+      formDataPayload.append('email', formData.email);
+      formDataPayload.append('dni', formData.dni);
+      formDataPayload.append('ciudad', formData.ciudad);
+      formDataPayload.append('país', formData.país);
+      if (formData.curriculum instanceof File) {
+        formDataPayload.append('curriculum', formData.curriculum);
+      }
+      formDataPayload.append('puesto', NOMBRE_PUESTO);
+      formDataPayload.append('landing_url', window.location.href);
+      formDataPayload.append('timestamp', new Date().toISOString());
+      // Enviar tracking data (UTM y click IDs)
+      const trackingFields = ['ttclid', 'fbclid', 'ad_id', 'adset_id', 'campaign_id', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
+      trackingFields.forEach(field => {
+        formDataPayload.append(field, utmData[field] || '');
+      });
+      // Debug
+      console.log('📊 FormData UTM:', utmData);
 
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 12000);
 
       const response = await fetch(WEBHOOK_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: formDataPayload,
         signal: controller.signal,
       });
       clearTimeout(timeoutId);
@@ -202,8 +207,7 @@ function VendedorPostulacionPage() {
       if (response.ok) {
         setModalType('success');
         setShowModal(true);
-        setFormData({ nombre: '', apellido: '', telefono: '', email: '', dni: '', curriculum: '', pretensiones: '' });
-        setClasificacion({ experiencia_ventas: '', sector_ventas: [], esquema_salarial: '', seguimiento_clientes: '', estilo_venta: '', disponibilidad: '', logro_ventas: '', manejo_rechazo: '', criterio_prioridad: '', motivacion_estetica: '', ejemplo_persuasion: '' });
+        setFormData({ nombre: '', apellido: '', telefono: '', email: '', dni: '', curriculum: null, ciudad: '', pais: '' });
         setErrors({});
       } else {
         setModalType('error');
@@ -359,12 +363,12 @@ function VendedorPostulacionPage() {
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium dp-text-secondary mb-1">Nombre *</label>
-                  <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} onBlur={handleBlur} placeholder="Ej: Rosa" className={inputClass('nombre')} />
+                  <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} placeholder="Ej: Rosa" className={inputClass('nombre')} />
                   {errors.nombre && <p className="text-red-500 text-xs mt-1">{errors.nombre}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium dp-text-secondary mb-1">Apellido *</label>
-                  <input type="text" name="apellido" value={formData.apellido} onChange={handleChange} onBlur={handleBlur} placeholder="Ej: Mendoza" className={inputClass('apellido')} />
+                  <input type="text" name="apellido" value={formData.apellido} onChange={handleChange} placeholder="Ej: Mendoza" className={inputClass('apellido')} />
                   {errors.apellido && <p className="text-red-500 text-xs mt-1">{errors.apellido}</p>}
                 </div>
               </div>
@@ -375,13 +379,13 @@ function VendedorPostulacionPage() {
                   <label className="block text-sm font-medium dp-text-secondary mb-1">Teléfono (WhatsApp) *</label>
                   <div className="flex">
                     <span className="inline-flex items-center px-3 border border-r-0 border-gray-300 bg-gray-50 text-gray-500 rounded-l-lg text-sm">+51</span>
-                    <input type="tel" name="telefono" value={formData.telefono} onChange={handleChange} onBlur={handleBlur} placeholder="987 654 321" maxLength="9" className={`w-full px-4 py-2 border rounded-r-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition ${errors.telefono ? 'border-red-500' : formData.telefono ? 'border-green-500' : 'border-gray-300'}`} />
+                    <input type="tel" name="telefono" value={formData.telefono} onChange={handleChange} placeholder="987 654 321" maxLength="9" className={`w-full px-4 py-2 border rounded-r-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition ${errors.telefono ? 'border-red-500' : formData.telefono ? 'border-green-500' : 'border-gray-300'}`} />
                   </div>
                   {errors.telefono && <p className="text-red-500 text-xs mt-1">{errors.telefono}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium dp-text-secondary mb-1">DNI *</label>
-                  <input type="text" name="dni" value={formData.dni} onChange={handleChange} onBlur={handleBlur} placeholder="12345678" maxLength="8" className={inputClass('dni')} />
+                  <input type="text" name="dni" value={formData.dni} onChange={handleChange} placeholder="12345678" maxLength="8" className={inputClass('dni')} />
                   {errors.dni && <p className="text-red-500 text-xs mt-1">{errors.dni}</p>}
                 </div>
               </div>
@@ -389,145 +393,82 @@ function VendedorPostulacionPage() {
               {/* Email */}
               <div>
                 <label className="block text-sm font-medium dp-text-secondary mb-1">Correo electrónico *</label>
-                <input type="email" name="email" value={formData.email} onChange={handleChange} onBlur={handleBlur} placeholder="ejemplo@correo.com" className={inputClass('email')} />
+                <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="ejemplo@correo.com" className={inputClass('email')} />
                 {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
               </div>
 
               {/* Curriculum */}
               <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-1">Link de CV (Google Drive, Dropbox, etc.) *</label>
-                <input type="url" name="curriculum" value={formData.curriculum} onChange={handleChange} onBlur={handleBlur} placeholder="https://drive.google.com/..." className={inputClass('curriculum')} />
-                {errors.curriculum && <p className="text-red-500 text-xs mt-1">{errors.curriculum}</p>}
-              </div>
-
-              {/* Pretensiones */}
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-1">Pretensiones salariales *</label>
-                <input type="text" name="pretensiones" value={formData.pretensiones} onChange={handleChange} onBlur={handleBlur} placeholder="Ej: S/ 1,200 base + comisiones" className={inputClass('pretensiones')} />
-                {errors.pretensiones && <p className="text-red-500 text-xs mt-1">{errors.pretensiones}</p>}
-              </div>
-
-              <hr className="border-gray-200" />
-              <p className="text-sm font-semibold dp-text-main">Preguntas de clasificación</p>
-
-              {/* Experiencia en ventas */}
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-2">¿Cuánta experiencia tienes en ventas directas? *</label>
-                <div className="grid grid-cols-2 gap-2">
-                  {['Sin experiencia', '6 meses - 1 año', '1-3 años', 'Más de 3 años'].map(opt => (
-                    <label key={opt} className={`flex items-center gap-2 p-3 rounded-lg border cursor-pointer transition ${clasificacion.experiencia_ventas === opt ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200 hover:border-gray-300'}`}>
-                      <input type="radio" name="experiencia_ventas" checked={clasificacion.experiencia_ventas === opt} onChange={() => handleRadio('experiencia_ventas', opt)} className="accent-yellow-500" />
-                      <span className="text-sm dp-text-main">{opt}</span>
-                    </label>
-                  ))}
+                <label className="block text-sm font-medium dp-text-secondary mb-2">Cargar CV (PDF) *</label>
+                <div
+                  onDragEnter={handleDrag}
+                  onDragLeave={handleDrag}
+                  onDragOver={handleDrag}
+                  onDrop={handleDrop}
+                  className={`relative w-full px-6 py-8 border-2 border-dashed rounded-lg transition-all text-center cursor-pointer ${
+                    dragActive
+                      ? 'border-yellow-400 bg-yellow-50'
+                      : errors.curriculum
+                      ? 'border-red-300 bg-red-50'
+                      : formData.curriculum
+                      ? 'border-green-300 bg-green-50'
+                      : 'border-gray-300 bg-gray-50 hover:border-yellow-300'
+                  }`}
+                >
+                  <input
+                    type="file"
+                    name="curriculum"
+                    accept=".pdf"
+                    onChange={handleChange}
+                    className="hidden"
+                    id="curriculum-input"
+                  />
+                  <label htmlFor="curriculum-input" className="cursor-pointer">
+                    {formData.curriculum ? (
+                      <div>
+                        <svg className="w-12 h-12 text-green-600 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <p className="text-sm font-medium dp-text-main mb-1">✓ {formData.curriculum.name}</p>
+                        <p className="text-xs dp-text-secondary">{(formData.curriculum.size / 1024).toFixed(2)} KB</p>
+                      </div>
+                    ) : (
+                      <div>
+                        <svg className="w-12 h-12 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        <p className="text-sm font-medium dp-text-main">Arrastra tu PDF aquí o haz clic</p>
+                        <p className="text-xs dp-text-secondary mt-1">Máximo 5 MB</p>
+                      </div>
+                    )}
+                  </label>
                 </div>
-                {errors.experiencia_ventas && <p className="text-red-500 text-xs mt-1">{errors.experiencia_ventas}</p>}
+                {errors.curriculum && <p className="text-red-500 text-xs mt-2">{errors.curriculum}</p>}
               </div>
 
-              {/* Sector de ventas */}
+              {/* País */}
               <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-2">¿En qué sector has vendido? (puedes marcar varios) *</label>
-                <div className="grid grid-cols-2 gap-2">
-                  {['Salud y bienestar', 'Estética y belleza', 'Tecnología', 'Educación', 'Seguros', 'Otro'].map(opt => (
-                    <label key={opt} className={`flex items-center gap-2 p-3 rounded-lg border cursor-pointer transition ${clasificacion.sector_ventas.includes(opt) ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200 hover:border-gray-300'}`}>
-                      <input type="checkbox" checked={clasificacion.sector_ventas.includes(opt)} onChange={() => handleCheckbox('sector_ventas', opt)} className="accent-yellow-500" />
-                      <span className="text-sm dp-text-main">{opt}</span>
-                    </label>
-                  ))}
-                </div>
-                {errors.sector_ventas && <p className="text-red-500 text-xs mt-1">{errors.sector_ventas}</p>}
+                <SearchableSelect
+                  label="País *"
+                  options={countriesData.countries.map(c => c.name)}
+                  value={formData.país}
+                  onChange={(value) => setFormData(prev => ({ ...prev, país: value }))}
+                  placeholder="Busca tu país..."
+                  error={errors.país}
+                />
               </div>
 
-              {/* Esquema salarial */}
+              {/* Ciudad */}
               <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-2">¿Estás cómodo/a trabajando con comisiones? *</label>
-                <div className="grid grid-cols-1 gap-2">
-                  {['Sí, prefiero comisiones', 'Sí con sueldo base + comisión', 'Prefiero solo sueldo fijo'].map(opt => (
-                    <label key={opt} className={`flex items-center gap-2 p-3 rounded-lg border cursor-pointer transition ${clasificacion.esquema_salarial === opt ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200 hover:border-gray-300'}`}>
-                      <input type="radio" name="esquema_salarial" checked={clasificacion.esquema_salarial === opt} onChange={() => handleRadio('esquema_salarial', opt)} className="accent-yellow-500" />
-                      <span className="text-sm dp-text-main">{opt}</span>
-                    </label>
-                  ))}
-                </div>
-                {errors.esquema_salarial && <p className="text-red-500 text-xs mt-1">{errors.esquema_salarial}</p>}
-              </div>
-
-              {/* Seguimiento de clientes */}
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-2">¿Tienes experiencia haciendo seguimiento de clientes? *</label>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                  {['Sí, uso CRM', 'Sí, de forma manual', 'No'].map(opt => (
-                    <label key={opt} className={`flex items-center gap-2 p-3 rounded-lg border cursor-pointer transition ${clasificacion.seguimiento_clientes === opt ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200 hover:border-gray-300'}`}>
-                      <input type="radio" name="seguimiento_clientes" checked={clasificacion.seguimiento_clientes === opt} onChange={() => handleRadio('seguimiento_clientes', opt)} className="accent-yellow-500" />
-                      <span className="text-sm dp-text-main">{opt}</span>
-                    </label>
-                  ))}
-                </div>
-                {errors.seguimiento_clientes && <p className="text-red-500 text-xs mt-1">{errors.seguimiento_clientes}</p>}
-              </div>
-
-              {/* Estilo de venta */}
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-2">¿Cómo describes tu estilo de venta? *</label>
-                <div className="grid grid-cols-1 gap-2">
-                  {['Consultivo (escucho primero)', 'Agresivo (cierro rápido)', 'Mixto según cliente'].map(opt => (
-                    <label key={opt} className={`flex items-center gap-2 p-3 rounded-lg border cursor-pointer transition ${clasificacion.estilo_venta === opt ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200 hover:border-gray-300'}`}>
-                      <input type="radio" name="estilo_venta" checked={clasificacion.estilo_venta === opt} onChange={() => handleRadio('estilo_venta', opt)} className="accent-yellow-500" />
-                      <span className="text-sm dp-text-main">{opt}</span>
-                    </label>
-                  ))}
-                </div>
-                {errors.estilo_venta && <p className="text-red-500 text-xs mt-1">{errors.estilo_venta}</p>}
-              </div>
-
-              {/* Disponibilidad */}
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-2">¿Disponibilidad? *</label>
-                <div className="grid grid-cols-1 gap-2">
-                  {['Lunes a sábado completo', 'Solo días de semana', 'Incluye domingos'].map(opt => (
-                    <label key={opt} className={`flex items-center gap-2 p-3 rounded-lg border cursor-pointer transition ${clasificacion.disponibilidad === opt ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200 hover:border-gray-300'}`}>
-                      <input type="radio" name="disponibilidad" checked={clasificacion.disponibilidad === opt} onChange={() => handleRadio('disponibilidad', opt)} className="accent-yellow-500" />
-                      <span className="text-sm dp-text-main">{opt}</span>
-                    </label>
-                  ))}
-                </div>
-                {errors.disponibilidad && <p className="text-red-500 text-xs mt-1">{errors.disponibilidad}</p>}
-              </div>
-
-              <hr className="border-gray-200" />
-              <div>
-                <p className="text-sm font-semibold dp-text-main">Preguntas de evaluación</p>
-                <p className="text-xs dp-text-secondary mt-1">Tómate tu tiempo. Estas respuestas son lo más importante para nosotros.</p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-1">1. ¿Cuál ha sido tu mayor logro en ventas o atención al cliente? Descríbelo con números si puedes. *</label>
-                <textarea rows={3} value={clasificacion.logro_ventas} onChange={e => handlePregunta('logro_ventas', e.target.value)} placeholder="Ej: En mi trabajo anterior superé la meta del mes un 30% en dos trimestres consecutivos logrando..." className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition resize-none ${errors.logro_ventas ? 'border-red-500' : clasificacion.logro_ventas ? 'border-green-500' : 'border-gray-300'}`} />
-                {errors.logro_ventas && <p className="text-red-500 text-xs mt-1">{errors.logro_ventas}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-1">2. ¿Cómo reaccionas cuando un cliente te dice "no me interesa" o te cuelga el teléfono? *</label>
-                <textarea rows={3} value={clasificacion.manejo_rechazo} onChange={e => handlePregunta('manejo_rechazo', e.target.value)} placeholder="Cuéntanos cómo manejas ese momento y qué haces después..." className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition resize-none ${errors.manejo_rechazo ? 'border-red-500' : clasificacion.manejo_rechazo ? 'border-green-500' : 'border-gray-300'}`} />
-                {errors.manejo_rechazo && <p className="text-red-500 text-xs mt-1">{errors.manejo_rechazo}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-1">3. Si hoy tienes 8 leads para contactar pero solo tiempo para 5, ¿cómo decides a cuáles llamar primero? *</label>
-                <textarea rows={3} value={clasificacion.criterio_prioridad} onChange={e => handlePregunta('criterio_prioridad', e.target.value)} placeholder="Explica tu criterio de priorización..." className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition resize-none ${errors.criterio_prioridad ? 'border-red-500' : clasificacion.criterio_prioridad ? 'border-green-500' : 'border-gray-300'}`} />
-                {errors.criterio_prioridad && <p className="text-red-500 text-xs mt-1">{errors.criterio_prioridad}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-1">4. ¿Qué te motivaría a trabajar específicamente en una clínica de estética y no en otro rubro? *</label>
-                <textarea rows={3} value={clasificacion.motivacion_estetica} onChange={e => handlePregunta('motivacion_estetica', e.target.value)} placeholder="Sé específico/a. ¿Qué tiene este sector que otros no tienen para ti?" className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition resize-none ${errors.motivacion_estetica ? 'border-red-500' : clasificacion.motivacion_estetica ? 'border-green-500' : 'border-gray-300'}`} />
-                {errors.motivacion_estetica && <p className="text-red-500 text-xs mt-1">{errors.motivacion_estetica}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-1">5. Cuéntanos de una vez que convenciste a alguien de algo difícil. ¿Qué hiciste? *</label>
-                <textarea rows={3} value={clasificacion.ejemplo_persuasion} onChange={e => handlePregunta('ejemplo_persuasion', e.target.value)} placeholder="Puede ser en el trabajo, con un cliente, o en cualquier situación de tu vida..." className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition resize-none ${errors.ejemplo_persuasion ? 'border-red-500' : clasificacion.ejemplo_persuasion ? 'border-green-500' : 'border-gray-300'}`} />
-                {errors.ejemplo_persuasion && <p className="text-red-500 text-xs mt-1">{errors.ejemplo_persuasion}</p>}
+                <SearchableSelect
+                  label="Ciudad *"
+                  options={availableCities}
+                  value={formData.ciudad}
+                  onChange={(value) => setFormData(prev => ({ ...prev, ciudad: value }))}
+                  placeholder={formData.país ? "Busca tu ciudad..." : "Selecciona un país primero"}
+                  error={errors.ciudad}
+                  className={!formData.país ? 'opacity-50 pointer-events-none' : ''}
+                />
               </div>
 
               <button type="submit" disabled={isSubmitting} className="w-full dp-bg-cta  font-bold py-4 px-6 rounded-lg transition-all duration-300 hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed text-base mt-2">
