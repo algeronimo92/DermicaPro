@@ -39,21 +39,21 @@ export const detectTrafficSource = () => {
  * @param {string} contentName - Nombre del contenido
  * @param {string} contentType - Tipo de contenido
  */
-export const trackPageViewConditional = (contentName, contentType = 'landing_page') => {
+export const trackPageViewConditional = (contentName, contentType = 'landing_page', value = 0) => {
   const source = detectTrafficSource();
 
   console.log(`📊 PageView - Fuente detectada: ${source}`);
 
   if (source === 'tiktok') {
     console.log('🎵 Disparando TikTok PageView');
-    trackTikTokViewContent(contentName, contentType);
+    trackTikTokViewContent(contentName, contentType, value);
   } else if (source === 'meta') {
     console.log('👤 Disparando Meta PageView');
-    trackMetaViewContent(contentName, contentType);
+    trackMetaViewContent(contentName, contentType, value);
   } else {
     console.log('🌐 Tráfico orgánico - Disparando ambos PageViews');
-    trackMetaViewContent(contentName, contentType);
-    trackTikTokViewContent(contentName, contentType);
+    trackMetaViewContent(contentName, contentType, value);
+    trackTikTokViewContent(contentName, contentType, value);
   }
 };
 

@@ -25,6 +25,17 @@ const TikTokPixel = () => {
       return;
     }
 
+    // No trackear en rutas de postulación (usan pixel de trabajo)
+    if (location.pathname.indexOf('/postulacion') === 0) {
+      return;
+    }
+
+    // No trackear en landings de servicios (manejan su propio ViewContent via trackPageViewConditional)
+    const SERVICE_LANDINGS = ['/hifu-landing', '/botox-landing', '/hollywood-peel-landing'];
+    if (SERVICE_LANDINGS.includes(location.pathname)) {
+      return;
+    }
+
     // Función para intentar trackear PageView
     const trackPageView = () => {
       if (typeof window.ttq === 'object' && typeof window.ttq.page === 'function') {

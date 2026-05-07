@@ -5,6 +5,8 @@
  * con validaciones y fallbacks
  */
 
+const SERVICES_PIXEL_ID = '1431286785234837';
+
 /**
  * Verifica si Meta Pixel está listo
  * @returns {boolean}
@@ -51,7 +53,7 @@ export const trackMetaEvent = async (eventName, params = {}) => {
 
   if (ready && window.fbq) {
     try {
-      window.fbq('track', eventName, params);
+      window.fbq('trackSingle', SERVICES_PIXEL_ID, eventName, params);
       console.log(`✅ Meta Pixel - ${eventName} tracked:`, params);
     } catch (error) {
       console.error(`❌ Error tracking Meta Pixel event ${eventName}:`, error);
@@ -71,7 +73,7 @@ export const trackMetaCustomEvent = async (eventName, params = {}) => {
 
   if (ready && window.fbq) {
     try {
-      window.fbq('trackCustom', eventName, params);
+      window.fbq('trackSingleCustom', SERVICES_PIXEL_ID, eventName, params);
       console.log(`✅ Meta Pixel - Custom ${eventName} tracked:`, params);
     } catch (error) {
       console.error(`❌ Error tracking custom event ${eventName}:`, error);
@@ -133,10 +135,12 @@ export const trackSchedule = (service = 'Consulta General', value = 0) => {
  * @param {string} contentName - Nombre del contenido
  * @param {string} contentType - Tipo de contenido
  */
-export const trackViewContent = (contentName, contentType = 'page') => {
+export const trackViewContent = (contentName, contentType = 'page', value = 0, currency = 'PEN') => {
   trackMetaEvent('ViewContent', {
     content_name: contentName,
-    content_type: contentType
+    content_type: contentType,
+    value: value,
+    currency: currency
   });
 };
 

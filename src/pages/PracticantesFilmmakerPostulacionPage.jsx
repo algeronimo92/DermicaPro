@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { captureAllUTM } from '../utils/trackingHelper';
+import { initJobPixel, trackJobPageView, initJobTikTokPixel, trackJobTikTokViewContent } from '../utils/jobPixelHelper';
 import SearchableSelect from '../components/SearchableSelect';
 import countriesData from '../data/countriesCities.json';
 
@@ -97,6 +98,13 @@ function PracticantesFilmmakerPostulacionPage() {
 
   useEffect(() => {
     setUtmData(captureAllUTM());
+    const init = async () => {
+      await initJobPixel();
+      await trackJobPageView(NOMBRE_PUESTO);
+      await initJobTikTokPixel();
+      await trackJobTikTokViewContent(NOMBRE_PUESTO);
+    };
+    init();
   }, []);
 
   useEffect(() => {

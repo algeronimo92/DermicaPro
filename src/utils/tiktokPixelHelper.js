@@ -94,10 +94,12 @@ export const trackContact = (method = 'whatsapp') => {
  * @param {string} contentName - Nombre del contenido
  * @param {string} contentType - Tipo de contenido
  */
-export const trackViewContent = (contentName, contentType = 'page') => {
+export const trackViewContent = (contentName, contentType = 'page', value = 0, currency = 'PEN') => {
   trackTikTokEvent('ViewContent', {
     content_name: contentName,
-    content_type: contentType
+    content_type: contentType,
+    value: value,
+    currency: currency
   });
 };
 
@@ -207,13 +209,13 @@ export const getCookie = (name) => {
  * Valores estimados de conversiones por tratamiento (en PEN - Soles Peruanos)
  */
 export const CONVERSION_VALUES = {
-  'HIFU 12D': 200,
-  'Hollywood Peel': 150,
+  'HIFU 12D': 400,
+  'Hollywood Peel': 180,
   'Borrado de Manchas': 180,
   'Pico Láser': 180,
   'Hydrafacial': 120,
   'Peeling Químico': 100,
-  'Botox': 180,
+  'Botox': 850,
   'Consulta General': 50
 };
 
