@@ -2,9 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { captureAllUTM } from '../utils/trackingHelper';
 import SearchableSelect from '../components/SearchableSelect';
 import countriesData from '../data/countriesCities.json';
+import QuestionnaireModal from '../components/QuestionnaireModal';
+import { getQuestionnaire } from '../data/questionnairesData';
+import useApplicationFlow from '../hooks/useApplicationFlow';
 
 const NOMBRE_PUESTO = 'Editor de Videos';
-const WEBHOOK_URL = 'https://n8n.dermicapro.online/webhook-test/cc4dda80-a015-463b-b922-d04c2fa42d8e';
+const WEBHOOK_URL = 'https://n8n.dermicapro.online/webhook/trabajos';
 const WHATSAPP_ERROR = '+51974637783';
 
 const customCss = `
@@ -50,8 +53,8 @@ const validateField = (name, value) => {
       return '';
     case 'ciudad':
       return !value ? 'Selecciona tu ciudad' : '';
-    case 'país':
-      return !value ? 'Selecciona tu país' : '';
+    case 'pais':
+      return !value ? 'Selecciona tu pais' : '';
     default:
       return '';
   }
@@ -66,7 +69,7 @@ function EditorVideoPostulacionPage() {
     dni: '',
     curriculum: null,
     ciudad: '',
-    país: '',
+    pais: '',
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -76,20 +79,38 @@ function EditorVideoPostulacionPage() {
   const [dragActive, setDragActive] = useState(false);
   const [availableCities, setAvailableCities] = useState([]);
 
-  // Cargar ciudades cuando cambia el país
+  // Nuevo: Gestionar flujo de dos pasos
+  const {
+    applicationStep,
+    proceedToQuestionnaire,
+    resetFlow,
+    backToApplication
+  } = useApplicationFlow();
+
+  const questionnaire = getQuestionnaire(NOMBRE_PUESTO);
+
+  // Cargar ciudades cuando cambia el pais
   useEffect(() => {
-    if (formData.país) {
-      const country = countriesData.countries.find(c => c.name === formData.país);
-      setAvailableCities(country ? country.cities : []);
-      // Resetear ciudad cuando cambia país
-      if (formData.ciudad) {
-        setFormData(prev => ({ ...prev, ciudad: '' }));
-        setErrors(prev => ({ ...prev, ciudad: '' }));
-      }
+    if (formData.pais) {
+      const country = countriesData.countries.find(c => c.name === formData.pais);
+      const cities = country ? country.cities : [];
+      setAvailableCities(cities);
     } else {
       setAvailableCities([]);
     }
-  }, [formData.país]);
+  }, [formData.pais]);
+
+  // Resetear ciudad cuando cambia el país
+  useEffect(() => {
+    if (formData.ciudad && formData.pais) {
+      const country = countriesData.countries.find(c => c.name === formData.pais);
+      const cities = country ? country.cities : [];
+      if (!cities.includes(formData.ciudad)) {
+        setFormData(prev => ({ ...prev, ciudad: '' }));
+        setErrors(prev => ({ ...prev, ciudad: '' }));
+      }
+    }
+  }, [formData.pais]);
 
   useEffect(() => {
     setUtmData(captureAllUTM());
@@ -170,54 +191,20 @@ function EditorVideoPostulacionPage() {
 
     if (Object.keys(allErrors).length > 0) return;
 
-    setIsSubmitting(true);
-    try {
-      const formDataPayload = new FormData();
-      formDataPayload.append('nombre', formData.nombre);
-      formDataPayload.append('apellido', formData.apellido);
-      formDataPayload.append('telefono', `+51${formData.telefono}`);
-      formDataPayload.append('email', formData.email);
-      formDataPayload.append('dni', formData.dni);
-      formDataPayload.append('ciudad', formData.ciudad);
-      formDataPayload.append('país', formData.país);
-      if (formData.curriculum instanceof File) {
-        formDataPayload.append('curriculum', formData.curriculum);
-      }
-      formDataPayload.append('puesto', NOMBRE_PUESTO);
-      formDataPayload.append('landing_url', window.location.href);
-      formDataPayload.append('timestamp', new Date().toISOString());
-      // Enviar tracking data (UTM y click IDs)
-      const trackingFields = ['ttclid', 'fbclid', 'ad_id', 'adset_id', 'campaign_id', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
-      trackingFields.forEach(field => {
-        formDataPayload.append(field, utmData[field] || '');
-      });
-      // Debug
-      console.log('📊 FormData UTM:', utmData);
+    // NUEVO: En lugar de enviar directo, pasar al cuestionario
+    const applicationDataWithTracking = {
+      ...formData,
+      utmData
+    };
 
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 12000);
-
-      const response = await fetch(WEBHOOK_URL, {
-        method: 'POST',
-        body: formDataPayload,
-        signal: controller.signal,
-      });
-      clearTimeout(timeoutId);
-
-      if (response.ok) {
-        setModalType('success');
-        setShowModal(true);
-        setFormData({ nombre: '', apellido: '', telefono: '', email: '', dni: '', curriculum: null, ciudad: '', país: '' });
-        setErrors({});
-      } else {
-        setModalType('error');
-        setShowModal(true);
-      }
-    } catch {
+    const success = proceedToQuestionnaire(applicationDataWithTracking, NOMBRE_PUESTO);
+    
+    if (success) {
+      // El modal del cuestionario se mostrará automáticamente
+      console.log('✓ Datos validados. Procediendo al cuestionario...');
+    } else {
       setModalType('error');
       setShowModal(true);
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -226,11 +213,90 @@ function EditorVideoPostulacionPage() {
       errors[field] ? 'border-red-500' : formData[field] ? 'border-green-500' : 'border-gray-300'
     }`;
 
+  // NUEVO: Handler para enviar cuestionario
+  const handleQuestionnaireSubmit = async (answers) => {
+    setIsSubmitting(true);
+
+    try {
+      // Construir FormData completo con datos de postulación + cuestionario
+      const formDataPayload = new FormData();
+      
+      // Datos personales
+      formDataPayload.append('nombre', formData.nombre);
+      formDataPayload.append('apellido', formData.apellido);
+      formDataPayload.append('telefono', `+51${formData.telefono}`);
+      formDataPayload.append('email', formData.email);
+      formDataPayload.append('dni', formData.dni);
+      formDataPayload.append('ciudad', formData.ciudad);
+      formDataPayload.append('pais', formData.pais);
+      
+      // CV
+      if (formData.curriculum instanceof File) {
+        formDataPayload.append('curriculum', formData.curriculum);
+      }
+
+      // Información de postulación
+      formDataPayload.append('puesto', NOMBRE_PUESTO);
+      formDataPayload.append('landing_url', window.location.href);
+      formDataPayload.append('timestamp', new Date().toISOString());
+      
+      // Respuestas del cuestionario
+      formDataPayload.append('respuestas_cuestionario', JSON.stringify(answers));
+
+      // Datos de tracking
+      const trackingFields = ['ttclid', 'fbclid', 'ad_id', 'adset_id', 'campaign_id', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
+      trackingFields.forEach(field => {
+        formDataPayload.append(field, utmData[field] || '');
+      });
+
+      console.log('📤 Enviando postulación completa con cuestionario...');
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+      const response = await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        body: formDataPayload,
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (response.ok) {
+        setModalType('success');
+        setShowModal(true);
+        resetFlow();
+        setFormData({ nombre: '', apellido: '', telefono: '', email: '', dni: '', curriculum: null, ciudad: '', pais: '' });
+        setErrors({});
+      } else {
+        setModalType('error');
+        setShowModal(true);
+        setIsSubmitting(false);
+      }
+    } catch (error) {
+      console.error('Error enviando postulación:', error);
+      setModalType('error');
+      setShowModal(true);
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="antialiased font-sans bg-gray-50 min-h-screen">
       <style>{customCss}</style>
 
-      {/* Modal */}
+      {/* NUEVO: Modal del Cuestionario */}
+      {applicationStep === 2 && questionnaire && (
+        <QuestionnaireModal
+          isOpen={applicationStep === 2}
+          questionnaire={questionnaire}
+          isSubmitting={isSubmitting}
+          onClose={backToApplication}
+          onSubmit={handleQuestionnaireSubmit}
+        />
+      )}
+
+      {/* Modal de éxito/error */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4" onClick={() => setShowModal(false)}>
           <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-8 text-center" onClick={e => e.stopPropagation()}>
@@ -446,15 +512,15 @@ function EditorVideoPostulacionPage() {
                 {errors.curriculum && <p className="text-red-500 text-xs mt-2">{errors.curriculum}</p>}
               </div>
 
-              {/* País */}
+              {/* pais */}
               <div>
                 <SearchableSelect
-                  label="País *"
+                  label="pais *"
                   options={countriesData.countries.map(c => c.name)}
-                  value={formData.país}
-                  onChange={(value) => setFormData(prev => ({ ...prev, país: value }))}
-                  placeholder="Busca tu país..."
-                  error={errors.país}
+                  value={formData.pais}
+                  onChange={(value) => setFormData(prev => ({ ...prev, pais: value }))}
+                  placeholder="Busca tu pais..."
+                  error={errors.pais}
                 />
               </div>
 
@@ -465,14 +531,14 @@ function EditorVideoPostulacionPage() {
                   options={availableCities}
                   value={formData.ciudad}
                   onChange={(value) => setFormData(prev => ({ ...prev, ciudad: value }))}
-                  placeholder={formData.país ? "Busca tu ciudad..." : "Selecciona un país primero"}
+                  placeholder={formData.pais ? "Busca tu ciudad..." : "Selecciona un pais primero"}
                   error={errors.ciudad}
-                  className={!formData.país ? 'opacity-50 pointer-events-none' : ''}
+                  className={!formData.pais ? 'opacity-50 pointer-events-none' : ''}
                 />
               </div>
 
               <button type="submit" disabled={isSubmitting} className="w-full dp-bg-cta  font-bold py-4 px-6 rounded-lg transition-all duration-300 hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed text-base mt-2">
-                {isSubmitting ? 'Enviando postulación...' : 'Enviar mi postulación'}
+                {isSubmitting ? 'Procesando...' : '→ Siguiente: Cuestionario'}
               </button>
               <p className="text-xs text-gray-400 text-center">
                 Al enviar, aceptas nuestra{' '}
