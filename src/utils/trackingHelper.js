@@ -90,8 +90,10 @@ export const captureAllUTM = () => {
   };
 };
 
-export default {
+const trackingHelper = {
   detectTrafficSource,
   trackPageViewConditional,
   captureAllUTM
 };
+
+export default trackingHelper;
