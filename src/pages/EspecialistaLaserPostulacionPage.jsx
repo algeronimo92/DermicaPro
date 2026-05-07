@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { captureAllUTM } from '../utils/trackingHelper';
+import { initJobPixel, trackJobPageView, initJobTikTokPixel, trackJobTikTokViewContent } from '../utils/jobPixelHelper';
 import SearchableSelect from '../components/SearchableSelect';
 import countriesData from '../data/countriesCities.json';
 import QuestionnaireModal from '../components/QuestionnaireModal';
@@ -69,7 +70,7 @@ function EspecialistaLaserPostulacionPage() {
     dni: '',
     curriculum: null,
     ciudad: '',
-    pais: '',
+    país: '',
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -114,6 +115,13 @@ function EspecialistaLaserPostulacionPage() {
 
   useEffect(() => {
     setUtmData(captureAllUTM());
+    const init = async () => {
+      await initJobPixel();
+      await trackJobPageView(NOMBRE_PUESTO);
+      await initJobTikTokPixel();
+      await trackJobTikTokViewContent(NOMBRE_PUESTO);
+    };
+    init();
   }, []);
 
   useEffect(() => {
@@ -257,7 +265,7 @@ function EspecialistaLaserPostulacionPage() {
         setModalType('success');
         setShowModal(true);
         resetFlow();
-        setFormData({ nombre: '', apellido: '', telefono: '', email: '', dni: '', curriculum: null, ciudad: '', pais: '' });
+        setFormData({ nombre: '', apellido: '', telefono: '', email: '', dni: '', curriculum: null, ciudad: '', país: '' });
         setErrors({});
       } else {
         setModalType('error');

@@ -25,11 +25,24 @@ const MetaPixel = () => {
       return;
     }
 
+    // No trackear PageView de servicios en rutas de postulación laboral
+    if (location.pathname.indexOf('/postulacion') === 0) {
+      return;
+    }
+
+    // No trackear en landings de servicios (manejan su propio ViewContent via trackPageViewConditional)
+    const SERVICE_LANDINGS = ['/hifu-landing', '/botox-landing', '/hollywood-peel-landing'];
+    if (SERVICE_LANDINGS.includes(location.pathname)) {
+      return;
+    }
+
+    const SERVICES_PIXEL_ID = '1431286785234837';
+
     // Función para intentar trackear PageView
     const trackPageView = () => {
       if (typeof window.fbq === 'function') {
         try {
-          window.fbq('track', 'PageView');
+          window.fbq('trackSingle', SERVICES_PIXEL_ID, 'PageView');
           console.log('✅ Meta Pixel - PageView tracked:', location.pathname);
           return true;
         } catch (error) {

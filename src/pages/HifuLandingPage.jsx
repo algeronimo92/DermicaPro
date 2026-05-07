@@ -25,7 +25,7 @@ function HifuLandingPage() {
         setUtmData(captureAllUTM());
 
         // Track PageView SOLO en el pixel correspondiente según la fuente
-        trackPageViewConditional('HIFU 12D Landing Page', 'landing_page');
+        trackPageViewConditional('HIFU 12D Landing Page', 'landing_page', 400);
 
         // Scroll automático al formulario en móviles al cargar la página
         const isMobile = window.innerWidth < 768;

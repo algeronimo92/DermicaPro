@@ -25,7 +25,7 @@ function BotoxLandingPage() {
         setUtmData(captureAllUTM());
 
         // Track PageView SOLO en el pixel correspondiente según la fuente
-        trackPageViewConditional('Botox Landing Page', 'landing_page');
+        trackPageViewConditional('Botox Landing Page', 'landing_page', 850);
 
         // Scroll automático al formulario en móviles al cargar la página
         const isMobile = window.innerWidth < 768;
