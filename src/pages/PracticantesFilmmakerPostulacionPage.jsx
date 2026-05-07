@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { captureAllUTM } from '../utils/trackingHelper';
+import SearchableSelect from '../components/SearchableSelect';
+import countriesData from '../data/countriesCities.json';
 
 const NOMBRE_PUESTO = 'Practicante Filmmaker';
-const WEBHOOK_URL = 'https://dermica-pro-n8n.rcsgeg.easypanel.host/webhook/postulacion-filmmaker';
+const WEBHOOK_URL = 'https://n8n.dermicapro.online/webhook-test/cc4dda80-a015-463b-b922-d04c2fa42d8e';
 const WHATSAPP_ERROR = '+51974637783';
 
 const customCss = `
@@ -45,13 +47,15 @@ const validateField = (name, value) => {
     case 'dni':
       return !/^[0-9]{8}$/.test(value.trim()) ? '8 dígitos requeridos' : '';
     case 'curriculum':
-      if (!value.trim()) return 'Ingresa el link de tu CV';
-      try { new URL(value.trim()); return ''; } catch { return 'Ingresa un link válido (Google Drive, etc.)'; }
-    case 'portafolio':
-      if (!value.trim()) return 'Ingresa el link de tu portafolio / reel';
-      try { new URL(value.trim()); return ''; } catch { return 'Ingresa un link válido'; }
-    case 'pretensiones':
-      return !value.trim() ? 'Ingresa tus pretensiones salariales' : '';
+      if (!value) return 'Selecciona un archivo PDF';
+      if (!(value instanceof File)) return 'Debes cargar un archivo';
+      if (value.type !== 'application/pdf') return 'Solo se permite archivos PDF';
+      if (value.size > 5 * 1024 * 1024) return 'El archivo no puede superar 5 MB';
+      return '';
+    case 'ciudad':
+      return !value ? 'Selecciona tu ciudad' : '';
+    case 'país':
+      return !value ? 'Selecciona tu país' : '';
     default:
       return '';
   }
@@ -64,26 +68,32 @@ function PracticantesFilmmakerPostulacionPage() {
     telefono: '',
     email: '',
     dni: '',
-    curriculum: '',
-    portafolio: '',
-    pretensiones: '',
-  });
-  const [clasificacion, setClasificacion] = useState({
-    experiencia_ciclo: '',
-    camara_manejo: [],
-    contenido_previo: '',
-    disponibilidad: '',
-    motivacion_cine: '',
-    proyecto_propio: '',
-    conocimiento_equipos: '',
-    manejo_revision: '',
-    interes_estetica: '',
+    curriculum: null,
+    ciudad: '',
+    país: '',
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [utmData, setUtmData] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState('');
+  const [dragActive, setDragActive] = useState(false);
+  const [availableCities, setAvailableCities] = useState([]);
+
+  // Cargar ciudades cuando cambia el país
+  useEffect(() => {
+    if (formData.país) {
+      const country = countriesData.countries.find(c => c.name === formData.país);
+      setAvailableCities(country ? country.cities : []);
+      // Resetear ciudad cuando cambia país
+      if (formData.ciudad) {
+        setFormData(prev => ({ ...prev, ciudad: '' }));
+        setErrors(prev => ({ ...prev, ciudad: '' }));
+      }
+    } else {
+      setAvailableCities([]);
+    }
+  }, [formData.país]);
 
   useEffect(() => {
     setUtmData(captureAllUTM());
@@ -108,57 +118,47 @@ function PracticantesFilmmakerPostulacionPage() {
   }, []);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, files } = e.target;
     let processed = value;
-    if (name === 'nombre' || name === 'apellido') {
+    
+    if (type === 'file') {
+      processed = files?.[0] || null;
+      setDragActive(false);
+    } else if (name === 'nombre' || name === 'apellido') {
       processed = value.toLowerCase().replace(/(^|\s)\S/g, c => c.toUpperCase());
     } else if (name === 'telefono' || name === 'dni') {
       processed = value.replace(/[^0-9]/g, '');
     }
+    
     setFormData(prev => ({ ...prev, [name]: processed }));
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: validateField(name, processed) }));
     }
   };
 
-  const handleBlur = (e) => {
-    const { name, value } = e.target;
-    setErrors(prev => ({ ...prev, [name]: validateField(name, value) }));
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === 'dragenter' || e.type === 'dragover') {
+      setDragActive(true);
+    } else if (e.type === 'dragleave') {
+      setDragActive(false);
+    }
   };
 
-  const handleRadio = (group, value) => {
-    setClasificacion(prev => ({ ...prev, [group]: value }));
-    if (errors[group]) setErrors(prev => ({ ...prev, [group]: '' }));
-  };
-
-  const handleCheckbox = (group, value) => {
-    setClasificacion(prev => {
-      const current = prev[group];
-      const updated = current.includes(value)
-        ? current.filter(v => v !== value)
-        : [...current, value];
-      return { ...prev, [group]: updated };
-    });
-    if (errors[group]) setErrors(prev => ({ ...prev, [group]: '' }));
-  };
-
-  const handlePregunta = (name, value) => {
-    setClasificacion(prev => ({ ...prev, [name]: value }));
-    if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
-  };
-
-  const validateClasificacion = () => {
-    const errs = {};
-    if (!clasificacion.experiencia_ciclo) errs.experiencia_ciclo = 'Selecciona una opción';
-    if (clasificacion.camara_manejo.length === 0) errs.camara_manejo = 'Selecciona al menos una opción';
-    if (!clasificacion.contenido_previo) errs.contenido_previo = 'Selecciona una opción';
-    if (!clasificacion.disponibilidad) errs.disponibilidad = 'Selecciona una opción';
-    if (!clasificacion.motivacion_cine || clasificacion.motivacion_cine.trim().length < 20) errs.motivacion_cine = 'Por favor desarrolla tu respuesta (mín. 20 caracteres)';
-    if (!clasificacion.proyecto_propio || clasificacion.proyecto_propio.trim().length < 20) errs.proyecto_propio = 'Por favor desarrolla tu respuesta (mín. 20 caracteres)';
-    if (!clasificacion.conocimiento_equipos || clasificacion.conocimiento_equipos.trim().length < 20) errs.conocimiento_equipos = 'Por favor desarrolla tu respuesta (mín. 20 caracteres)';
-    if (!clasificacion.manejo_revision || clasificacion.manejo_revision.trim().length < 20) errs.manejo_revision = 'Por favor desarrolla tu respuesta (mín. 20 caracteres)';
-    if (!clasificacion.interes_estetica || clasificacion.interes_estetica.trim().length < 20) errs.interes_estetica = 'Por favor desarrolla tu respuesta (mín. 20 caracteres)';
-    return errs;
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    
+    const files = e.dataTransfer?.files;
+    if (files && files[0]) {
+      const file = files[0];
+      setFormData(prev => ({ ...prev, curriculum: file }));
+      if (errors.curriculum) {
+        setErrors(prev => ({ ...prev, curriculum: validateField('curriculum', file) }));
+      }
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -169,36 +169,41 @@ function PracticantesFilmmakerPostulacionPage() {
       if (err) acc[key] = err;
       return acc;
     }, {});
-    const clasifErrors = validateClasificacion();
-    const allErrors = { ...fieldErrors, ...clasifErrors };
-    setErrors(allErrors);
+    setErrors(fieldErrors);
 
-    if (Object.keys(allErrors).length > 0) return;
+    if (Object.keys(fieldErrors).length > 0) return;
 
     setIsSubmitting(true);
     try {
-      const payload = {
-        ...formData,
-        telefono: `+51${formData.telefono}`,
-        ...Object.fromEntries(
-          Object.entries(clasificacion).map(([k, v]) => [
-            k,
-            Array.isArray(v) ? v.join(', ') : v,
-          ])
-        ),
-        puesto: NOMBRE_PUESTO,
-        landing_url: window.location.href,
-        timestamp: new Date().toISOString(),
-        ...Object.fromEntries(Object.entries(utmData).filter(([, v]) => v)),
-      };
+      const formDataPayload = new FormData();
+      formDataPayload.append('nombre', formData.nombre);
+      formDataPayload.append('apellido', formData.apellido);
+      formDataPayload.append('telefono', `+51${formData.telefono}`);
+      formDataPayload.append('email', formData.email);
+      formDataPayload.append('dni', formData.dni);
+      formDataPayload.append('ciudad', formData.ciudad);
+      formDataPayload.append('país', formData.país);
+      if (formData.curriculum instanceof File) {
+        formDataPayload.append('curriculum', formData.curriculum);
+      }
+      formDataPayload.append('puesto', NOMBRE_PUESTO);
+      formDataPayload.append('tipo_postulacion', 'practicante');
+      formDataPayload.append('landing_url', window.location.href);
+      formDataPayload.append('timestamp', new Date().toISOString());
+      // Enviar tracking data (UTM y click IDs)
+      const trackingFields = ['ttclid', 'fbclid', 'ad_id', 'adset_id', 'campaign_id', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
+      trackingFields.forEach(field => {
+        formDataPayload.append(field, utmData[field] || '');
+      });
+      // Debug
+      console.log('📊 FormData UTM:', utmData);
 
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 12000);
 
       const response = await fetch(WEBHOOK_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: formDataPayload,
         signal: controller.signal,
       });
       clearTimeout(timeoutId);
@@ -206,8 +211,7 @@ function PracticantesFilmmakerPostulacionPage() {
       if (response.ok) {
         setModalType('success');
         setShowModal(true);
-        setFormData({ nombre: '', apellido: '', telefono: '', email: '', dni: '', curriculum: '', portafolio: '', pretensiones: '' });
-        setClasificacion({ experiencia_ciclo: '', camara_manejo: [], contenido_previo: '', disponibilidad: '', motivacion_cine: '', proyecto_propio: '', conocimiento_equipos: '', manejo_revision: '', interes_estetica: '' });
+        setFormData({ nombre: '', apellido: '', telefono: '', email: '', dni: '', curriculum: null, ciudad: '', país: '' });
         setErrors({});
       } else {
         setModalType('error');
@@ -365,12 +369,12 @@ function PracticantesFilmmakerPostulacionPage() {
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium dp-text-secondary mb-1">Nombre *</label>
-                  <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} onBlur={handleBlur} placeholder="Ej: Carlos" className={inputClass('nombre')} />
+                  <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} placeholder="Ej: Carlos" className={inputClass('nombre')} />
                   {errors.nombre && <p className="text-red-500 text-xs mt-1">{errors.nombre}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium dp-text-secondary mb-1">Apellido *</label>
-                  <input type="text" name="apellido" value={formData.apellido} onChange={handleChange} onBlur={handleBlur} placeholder="Ej: Ramirez" className={inputClass('apellido')} />
+                  <input type="text" name="apellido" value={formData.apellido} onChange={handleChange} placeholder="Ej: Ramirez" className={inputClass('apellido')} />
                   {errors.apellido && <p className="text-red-500 text-xs mt-1">{errors.apellido}</p>}
                 </div>
               </div>
@@ -381,13 +385,13 @@ function PracticantesFilmmakerPostulacionPage() {
                   <label className="block text-sm font-medium dp-text-secondary mb-1">Teléfono (WhatsApp) *</label>
                   <div className="flex">
                     <span className="inline-flex items-center px-3 border border-r-0 border-gray-300 bg-gray-50 text-gray-500 rounded-l-lg text-sm">+51</span>
-                    <input type="tel" name="telefono" value={formData.telefono} onChange={handleChange} onBlur={handleBlur} placeholder="987 654 321" maxLength="9" className={`w-full px-4 py-2 border rounded-r-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition ${errors.telefono ? 'border-red-500' : formData.telefono ? 'border-green-500' : 'border-gray-300'}`} />
+                    <input type="tel" name="telefono" value={formData.telefono} onChange={handleChange} placeholder="987 654 321" maxLength="9" className={`w-full px-4 py-2 border rounded-r-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition ${errors.telefono ? 'border-red-500' : formData.telefono ? 'border-green-500' : 'border-gray-300'}`} />
                   </div>
                   {errors.telefono && <p className="text-red-500 text-xs mt-1">{errors.telefono}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium dp-text-secondary mb-1">DNI *</label>
-                  <input type="text" name="dni" value={formData.dni} onChange={handleChange} onBlur={handleBlur} placeholder="12345678" maxLength="8" className={inputClass('dni')} />
+                  <input type="text" name="dni" value={formData.dni} onChange={handleChange} placeholder="12345678" maxLength="8" className={inputClass('dni')} />
                   {errors.dni && <p className="text-red-500 text-xs mt-1">{errors.dni}</p>}
                 </div>
               </div>
@@ -395,127 +399,69 @@ function PracticantesFilmmakerPostulacionPage() {
               {/* Email */}
               <div>
                 <label className="block text-sm font-medium dp-text-secondary mb-1">Correo electrónico *</label>
-                <input type="email" name="email" value={formData.email} onChange={handleChange} onBlur={handleBlur} placeholder="ejemplo@correo.com" className={inputClass('email')} />
+                <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="ejemplo@correo.com" className={inputClass('email')} />
                 {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
               </div>
 
-              {/* Curriculum */}
+              {/* Curriculum PDF */}
               <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-1">Link de CV (Google Drive, Dropbox, etc.) *</label>
-                <input type="url" name="curriculum" value={formData.curriculum} onChange={handleChange} onBlur={handleBlur} placeholder="https://drive.google.com/..." className={inputClass('curriculum')} />
+                <label className="block text-sm font-medium dp-text-secondary mb-1">Curriculum (PDF) *</label>
+                <div 
+                  onDragEnter={handleDrag}
+                  onDragLeave={handleDrag}
+                  onDragOver={handleDrag}
+                  onDrop={handleDrop}
+                  className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+                    dragActive ? 'border-yellow-400 bg-yellow-50' : 'border-gray-300 hover:border-gray-400 bg-gray-50'
+                  } ${errors.curriculum ? 'border-red-500' : ''}`}
+                >
+                  {formData.curriculum ? (
+                    <div className="space-y-2">
+                      <svg className="w-10 h-10 mx-auto text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
+                      <p className="text-green-600 font-semibold">{formData.curriculum.name}</p>
+                      <p className="text-xs text-gray-500">{(formData.curriculum.size / 1024).toFixed(1)} KB</p>
+                    </div>
+                  ) : (
+                    <>
+                      <p className="dp-text-main font-semibold">Arrastra tu PDF aquí</p>
+                      <p className="text-xs dp-text-secondary mt-1">o</p>
+                      <label className="inline-block mt-2 cursor-pointer">
+                        <span className="text-yellow-500 font-semibold hover:underline">Selecciona un archivo</span>
+                        <input type="file" name="curriculum" accept=".pdf" onChange={handleChange} className="hidden" />
+                      </label>
+                      <p className="text-xs dp-text-secondary mt-2">Máximo 5 MB</p>
+                    </>
+                  )}
+                </div>
                 {errors.curriculum && <p className="text-red-500 text-xs mt-1">{errors.curriculum}</p>}
               </div>
 
-              {/* Portafolio */}
+              {/* País */}
               <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-1">Link de portafolio / reel *</label>
-                <input type="url" name="portafolio" value={formData.portafolio} onChange={handleChange} onBlur={handleBlur} placeholder="https://youtube.com/... o link de trabajos" className={inputClass('portafolio')} />
-                {errors.portafolio && <p className="text-red-500 text-xs mt-1">{errors.portafolio}</p>}
+                <SearchableSelect
+                  label="País *"
+                  options={countriesData.countries.map(c => c.name)}
+                  value={formData.país}
+                  onChange={(value) => setFormData(prev => ({ ...prev, país: value }))}
+                  placeholder="Busca tu país..."
+                  error={errors.país}
+                />
               </div>
 
-              {/* Pretensiones */}
+              {/* Ciudad */}
               <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-1">Pretensiones salariales *</label>
-                <input type="text" name="pretensiones" value={formData.pretensiones} onChange={handleChange} onBlur={handleBlur} placeholder="Ej: S/ 800 mensuales" className={inputClass('pretensiones')} />
-                {errors.pretensiones && <p className="text-red-500 text-xs mt-1">{errors.pretensiones}</p>}
+                <SearchableSelect
+                  label="Ciudad *"
+                  options={availableCities}
+                  value={formData.ciudad}
+                  onChange={(value) => setFormData(prev => ({ ...prev, ciudad: value }))}
+                  placeholder={formData.país ? "Busca tu ciudad..." : "Selecciona un país primero"}
+                  error={errors.ciudad}
+                  className={!formData.país ? 'opacity-50 pointer-events-none' : ''}
+                />
               </div>
 
-              <hr className="border-gray-200" />
-              <p className="text-sm font-semibold dp-text-main">Preguntas de clasificación</p>
-
-              {/* Ciclo de estudios */}
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-2">¿En qué ciclo de estudios estás? *</label>
-                <div className="grid grid-cols-2 gap-2">
-                  {['1ro-4to ciclo', '5to-8vo ciclo', '9no-10mo ciclo', 'Egresado'].map(opt => (
-                    <label key={opt} className={`flex items-center gap-2 p-3 rounded-lg border cursor-pointer transition ${clasificacion.experiencia_ciclo === opt ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200 hover:border-gray-300'}`}>
-                      <input type="radio" name="experiencia_ciclo" checked={clasificacion.experiencia_ciclo === opt} onChange={() => handleRadio('experiencia_ciclo', opt)} className="accent-yellow-500" />
-                      <span className="text-sm dp-text-main">{opt}</span>
-                    </label>
-                  ))}
-                </div>
-                {errors.experiencia_ciclo && <p className="text-red-500 text-xs mt-1">{errors.experiencia_ciclo}</p>}
-              </div>
-
-              {/* Cámara */}
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-2">¿Qué cámara manejas? (puedes marcar varias) *</label>
-                <div className="grid grid-cols-2 gap-2">
-                  {['DSLR', 'Mirrorless', 'Celular profesional', 'No tengo aún'].map(opt => (
-                    <label key={opt} className={`flex items-center gap-2 p-3 rounded-lg border cursor-pointer transition ${clasificacion.camara_manejo.includes(opt) ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200 hover:border-gray-300'}`}>
-                      <input type="checkbox" checked={clasificacion.camara_manejo.includes(opt)} onChange={() => handleCheckbox('camara_manejo', opt)} className="accent-yellow-500" />
-                      <span className="text-sm dp-text-main">{opt}</span>
-                    </label>
-                  ))}
-                </div>
-                {errors.camara_manejo && <p className="text-red-500 text-xs mt-1">{errors.camara_manejo}</p>}
-              </div>
-
-              {/* Contenido previo */}
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-2">¿Has producido contenido para redes sociales? *</label>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                  {['Sí, para marcas', 'Sí, contenido personal', 'No aún'].map(opt => (
-                    <label key={opt} className={`flex items-center gap-2 p-3 rounded-lg border cursor-pointer transition ${clasificacion.contenido_previo === opt ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200 hover:border-gray-300'}`}>
-                      <input type="radio" name="contenido_previo" checked={clasificacion.contenido_previo === opt} onChange={() => handleRadio('contenido_previo', opt)} className="accent-yellow-500" />
-                      <span className="text-sm dp-text-main">{opt}</span>
-                    </label>
-                  ))}
-                </div>
-                {errors.contenido_previo && <p className="text-red-500 text-xs mt-1">{errors.contenido_previo}</p>}
-              </div>
-
-              {/* Disponibilidad */}
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-2">¿Disponibilidad horaria? *</label>
-                <div className="grid grid-cols-3 gap-2">
-                  {['Mañanas', 'Tardes', 'Tiempo completo'].map(opt => (
-                    <label key={opt} className={`flex items-center gap-2 p-3 rounded-lg border cursor-pointer transition ${clasificacion.disponibilidad === opt ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200 hover:border-gray-300'}`}>
-                      <input type="radio" name="disponibilidad" checked={clasificacion.disponibilidad === opt} onChange={() => handleRadio('disponibilidad', opt)} className="accent-yellow-500" />
-                      <span className="text-sm dp-text-main">{opt}</span>
-                    </label>
-                  ))}
-                </div>
-                {errors.disponibilidad && <p className="text-red-500 text-xs mt-1">{errors.disponibilidad}</p>}
-              </div>
-
-              <hr className="border-gray-200" />
-              <div>
-                <p className="text-sm font-semibold dp-text-main">Preguntas de evaluación</p>
-                <p className="text-xs dp-text-secondary mt-1">Tómate tu tiempo. Estas respuestas son lo más importante para nosotros.</p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-1">1. ¿Qué te llevó a estudiar comunicaciones o cine? ¿Qué tipo de contenido quieres crear en el futuro? *</label>
-                <textarea rows={3} value={clasificacion.motivacion_cine} onChange={e => handlePregunta('motivacion_cine', e.target.value)} placeholder="Cuéntanos tu historia y hacia dónde quieres llevar tu carrera..." className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition resize-none ${errors.motivacion_cine ? 'border-red-500' : clasificacion.motivacion_cine ? 'border-green-500' : 'border-gray-300'}`} />
-                {errors.motivacion_cine && <p className="text-red-500 text-xs mt-1">{errors.motivacion_cine}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-1">2. ¿Has filmado algún proyecto propio o encargo, aunque sea pequeño? ¿Qué aprendiste de esa experiencia? *</label>
-                <textarea rows={3} value={clasificacion.proyecto_propio} onChange={e => handlePregunta('proyecto_propio', e.target.value)} placeholder="No importa el tamaño. Cuéntanos qué filmaste y qué aprendiste..." className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition resize-none ${errors.proyecto_propio ? 'border-red-500' : clasificacion.proyecto_propio ? 'border-green-500' : 'border-gray-300'}`} />
-                {errors.proyecto_propio && <p className="text-red-500 text-xs mt-1">{errors.proyecto_propio}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-1">3. ¿Qué equipos conoces o has usado (cámara, iluminación, audio)? Sé específico/a. *</label>
-                <textarea rows={3} value={clasificacion.conocimiento_equipos} onChange={e => handlePregunta('conocimiento_equipos', e.target.value)} placeholder="Ej: Sony ZV-E10, ring light, micrófono de solapa, DJI Osmo..." className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition resize-none ${errors.conocimiento_equipos ? 'border-red-500' : clasificacion.conocimiento_equipos ? 'border-green-500' : 'border-gray-300'}`} />
-                {errors.conocimiento_equipos && <p className="text-red-500 text-xs mt-1">{errors.conocimiento_equipos}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-1">4. Si el director te dice que la toma no quedó bien y hay que repetirla, ¿cómo reaccionas? *</label>
-                <textarea rows={3} value={clasificacion.manejo_revision} onChange={e => handlePregunta('manejo_revision', e.target.value)} placeholder="Sé honesto/a sobre cómo manejas ese momento..." className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition resize-none ${errors.manejo_revision ? 'border-red-500' : clasificacion.manejo_revision ? 'border-green-500' : 'border-gray-300'}`} />
-                {errors.manejo_revision && <p className="text-red-500 text-xs mt-1">{errors.manejo_revision}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-1">5. ¿Por qué te interesa hacer prácticas en una clínica de estética y no en otro tipo de empresa? *</label>
-                <textarea rows={3} value={clasificacion.interes_estetica} onChange={e => handlePregunta('interes_estetica', e.target.value)} placeholder="¿Qué tiene DermicaPro o el sector salud/estética que te atrae?" className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition resize-none ${errors.interes_estetica ? 'border-red-500' : clasificacion.interes_estetica ? 'border-green-500' : 'border-gray-300'}`} />
-                {errors.interes_estetica && <p className="text-red-500 text-xs mt-1">{errors.interes_estetica}</p>}
-              </div>
-
-              <button type="submit" disabled={isSubmitting} className="w-full dp-bg-cta  font-bold py-4 px-6 rounded-lg transition-all duration-300 hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed text-base mt-2">
+              <button type="submit" disabled={isSubmitting} className="w-full dp-bg-cta font-bold py-4 px-6 rounded-lg transition-all duration-300 hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed text-base mt-2">
                 {isSubmitting ? 'Enviando postulación...' : 'Enviar mi postulación'}
               </button>
               <p className="text-xs text-gray-400 text-center">
