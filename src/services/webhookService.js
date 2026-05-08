@@ -3,16 +3,14 @@
  * Implementa patrón Service + Factory para estandarizar el comportamiento
  */
 
-
 /**
  * Configuración del webhook
  */
 const WEBHOOK_CONFIG = {
-  baseUrl: 'https://n8n.dermicapro.online',
-  endpoint: '/webhook/landing',
-  timeout: 10000 // 10 segundos
+  baseUrl: "https://n8n.dermicapro.online",
+  endpoint: "/webhook/landing",
+  timeout: 10000, // 10 segundos
 };
-
 
 /**
  * Factory: Crea payload estandarizado para webhook
@@ -22,20 +20,27 @@ const WEBHOOK_CONFIG = {
  * @param {Object} utmData - Datos UTM capturados
  * @returns {Object} Payload estandarizado
  */
-export const createWebhookPayload = (formData, tratamiento, landing = null, utmData = {}) => {
+export const createWebhookPayload = (
+  formData,
+  tratamiento,
+  landing = null,
+  utmData = {},
+) => {
   // Filtrar campos UTM vacíos para no enviar nulls a n8n
   const filteredUTM = Object.fromEntries(
-    Object.entries(utmData).filter(([, v]) => v !== null && v !== undefined && v !== '')
+    Object.entries(utmData).filter(
+      ([, v]) => v !== null && v !== undefined && v !== "",
+    ),
   );
 
   const payload = {
     nombre: formData.nombre,
-    whatsapp: formData.whatsapp.startsWith('+51')
+    whatsapp: formData.whatsapp.startsWith("+51")
       ? formData.whatsapp
       : `+51${formData.whatsapp}`,
     email: formData.email,
     tratamiento: tratamiento,
-    ...filteredUTM
+    ...filteredUTM,
   };
 
   if (landing) {
@@ -45,7 +50,6 @@ export const createWebhookPayload = (formData, tratamiento, landing = null, utmD
   return payload;
 };
 
-
 /**
  * Servicio principal: Envía datos al webhook
  * @param {Object} formData - Datos del formulario
@@ -54,7 +58,12 @@ export const createWebhookPayload = (formData, tratamiento, landing = null, utmD
  * @param {Object} utmData - Datos UTM (opcional)
  * @returns {Promise<{success: boolean, error?: string}>}
  */
-export const sendToWebhook = async (formData, tratamiento, landing = null, utmData = {}) => {
+export const sendToWebhook = async (
+  formData,
+  tratamiento,
+  landing = null,
+  utmData = {},
+) => {
   const webhookUrl = `${WEBHOOK_CONFIG.baseUrl}${WEBHOOK_CONFIG.endpoint}`;
   const payload = createWebhookPayload(formData, tratamiento, landing, utmData);
 
@@ -63,43 +72,46 @@ export const sendToWebhook = async (formData, tratamiento, landing = null, utmDa
 
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), WEBHOOK_CONFIG.timeout);
+    const timeoutId = setTimeout(
+      () => controller.abort(),
+      WEBHOOK_CONFIG.timeout,
+    );
 
     const response = await fetch(webhookUrl, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),
-      signal: controller.signal
+      signal: controller.signal,
     });
 
     clearTimeout(timeoutId);
 
     if (response.ok) {
-      console.log('✅ Webhook enviado exitosamente');
+      console.log("✅ Webhook enviado exitosamente");
       return { success: true };
     } else {
       const errorText = await response.text();
-      console.error('❌ Error del servidor:', response.status, errorText);
+      console.error("❌ Error del servidor:", response.status, errorText);
       return {
         success: false,
-        error: `Error del servidor: ${response.status}`
+        error: `Error del servidor: ${response.status}`,
       };
     }
   } catch (error) {
-    console.error('❌ Error enviando webhook:', error);
+    console.error("❌ Error enviando webhook:", error);
 
-    if (error.name === 'AbortError') {
+    if (error.name === "AbortError") {
       return {
         success: false,
-        error: 'Tiempo de espera agotado. Por favor, intenta nuevamente.'
+        error: "Tiempo de espera agotado. Por favor, intenta nuevamente.",
       };
     }
 
     return {
       success: false,
-      error: 'Error de conexión. Verifica tu internet e intenta nuevamente.'
+      error: "Error de conexión. Verifica tu internet e intenta nuevamente.",
     };
   }
 };
@@ -123,7 +135,7 @@ export const handleFormSubmission = async ({
   utmData = {},
   onSuccess,
   onError,
-  setIsSubmitting
+  setIsSubmitting,
 }) => {
   setIsSubmitting(true);
 
@@ -136,7 +148,7 @@ export const handleFormSubmission = async ({
       onError(result.error);
     }
   } catch (error) {
-    onError('Error inesperado. Por favor, intenta nuevamente.');
+    onError("Error inesperado. Por favor, intenta nuevamente.");
   } finally {
     setIsSubmitting(false);
   }
@@ -146,31 +158,90 @@ export const handleFormSubmission = async ({
  * Configuración de tratamientos disponibles
  */
 export const TRATAMIENTOS = {
-  HIFU: 'HIFU 12D',
-  BOTOX: 'Botox',
-  HOLLYWOOD_PEEL: 'Hollywood Peel',
-  CONSULTA: 'Consulta General',
-  BORRADO_MANCHAS: 'Borrado de Manchas',
-  PICO_LASER: 'Pico Láser',
-  HYDRAFACIAL: 'Hydrafacial',
-  PEELING: 'Peeling Químico'
+  HIFU: "HIFU 12D",
+  BOTOX: "Botox",
+  HOLLYWOOD_PEEL: "Hollywood Peel",
+  CONSULTA: "Consulta General",
+  BORRADO_MANCHAS: "Borrado de Manchas",
+  PICO_LASER: "Pico Láser",
+  HYDRAFACIAL: "Hydrafacial",
+  PEELING: "Peeling Químico",
 };
 
 /**
  * Configuración de landings disponibles
  */
 export const LANDINGS = {
-  HIFU: 'hifu-landing',
-  BOTOX: 'botox-landing',
-  HOLLYWOOD_PEEL: 'hollywood-peel-landing'
+  HIFU: "hifu-landing",
+  BOTOX: "botox-landing",
+  HOLLYWOOD_PEEL: "hollywood-peel-landing",
+};
+
+/**
+ * Enviar postulación con cuestionario a webhook
+ * @param {FormData} formData - FormData que incluye:
+ *   - nombre, apellido, telefono, email, dni, ciudad, país
+ *   - curriculum (archivo PDF)
+ *   - puesto (nombre del puesto)
+ *   - respuestas_cuestionario (JSON stringificado)
+ *   - landing_url, timestamp
+ *   - tracking fields (UTM, fbclid, ttclid, etc)
+ * @param {string} webhookUrl - URL del webhook de n8n
+ * @returns {Promise<{success: boolean, error?: string}>}
+ */
+export const sendApplicationWithQuestionnaire = async (
+  formData,
+  webhookUrl,
+) => {
+  console.log("🔗 Enviando postulación con cuestionario a:", webhookUrl);
+
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 segundos para archivos grandes
+
+    const response = await fetch(webhookUrl, {
+      method: "POST",
+      body: formData, // FormData se envía tal cual
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (response.ok) {
+      console.log("✅ Postulación con cuestionario enviada exitosamente");
+      return { success: true };
+    } else {
+      const errorText = await response.text();
+      console.error("❌ Error del servidor:", response.status, errorText);
+      return {
+        success: false,
+        error: `Error del servidor: ${response.status}`,
+      };
+    }
+  } catch (error) {
+    console.error("❌ Error enviando postulación:", error);
+
+    if (error.name === "AbortError") {
+      return {
+        success: false,
+        error: "Tiempo de espera agotado. Por favor, intenta nuevamente.",
+      };
+    }
+
+    return {
+      success: false,
+      error: "Error de conexión. Verifica tu internet e intenta nuevamente.",
+    };
+  }
 };
 
 const webhookService = {
   sendToWebhook,
   handleFormSubmission,
   createWebhookPayload,
+  sendApplicationWithQuestionnaire,
   TRATAMIENTOS,
-  LANDINGS
+  LANDINGS,
 };
 
 export default webhookService;
