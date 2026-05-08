@@ -103,14 +103,13 @@ function PracticantesEditorVideoPostulacionPage() {
 
   // Resetear ciudad cuando cambia el país
   useEffect(() => {
-    if (formData.ciudad && formData.pais) {
-      const country = countriesData.countries.find(c => c.name === formData.pais);
+    setFormData(prev => {
+      if (!prev.ciudad || !prev.pais) return prev;
+      const country = countriesData.countries.find(c => c.name === prev.pais);
       const cities = country ? country.cities : [];
-      if (!cities.includes(formData.ciudad)) {
-        setFormData(prev => ({ ...prev, ciudad: '' }));
-        setErrors(prev => ({ ...prev, ciudad: '' }));
-      }
-    }
+      return cities.includes(prev.ciudad) ? prev : { ...prev, ciudad: '' };
+    });
+    setErrors(prev => ({ ...prev, ciudad: '' }));
   }, [formData.pais]);
 
   useEffect(() => {
