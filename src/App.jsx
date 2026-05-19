@@ -21,6 +21,7 @@ import PracticantesEditorVideoPostulacionPage from "./pages/PracticantesEditorVi
 import EditorVideoPostulacionPage from "./pages/EditorVideoPostulacionPage";
 import VendedorPostulacionPage from "./pages/VendedorPostulacionPage";
 import EspecialistaLaserPostulacionPage from "./pages/EspecialistaLaserPostulacionPage";
+import CosmiatraPostulacionPage from "./pages/CosmiatraPostulacionPage";
 import TrabajaNosotrosPage from "./pages/TrabajaNosotrosPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import Navbar from "./components/Navbar";
@@ -43,6 +44,7 @@ export default function App() {
     "/postulacion/editor-video",
     "/postulacion/vendedor",
     "/postulacion/especialista-laser",
+    "/postulacion/cosmiatra",
   ];
   const shouldHideNavBar = hideLayout.includes(location.pathname);
 
@@ -88,6 +90,7 @@ export default function App() {
             <Route path="/postulacion/editor-video" element={<EditorVideoPostulacionPage />} />
             <Route path="/postulacion/vendedor" element={<VendedorPostulacionPage />} />
             <Route path="/postulacion/especialista-laser" element={<EspecialistaLaserPostulacionPage />} />
+            <Route path="/postulacion/cosmiatra" element={<CosmiatraPostulacionPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </main>

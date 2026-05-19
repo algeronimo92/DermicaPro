@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { captureAllUTM } from '../utils/trackingHelper';
 import { initJobPixel, trackJobPageView, initJobTikTokPixel, trackJobTikTokViewContent } from '../utils/jobPixelHelper';
 import SearchableSelect from '../components/SearchableSelect';
@@ -8,70 +8,83 @@ import { getQuestionnaire } from '../data/questionnairesData';
 import useApplicationFlow from '../hooks/useApplicationFlow';
 
 const NOMBRE_PUESTO = 'Asesor Comercial';
-const WEBHOOK_URL = 'https://n8n.dermicapro.online/webhook/trabajos';
+const WEBHOOK_URL   = 'https://n8n.dermicapro.online/webhook/trabajos';
 const WHATSAPP_ERROR = '+51974637783';
 
-const customCss = `
+const css = `
+  *, *::before, *::after { box-sizing: border-box; }
   :root {
-    --primary: #ea899a; --primary-light: #fde8ed; --primary-dark: #d37989;
-    --hero-bg: #2d1520;
-    --accent-on-light: #9b2c47;
-    --accent-on-dark:  #ea899a;
-    --cta-bg: #ea899a; --cta-bg-hover: #d37989; --cta-btn-text: #1f2937;
-    --background-light: #FFFFFF; --background-medium: #fdf4f6;
-    --text-main: #374151; --text-secondary: #6B7280;
+    --black : #040D08; --gold  : #C8A13E; --gray  : #7A7A79;
+    --rose  : #CF9B9B; --light : #F2F2F2; --white : #FFFFFF;
+    --gold-low : rgba(200,161,62,.12); --gold-mid : rgba(200,161,62,.35);
   }
-  .dp-bg-primary { background-color: var(--hero-bg); }
-  .dp-bg-primary-light { background-color: var(--primary-light); }
-  .dp-bg-cta { background-color: var(--cta-bg); color: var(--cta-btn-text); }
-  .dp-bg-cta:hover { background-color: var(--cta-bg-hover); color: var(--cta-btn-text); }
-  .dp-text-primary { color: var(--accent-on-dark); }
-  .dp-text-cta { color: var(--accent-on-light); }
-  .dp-text-main { color: var(--text-main); }
-  .dp-text-secondary { color: var(--text-secondary); }
-  @keyframes dp-fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-  .dp-fade-in { animation: dp-fadeInUp 0.7s ease-out forwards; }
-  @keyframes dp-form-glow { 0% { box-shadow: 0 0 0 0 rgba(234,137,154,0.6); } 70% { box-shadow: 0 0 0 14px rgba(234,137,154,0); } 100% { box-shadow: 0 0 0 0 rgba(234,137,154,0); } }
-  .dp-form-highlight { animation: dp-form-glow 1.5s ease-out; }
+  .dp-hero-title { font-size: clamp(2.6rem, 7vw, 5rem); font-weight: 900; line-height: 1.05; letter-spacing: -.02em; }
+  .dp-section-title { font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 800; }
+  .dp-btn { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; font-weight: 700; border-radius: 9999px; padding: .9rem 2.2rem; font-size: .95rem; transition: transform .2s, box-shadow .2s, background .2s; cursor: pointer; text-decoration: none; border: none; }
+  .dp-btn-gold { background: var(--gold); color: var(--black); }
+  .dp-btn-gold:hover { background: #b8922e; transform: translateY(-2px); box-shadow: 0 10px 30px rgba(200,161,62,.4); }
+  .dp-submit { width: 100%; background: var(--gold); color: var(--black); font-size: 1rem; font-weight: 800; padding: 1rem; border-radius: 14px; transition: all .2s; border: none; cursor: pointer; }
+  .dp-submit:hover:not(:disabled) { background: #b8922e; box-shadow: 0 8px 24px rgba(200,161,62,.4); transform: translateY(-1px); }
+  .dp-submit:disabled { opacity: .55; cursor: not-allowed; }
+  .dp-input { width: 100%; padding: .75rem 1rem; border-radius: 10px; border: 1.5px solid #E5E7EB; font-size: .9rem; color: #111; background: #fff; transition: border-color .18s, box-shadow .18s; outline: none; }
+  .dp-input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(200,161,62,.18); }
+  .dp-input-ok  { border-color: #4ade80 !important; }
+  .dp-input-err { border-color: #f87171 !important; }
+  .dp-form-card { background: var(--white); border-radius: 20px; border: 1px solid var(--gold-mid); box-shadow: 0 20px 60px rgba(4,13,8,.12); padding: 2.2rem; }
+  .dp-sticky-cta { position: fixed; bottom: 0; left: 0; right: 0; z-index: 40; display: none; padding: .9rem 1.25rem; background: var(--black); border-top: 1px solid var(--gold-mid); }
+  @media (max-width: 1023px) { .dp-sticky-cta { display: block; } }
+  .dp-hero-grid { display: grid; grid-template-columns: 1fr; gap: 3rem; align-items: start; }
+  @media (min-width: 1024px) { .dp-hero-grid { grid-template-columns: 55fr 45fr; gap: 4rem; align-items: center; } }
+  .dp-dots { background-image: radial-gradient(circle, rgba(200,161,62,.22) 1.5px, transparent 1.5px); background-size: 20px 20px; }
+  .dp-badge { display: inline-flex; align-items: center; gap: .4rem; font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: .35rem .9rem; border-radius: 9999px; }
+  .dp-badge-gold { background: var(--gold-low); color: var(--gold); border: 1px solid var(--gold-mid); }
+  .dp-badge-rose { background: rgba(207,155,155,.18); color: var(--rose); border: 1px solid rgba(207,155,155,.4); }
+  .dp-check-item { display: flex; gap: .75rem; align-items: flex-start; }
+  .dp-check-icon { color: var(--gold); flex-shrink: 0; margin-top: 2px; }
+  .dp-tool { display: flex; align-items: center; gap: .6rem; padding: .55rem 1rem; border-radius: 10px; background: rgba(255,255,255,.05); border: 1px solid rgba(200,161,62,.2); transition: border-color .2s; }
+  .dp-tool:hover { border-color: var(--gold); }
+  .dp-drop { border: 2px dashed #E5E7EB; border-radius: 12px; transition: all .2s; }
+  .dp-drop:hover { border-color: var(--gold); background: var(--gold-low); }
+  .dp-drop-active { border-color: var(--gold) !important; background: var(--gold-low) !important; }
+  .dp-drop-ok  { border-color: #4ade80 !important; background: #f0fdf4 !important; }
+  .dp-drop-err { border-color: #f87171 !important; background: #fef2f2 !important; }
+  @keyframes dpUp { from { opacity:0; transform: translateY(22px); } to { opacity:1; transform: translateY(0); } }
+  .dp-anim { animation: dpUp .65s ease both; } .dp-anim-d1 { animation-delay: .1s; } .dp-anim-d2 { animation-delay: .22s; } .dp-anim-d3 { animation-delay: .36s; } .dp-anim-d4 { animation-delay: .5s; }
+  @keyframes dpGlow { 0%{box-shadow:0 0 0 0 rgba(200,161,62,.5)} 70%{box-shadow:0 0 0 16px rgba(200,161,62,0)} 100%{box-shadow:0 0 0 0 rgba(200,161,62,0)} }
+  .dp-glow { animation: dpGlow 1.6s ease-out; }
+  .dp-label { display: block; font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--gray); margin-bottom: .45rem; }
+  .dp-error { font-size: .75rem; color: #f87171; margin-top: .25rem; }
 `;
 
 const validateField = (name, value) => {
   switch (name) {
-    case 'nombre':
-    case 'apellido':
-      return value.trim().length < 2 ? 'Mínimo 2 caracteres' : '';
-    case 'telefono':
-      return !/^[0-9]{9}$/.test(value.trim()) ? '9 dígitos requeridos' : '';
-    case 'email':
-      return !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim()) ? 'Email inválido' : '';
-    case 'dni':
-      return !/^[0-9]{8}$/.test(value.trim()) ? '8 dígitos requeridos' : '';
+    case 'nombre': case 'apellido': return value.trim().length < 2 ? 'Mínimo 2 caracteres' : '';
+    case 'telefono': return !/^[0-9]{9}$/.test(value.trim()) ? '9 dígitos requeridos' : '';
+    case 'email': return !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim()) ? 'Email inválido' : '';
+    case 'dni': return !/^[0-9]{8}$/.test(value.trim()) ? '8 dígitos requeridos' : '';
     case 'curriculum':
       if (!value) return 'Selecciona un archivo PDF';
       if (!(value instanceof File)) return 'Debes cargar un archivo';
-      if (value.type !== 'application/pdf') return 'Solo se permite archivos PDF';
-      if (value.size > 5 * 1024 * 1024) return 'El archivo no puede superar 5 MB';
+      if (value.type !== 'application/pdf') return 'Solo se permite PDF';
+      if (value.size > 5 * 1024 * 1024) return 'Máximo 5 MB';
       return '';
-    case 'ciudad':
-      return !value ? 'Selecciona tu ciudad' : '';
-    case 'pais':
-      return !value ? 'Selecciona tu pais' : '';
-    default:
-      return '';
+    case 'ciudad': return !value ? 'Selecciona tu ciudad' : '';
+    case 'pais':   return !value ? 'Selecciona tu país'  : '';
+    default: return '';
   }
 };
 
-function VendedorPostulacionPage() {
-  const [formData, setFormData] = useState({
-    nombre: '',
-    apellido: '',
-    telefono: '',
-    email: '',
-    dni: '',
-    curriculum: null,
-    ciudad: '',
-    país: '',
-  });
+const Tick = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 13l4 4L19 7" /></svg>;
+const ArrowRight = ({ size = 18 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg>;
+const CheckItem = ({ children }) => (
+  <li className="dp-check-item">
+    <span className="dp-check-icon"><Tick /></span>
+    <span style={{ color: '#374151', fontSize: '.92rem', lineHeight: '1.5' }}>{children}</span>
+  </li>
+);
+
+export default function VendedorPostulacionPage() {
+  const [formData, setFormData] = useState({ nombre:'', apellido:'', telefono:'', email:'', dni:'', curriculum:null, ciudad:'', pais:'' });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [utmData, setUtmData] = useState({});
@@ -79,34 +92,24 @@ function VendedorPostulacionPage() {
   const [modalType, setModalType] = useState('');
   const [dragActive, setDragActive] = useState(false);
   const [availableCities, setAvailableCities] = useState([]);
+  const [formVisible, setFormVisible] = useState(false);
+  const formRef = useRef(null);
 
-  // Nuevo: Gestionar flujo de dos pasos
-  const {
-    applicationStep,
-    proceedToQuestionnaire,
-    resetFlow,
-    backToApplication
-  } = useApplicationFlow();
-
+  const { applicationStep, proceedToQuestionnaire, resetFlow, backToApplication } = useApplicationFlow();
   const questionnaire = getQuestionnaire(NOMBRE_PUESTO);
 
-  // Cargar ciudades cuando cambia el pais
   useEffect(() => {
     if (formData.pais) {
-      const country = countriesData.countries.find(c => c.name === formData.pais);
-      const cities = country ? country.cities : [];
-      setAvailableCities(cities);
-    } else {
-      setAvailableCities([]);
-    }
+      const c = countriesData.countries.find(c => c.name === formData.pais);
+      setAvailableCities(c ? c.cities : []);
+    } else setAvailableCities([]);
   }, [formData.pais]);
 
-  // Resetear ciudad cuando cambia el país
   useEffect(() => {
     setFormData(prev => {
       if (!prev.ciudad || !prev.pais) return prev;
-      const country = countriesData.countries.find(c => c.name === prev.pais);
-      const cities = country ? country.cities : [];
+      const c = countriesData.countries.find(c => c.name === prev.pais);
+      const cities = c ? c.cities : [];
       return cities.includes(prev.ciudad) ? prev : { ...prev, ciudad: '' };
     });
     setErrors(prev => ({ ...prev, ciudad: '' }));
@@ -114,453 +117,269 @@ function VendedorPostulacionPage() {
 
   useEffect(() => {
     setUtmData(captureAllUTM());
-    const init = async () => {
-      await initJobPixel();
-      await trackJobPageView(NOMBRE_PUESTO);
-      await initJobTikTokPixel();
-      await trackJobTikTokViewContent(NOMBRE_PUESTO);
-    };
+    const init = async () => { await initJobPixel(); await trackJobPageView(NOMBRE_PUESTO); await initJobTikTokPixel(); await trackJobTikTokViewContent(NOMBRE_PUESTO); };
     init();
   }, []);
 
   useEffect(() => {
-    const scrollToFormButtons = document.querySelectorAll('a[href="#postulacion-form"]');
-    const formContainer = document.getElementById('postulacion-form');
-
-    const handleScrollToForm = (e) => {
-      e.preventDefault();
-      if (formContainer) {
-        formContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        formContainer.classList.remove('dp-form-highlight');
-        void formContainer.offsetWidth;
-        formContainer.classList.add('dp-form-highlight');
-      }
-    };
-
-    scrollToFormButtons.forEach(btn => btn.addEventListener('click', handleScrollToForm));
-    return () => scrollToFormButtons.forEach(btn => btn.removeEventListener('click', handleScrollToForm));
+    if (!formRef.current) return;
+    const obs = new IntersectionObserver(([e]) => setFormVisible(e.isIntersecting), { threshold: .1 });
+    obs.observe(formRef.current);
+    return () => obs.disconnect();
   }, []);
+
+  const scrollToForm = (e) => {
+    e?.preventDefault();
+    formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setTimeout(() => { formRef.current?.classList.remove('dp-glow'); void formRef.current?.offsetWidth; formRef.current?.classList.add('dp-glow'); }, 400);
+  };
 
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
-    let processed = value;
-    
-    if (type === 'file') {
-      processed = files?.[0] || null;
-      setDragActive(false);
-    } else if (name === 'nombre' || name === 'apellido') {
-      processed = value.toLowerCase().replace(/(^|\s)\S/g, c => c.toUpperCase());
-    } else if (name === 'telefono' || name === 'dni') {
-      processed = value.replace(/[^0-9]/g, '');
-    }
-    
-    setFormData(prev => ({ ...prev, [name]: processed }));
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: validateField(name, processed) }));
-    }
+    let val = value;
+    if (type === 'file') { val = files?.[0] || null; setDragActive(false); }
+    else if (name === 'nombre' || name === 'apellido') val = value.toLowerCase().replace(/(^|\s)\S/g, c => c.toUpperCase());
+    else if (name === 'telefono' || name === 'dni') val = value.replace(/[^0-9]/g, '');
+    setFormData(prev => ({ ...prev, [name]: val }));
+    if (errors[name]) setErrors(prev => ({ ...prev, [name]: validateField(name, val) }));
   };
 
-  const handleDrag = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === 'dragenter' || e.type === 'dragover') {
-      setDragActive(true);
-    } else if (e.type === 'dragleave') {
-      setDragActive(false);
-    }
-  };
-
+  const handleDrag = (e) => { e.preventDefault(); e.stopPropagation(); setDragActive(e.type === 'dragenter' || e.type === 'dragover'); };
   const handleDrop = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-    
-    const files = e.dataTransfer?.files;
-    if (files && files[0]) {
-      const file = files[0];
-      setFormData(prev => ({ ...prev, curriculum: file }));
-      if (errors.curriculum) {
-        setErrors(prev => ({ ...prev, curriculum: validateField('curriculum', file) }));
-      }
-    }
+    e.preventDefault(); e.stopPropagation(); setDragActive(false);
+    const file = e.dataTransfer?.files?.[0];
+    if (file) { setFormData(prev => ({ ...prev, curriculum: file })); if (errors.curriculum) setErrors(prev => ({ ...prev, curriculum: validateField('curriculum', file) })); }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const fieldErrors = Object.keys(formData).reduce((acc, key) => {
-      const err = validateField(key, formData[key]);
-      if (err) acc[key] = err;
-      return acc;
-    }, {});
-    const allErrors = { ...fieldErrors};
+    const allErrors = Object.keys(formData).reduce((acc, k) => { const err = validateField(k, formData[k]); if (err) acc[k] = err; return acc; }, {});
     setErrors(allErrors);
-
     if (Object.keys(allErrors).length > 0) return;
-
-    const applicationDataWithTracking = {
-      ...formData,
-      utmData
-    };
-
-    const success = proceedToQuestionnaire(applicationDataWithTracking, NOMBRE_PUESTO);
-    
-    if (success) {
-      console.log('✓ Datos validados. Procediendo al cuestionario...');
-    } else {
-      setModalType('error');
-      setShowModal(true);
-    }
+    const ok = proceedToQuestionnaire({ ...formData, utmData }, NOMBRE_PUESTO);
+    if (!ok) { setModalType('error'); setShowModal(true); }
   };
 
   const handleQuestionnaireSubmit = async (answers) => {
     setIsSubmitting(true);
-
     try {
-      const formDataPayload = new FormData();
-      
-      // Datos personales
-      formDataPayload.append('nombre', formData.nombre);
-      formDataPayload.append('apellido', formData.apellido);
-      formDataPayload.append('telefono', `+51${formData.telefono}`);
-      formDataPayload.append('email', formData.email);
-      formDataPayload.append('dni', formData.dni);
-      formDataPayload.append('ciudad', formData.ciudad);
-      formDataPayload.append('pais', formData.pais);
-      
-      // CV
-      if (formData.curriculum instanceof File) {
-        formDataPayload.append('curriculum', formData.curriculum);
-      }
-
-      // Información de postulación
-      formDataPayload.append('puesto', NOMBRE_PUESTO);
-      formDataPayload.append('landing_url', window.location.href);
-      formDataPayload.append('timestamp', new Date().toISOString());
-      
-      // Respuestas del cuestionario
-      formDataPayload.append('respuestas_cuestionario', JSON.stringify(answers));
-
-      // Datos de tracking
-      const trackingFields = ['ttclid', 'fbclid', 'ad_id', 'adset_id', 'campaign_id', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
-      trackingFields.forEach(field => {
-        formDataPayload.append(field, utmData[field] || '');
-      });
-
-      console.log('📤 Enviando postulación completa con cuestionario...');
-
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000);
-
-      const response = await fetch(WEBHOOK_URL, {
-        method: 'POST',
-        body: formDataPayload,
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
-
-      if (response.ok) {
-        setModalType('success');
-        setShowModal(true);
-        resetFlow();
-        setFormData({ nombre: '', apellido: '', telefono: '', email: '', dni: '', curriculum: null, ciudad: '', país: '' });
-        setErrors({});
-      } else {
-        setModalType('error');
-        setShowModal(true);
-        setIsSubmitting(false);
-      }
-    } catch (error) {
-      console.error('Error enviando postulación:', error);
-      setModalType('error');
-      setShowModal(true);
-      setIsSubmitting(false);
-    }
+      const payload = new FormData();
+      payload.append('nombre', formData.nombre); payload.append('apellido', formData.apellido);
+      payload.append('telefono', `+51${formData.telefono}`); payload.append('email', formData.email);
+      payload.append('dni', formData.dni); payload.append('ciudad', formData.ciudad); payload.append('pais', formData.pais);
+      if (formData.curriculum instanceof File) payload.append('curriculum', formData.curriculum);
+      payload.append('puesto', NOMBRE_PUESTO); payload.append('landing_url', window.location.href);
+      payload.append('timestamp', new Date().toISOString()); payload.append('respuestas_cuestionario', JSON.stringify(answers));
+      ['ttclid','fbclid','ad_id','adset_id','campaign_id','utm_source','utm_medium','utm_campaign','utm_content','utm_term'].forEach(f => payload.append(f, utmData[f] || ''));
+      const ctrl = new AbortController(); const tid = setTimeout(() => ctrl.abort(), 15000);
+      const res = await fetch(WEBHOOK_URL, { method: 'POST', body: payload, signal: ctrl.signal });
+      clearTimeout(tid);
+      if (res.ok) { setModalType('success'); setShowModal(true); resetFlow(); setFormData({ nombre:'', apellido:'', telefono:'', email:'', dni:'', curriculum:null, ciudad:'', pais:'' }); setErrors({}); }
+      else { setModalType('error'); setShowModal(true); setIsSubmitting(false); }
+    } catch { setModalType('error'); setShowModal(true); setIsSubmitting(false); }
   };
 
-  const inputClass = (field) =>
-    `w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition ${
-      errors[field] ? 'border-red-500' : formData[field] ? 'border-green-500' : 'border-gray-300'
-    }`;
+  const inCls = (f) => `dp-input ${errors[f] ? 'dp-input-err' : formData[f] ? 'dp-input-ok' : ''}`;
 
   return (
-    <div className="antialiased font-sans bg-gray-50 min-h-screen">
-      <style>{customCss}</style>
+    <div className="antialiased" style={{ fontFamily:'system-ui,-apple-system,sans-serif', background:'var(--light)' }}>
+      <style>{css}</style>
 
-      {/* NUEVO: Modal del Cuestionario */}
       {applicationStep === 2 && questionnaire && (
-        <QuestionnaireModal
-          isOpen={applicationStep === 2}
-          questionnaire={questionnaire}
-          isSubmitting={isSubmitting}
-          onClose={backToApplication}
-          onSubmit={handleQuestionnaireSubmit}
-        />
+        <QuestionnaireModal isOpen={true} questionnaire={questionnaire} isSubmitting={isSubmitting} onClose={backToApplication} onSubmit={handleQuestionnaireSubmit} />
       )}
 
-      {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4" onClick={() => setShowModal(false)}>
-          <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-8 text-center" onClick={e => e.stopPropagation()}>
+        <div style={{ position:'fixed', inset:0, background:'rgba(4,13,8,.8)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:60, padding:'1rem' }} onClick={() => setShowModal(false)}>
+          <div style={{ background:'#fff', borderRadius:'20px', maxWidth:'380px', width:'100%', padding:'2.5rem', textAlign:'center', boxShadow:'0 30px 80px rgba(0,0,0,.3)' }} onClick={e => e.stopPropagation()}>
             {modalType === 'success' ? (
               <>
-                <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
-                  <svg className="h-10 w-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
-                </div>
-                <h3 className="text-2xl font-bold dp-text-main mb-2">¡Postulación enviada!</h3>
-                <p className="dp-text-secondary mb-6">Revisaremos tu perfil y te contactaremos por WhatsApp si avanzas en el proceso. ¡Mucho éxito!</p>
-                <button onClick={() => setShowModal(false)} className="w-full dp-bg-cta  font-bold py-3 px-6 rounded-lg transition-colors duration-300">
-                  Cerrar
-                </button>
+                <div style={{ width:64, height:64, borderRadius:'50%', background:'rgba(200,161,62,.12)', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 1.25rem', border:'2px solid rgba(200,161,62,.4)' }}><Tick /></div>
+                <h3 style={{ fontWeight:800, fontSize:'1.4rem', color:'var(--black)', marginBottom:'.5rem' }}>¡Postulación enviada!</h3>
+                <p style={{ color:'var(--gray)', fontSize:'.9rem', lineHeight:1.6, marginBottom:'1.5rem' }}>Revisaremos tu perfil y te contactaremos por WhatsApp si avanzas. ¡Mucho éxito!</p>
+                <button onClick={() => setShowModal(false)} className="dp-btn dp-btn-gold" style={{ width:'100%' }}>Cerrar</button>
               </>
             ) : (
               <>
-                <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-4">
-                  <svg className="h-10 w-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                <div style={{ width:64, height:64, borderRadius:'50%', background:'#fef2f2', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 1.25rem' }}>
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="2" strokeLinecap="round"><path d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 </div>
-                <h3 className="text-2xl font-bold dp-text-main mb-2">¡Ups! Algo salió mal</h3>
-                <p className="dp-text-secondary mb-6">No pudimos enviar tu postulación. Por favor escríbenos directamente por WhatsApp.</p>
-                <a
-                  href={`https://wa.me/${WHATSAPP_ERROR.replace(/\D/g, '')}?text=Hola%2C%20quiero%20postular%20a%20${encodeURIComponent(NOMBRE_PUESTO)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300 mb-2"
-                >
-                  Escribir por WhatsApp
-                </a>
-                <button onClick={() => setShowModal(false)} className="w-full text-gray-500 hover:text-gray-700 font-medium py-2">
-                  Intentar de nuevo
-                </button>
+                <h3 style={{ fontWeight:800, fontSize:'1.4rem', color:'var(--black)', marginBottom:'.5rem' }}>Ups, algo salió mal</h3>
+                <p style={{ color:'var(--gray)', fontSize:'.9rem', lineHeight:1.6, marginBottom:'1.5rem' }}>No pudimos enviar tu postulación. Escríbenos directamente.</p>
+                <a href={`https://wa.me/${WHATSAPP_ERROR.replace(/\D/g,'')}?text=Hola%2C%20quiero%20postular%20a%20${encodeURIComponent(NOMBRE_PUESTO)}`} target="_blank" rel="noopener noreferrer" style={{ display:'block', background:'#22c55e', color:'#fff', fontWeight:700, padding:'.85rem', borderRadius:'10px', textDecoration:'none', marginBottom:'.5rem' }}>Escribir por WhatsApp</a>
+                <button onClick={() => setShowModal(false)} style={{ background:'none', border:'none', color:'var(--gray)', cursor:'pointer', fontSize:'.85rem', padding:'.5rem' }}>Intentar de nuevo</button>
               </>
             )}
           </div>
         </div>
       )}
 
-      {/* HERO */}
-      <header className="dp-bg-primary text-white py-16 md:py-24">
-        <div className="container mx-auto px-6 max-w-4xl text-center">
-          <div className="mb-6">
-            <span className="inline-block bg-white bg-opacity-10 text-white text-sm font-semibold px-4 py-1 rounded-full uppercase tracking-wider">DermicaPro - Estamos contratando</span>
-          </div>
-          <h1 className="text-4xl md:text-5xl font-extrabold leading-tight mb-4">
-            Asesor <span style={{color: 'var(--accent-on-dark)'}}>Comercial</span>
-          </h1>
-          <p className="text-lg md:text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-            ¿Eres una persona con don de gentes y pasión por ayudar? Únete al equipo comercial de DermicaPro y ayuda a transformar la vida de nuestros clientes.
-          </p>
-          <a href="#postulacion-form" className="inline-block dp-bg-cta  font-bold py-4 px-10 rounded-full transition-transform duration-300 hover:scale-105 shadow-lg">
-            Postular Ahora
-          </a>
+      {!formVisible && (
+        <div className="dp-sticky-cta">
+          <button onClick={scrollToForm} className="dp-btn dp-btn-gold" style={{ width:'100%', fontSize:'1rem' }}>Postúlate ahora <ArrowRight /></button>
         </div>
-      </header>
+      )}
 
-      <main>
-        {/* POR QUÉ DERMICAPRO */}
-        <section className="py-16 md:py-20 bg-white">
-          <div className="container mx-auto px-6 max-w-5xl">
-            <h2 className="text-3xl font-bold dp-text-main text-center mb-12">
-              ¿Por qué unirte a <span className="dp-text-cta">DermicaPro</span>?
-            </h2>
-            <div className="grid md:grid-cols-3 gap-8">
-              {[
-                {
-                  icon: (
-                    <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                  ),
-                  title: 'Comisiones atractivas',
-                  desc: 'Gana según tu rendimiento. En DermicaPro premiamos el esfuerzo real con esquemas salariales competitivos.',
-                },
-                {
-                  icon: (
-                    <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
-                  ),
-                  title: 'Crecimiento real',
-                  desc: 'Los mejores asesores avanzan rápidamente. Tu desempeño habla por ti y abre puertas dentro de la clínica.',
-                },
-                {
-                  icon: (
-                    <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
-                  ),
-                  title: 'Capacitación en tratamientos',
-                  desc: 'Te formamos en los tratamientos que vendes para que puedas asesorar con confianza y cerrar mejor.',
-                },
-              ].map((b, i) => (
-                <div key={i} className="dp-bg-primary-light rounded-xl p-8 text-center">
-                  <div className="flex justify-center mb-4 dp-text-cta">{b.icon}</div>
-                  <h3 className="text-xl font-bold dp-text-main mb-2">{b.title}</h3>
-                  <p className="dp-text-secondary">{b.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+      <div style={{ background:'var(--black)', borderBottom:'1px solid rgba(200,161,62,.2)', padding:'.75rem 1.5rem', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+        <span style={{ color:'var(--white)', fontWeight:800, fontSize:'1rem' }}>Dérmica<span style={{ color:'var(--gold)' }}>Pro</span></span>
+        <button onClick={scrollToForm} className="dp-btn dp-btn-gold" style={{ padding:'.45rem 1.2rem', fontSize:'.8rem', borderRadius:'9999px' }}>Postularme</button>
+      </div>
 
-        {/* REQUISITOS */}
-        <section className="py-16 md:py-20 bg-gray-50">
-          <div className="container mx-auto px-6 max-w-3xl">
-            <h2 className="text-3xl font-bold dp-text-main text-center mb-10">Buscamos a alguien que...</h2>
-            <ul className="space-y-4">
-              {[
-                'Tenga mínimo 6 meses de experiencia en ventas directas.',
-                'Sea una persona con excelente comunicación y don de gentes.',
-                'Esté orientado/a a resultados y metas comerciales.',
-                'Tenga disponibilidad de lunes a sábado para trabajar con el equipo.',
-              ].map((req, i) => (
-                <li key={i} className="flex items-start gap-3 bg-white rounded-lg p-4 shadow-sm">
-                  <span className="flex-shrink-0 mt-0.5">
-                    <svg className="w-5 h-5 dp-text-cta" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" /></svg>
-                  </span>
-                  <span className="dp-text-main">{req}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-
-        {/* FORMULARIO */}
-        <section id="postulacion-form" className="py-16 md:py-24 bg-white">
-          <div className="container mx-auto px-6 max-w-2xl">
-            <div className="text-center mb-10">
-              <h2 className="text-3xl font-bold dp-text-main">Envía tu postulación</h2>
-              <p className="dp-text-secondary mt-2">Completa el formulario y nos pondremos en contacto si tu perfil avanza.</p>
-            </div>
-
-            <form onSubmit={handleSubmit} noValidate className="bg-white rounded-2xl shadow-lg p-8 space-y-5 border border-gray-100">
-              {/* Nombre y Apellido */}
-              <div className="grid sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium dp-text-secondary mb-1">Nombre *</label>
-                  <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} placeholder="Ej: Rosa" className={inputClass('nombre')} />
-                  {errors.nombre && <p className="text-red-500 text-xs mt-1">{errors.nombre}</p>}
-                </div>
-                <div>
-                  <label className="block text-sm font-medium dp-text-secondary mb-1">Apellido *</label>
-                  <input type="text" name="apellido" value={formData.apellido} onChange={handleChange} placeholder="Ej: Mendoza" className={inputClass('apellido')} />
-                  {errors.apellido && <p className="text-red-500 text-xs mt-1">{errors.apellido}</p>}
-                </div>
+      <section style={{ background:'var(--black)', paddingBottom:'5rem' }}>
+        <div className="dp-dots" style={{ position:'absolute', top:60, left:0, width:160, height:160, opacity:.5, pointerEvents:'none' }} />
+        <div style={{ maxWidth:'1200px', margin:'0 auto', padding:'4rem 1.5rem 0' }}>
+          <div className="dp-hero-grid">
+            <div>
+              <div className="dp-anim dp-anim-d1" style={{ marginBottom:'1.25rem', display:'flex', flexWrap:'wrap', gap:'.5rem' }}>
+                <span className="dp-badge dp-badge-rose">Estamos contratando</span>
+                <span className="dp-badge dp-badge-gold">Trujillo, Perú</span>
               </div>
-
-              {/* Teléfono y DNI */}
-              <div className="grid sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium dp-text-secondary mb-1">Teléfono (WhatsApp) *</label>
-                  <div className="flex">
-                    <span className="inline-flex items-center px-3 border border-r-0 border-gray-300 bg-gray-50 text-gray-500 rounded-l-lg text-sm">+51</span>
-                    <input type="tel" name="telefono" value={formData.telefono} onChange={handleChange} placeholder="987 654 321" maxLength="9" className={`w-full px-4 py-2 border rounded-r-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition ${errors.telefono ? 'border-red-500' : formData.telefono ? 'border-green-500' : 'border-gray-300'}`} />
-                  </div>
-                  {errors.telefono && <p className="text-red-500 text-xs mt-1">{errors.telefono}</p>}
-                </div>
-                <div>
-                  <label className="block text-sm font-medium dp-text-secondary mb-1">DNI *</label>
-                  <input type="text" name="dni" value={formData.dni} onChange={handleChange} placeholder="12345678" maxLength="8" className={inputClass('dni')} />
-                  {errors.dni && <p className="text-red-500 text-xs mt-1">{errors.dni}</p>}
-                </div>
+              <h1 className="dp-hero-title dp-anim dp-anim-d2" style={{ color:'var(--white)', marginBottom:'.1em' }}>Asesor</h1>
+              <h1 className="dp-hero-title dp-anim dp-anim-d2" style={{ color:'var(--gold)', marginBottom:'1rem' }}>Comercial</h1>
+              <div className="dp-anim dp-anim-d2" style={{ marginBottom:'1.5rem' }}>
+                <span style={{ background:'var(--rose)', color:'var(--black)', fontWeight:700, fontSize:'.8rem', letterSpacing:'.12em', textTransform:'uppercase', padding:'.4rem 1rem', borderRadius:'4px', display:'inline-block' }}>
+                  Enfocado en ventas y fidelización
+                </span>
               </div>
-
-              {/* Email */}
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-1">Correo electrónico *</label>
-                <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="ejemplo@correo.com" className={inputClass('email')} />
-                {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
-              </div>
-
-              {/* Curriculum */}
-              <div>
-                <label className="block text-sm font-medium dp-text-secondary mb-2">Cargar CV (PDF) *</label>
-                <div
-                  onDragEnter={handleDrag}
-                  onDragLeave={handleDrag}
-                  onDragOver={handleDrag}
-                  onDrop={handleDrop}
-                  className={`relative w-full px-6 py-8 border-2 border-dashed rounded-lg transition-all text-center cursor-pointer ${
-                    dragActive
-                      ? 'border-yellow-400 bg-yellow-50'
-                      : errors.curriculum
-                      ? 'border-red-300 bg-red-50'
-                      : formData.curriculum
-                      ? 'border-green-300 bg-green-50'
-                      : 'border-gray-300 bg-gray-50 hover:border-yellow-300'
-                  }`}
-                >
-                  <input
-                    type="file"
-                    name="curriculum"
-                    accept=".pdf"
-                    onChange={handleChange}
-                    className="hidden"
-                    id="curriculum-input"
-                  />
-                  <label htmlFor="curriculum-input" className="cursor-pointer">
-                    {formData.curriculum ? (
-                      <div>
-                        <svg className="w-12 h-12 text-green-600 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <p className="text-sm font-medium dp-text-main mb-1">✓ {formData.curriculum.name}</p>
-                        <p className="text-xs dp-text-secondary">{(formData.curriculum.size / 1024).toFixed(2)} KB</p>
-                      </div>
-                    ) : (
-                      <div>
-                        <svg className="w-12 h-12 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-                        </svg>
-                        <p className="text-sm font-medium dp-text-main">Arrastra tu PDF aquí o haz clic</p>
-                        <p className="text-xs dp-text-secondary mt-1">Máximo 5 MB</p>
-                      </div>
-                    )}
-                  </label>
-                </div>
-                {errors.curriculum && <p className="text-red-500 text-xs mt-2">{errors.curriculum}</p>}
-              </div>
-
-              {/* pais */}
-              <div>
-                <SearchableSelect
-                  label="Pais *"
-                  options={countriesData.countries.map(c => c.name)}
-                  value={formData.pais}
-                  onChange={(value) => setFormData(prev => ({ ...prev, pais: value }))}
-                  placeholder="Busca tu pais..."
-                  error={errors.pais}
-                />
-              </div>
-
-              {/* Ciudad */}
-              <div>
-                <SearchableSelect
-                  label="Ciudad *"
-                  options={availableCities}
-                  value={formData.ciudad}
-                  onChange={(value) => setFormData(prev => ({ ...prev, ciudad: value }))}
-                  placeholder={formData.pais ? "Busca tu ciudad..." : "Selecciona un pais primero"}
-                  error={errors.ciudad}
-                  className={!formData.pais ? 'opacity-50 pointer-events-none' : ''}
-                />
-              </div>
-
-              <button type="submit" disabled={isSubmitting} className="w-full dp-bg-cta  font-bold py-4 px-6 rounded-lg transition-all duration-300 hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed text-base mt-2">
-                {isSubmitting ? 'Procesando...' : '→ Siguiente: Cuestionario'}
-              </button>
-              <p className="text-xs text-gray-400 text-center">
-                Al enviar, aceptas nuestra{' '}
-                <a href="/politica-privacidad" className="underline hover:text-gray-600">Política de Privacidad</a>.
+              <p className="dp-anim dp-anim-d3" style={{ color:'rgba(255,255,255,.7)', fontSize:'1.05rem', lineHeight:1.7, marginBottom:'2rem', maxWidth:'480px' }}>
+                ¿Tienes don de gentes y pasión por ayudar a las personas? Únete al equipo comercial de DermicaPro y transforma la vida de nuestros clientes.
               </p>
-            </form>
-          </div>
-        </section>
-      </main>
+              <div className="dp-anim dp-anim-d3" style={{ display:'flex', flexWrap:'wrap', gap:'1rem', marginBottom:'2.5rem' }}>
+                {[{ icon:'💰', label:'Comisiones atractivas' },{ icon:'📈', label:'Crecimiento real' },{ icon:'🎓', label:'Capacitación en tratamientos' }].map(b => (
+                  <div key={b.label} style={{ display:'flex', alignItems:'center', gap:'.5rem', background:'rgba(255,255,255,.06)', border:'1px solid rgba(200,161,62,.2)', borderRadius:'10px', padding:'.6rem 1rem' }}>
+                    <span style={{ fontSize:'1.1rem' }}>{b.icon}</span>
+                    <span style={{ color:'rgba(255,255,255,.85)', fontSize:'.82rem', fontWeight:600 }}>{b.label}</span>
+                  </div>
+                ))}
+              </div>
+              <div style={{ marginTop:'2rem', display:'block' }} className="lg-hidden">
+                <button onClick={scrollToForm} className="dp-btn dp-btn-gold" style={{ width:'100%', fontSize:'1rem', borderRadius:'12px' }}>Ir al formulario <ArrowRight /></button>
+              </div>
+            </div>
 
-      <footer className="dp-bg-primary text-gray-400 py-8">
-        <div className="container mx-auto px-6 text-center">
-          <p className="font-semibold text-white mb-1">DermicaPro</p>
-          <p className="text-sm">Av. Larco 877, Trujillo, Perú &nbsp;|&nbsp; +51 974 637 783</p>
-          <p className="text-xs mt-3">&copy; {new Date().getFullYear()} DermicaPro. Todos los derechos reservados.</p>
+            <div ref={formRef} id="postulacion-form" className="dp-anim dp-anim-d2">
+              <div className="dp-form-card">
+                <div style={{ marginBottom:'1.5rem', paddingBottom:'1.25rem', borderBottom:'1px solid var(--light)' }}>
+                  <p style={{ color:'var(--gold)', fontSize:'.72rem', fontWeight:700, letterSpacing:'.1em', textTransform:'uppercase', marginBottom:'.25rem' }}>Paso 1 de 2 · Datos personales</p>
+                  <h2 style={{ color:'var(--black)', fontWeight:800, fontSize:'1.3rem', margin:0 }}>Completa tu postulación</h2>
+                  <p style={{ color:'var(--gray)', fontSize:'.83rem', marginTop:'.3rem' }}>Todos los campos son obligatorios.</p>
+                </div>
+                <form onSubmit={handleSubmit} noValidate>
+                  <div style={{ display:'flex', flexDirection:'column', gap:'1rem' }}>
+                    <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'.75rem' }}>
+                      {[['nombre','Nombre','Rosa'],['apellido','Apellido','Mendoza']].map(([f,l,p]) => (
+                        <div key={f}><label className="dp-label">{l} *</label><input type="text" name={f} value={formData[f]} onChange={handleChange} placeholder={p} className={inCls(f)} />{errors[f] && <p className="dp-error">{errors[f]}</p>}</div>
+                      ))}
+                    </div>
+                    <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'.75rem' }}>
+                      <div>
+                        <label className="dp-label">Teléfono (WhatsApp) *</label>
+                        <div style={{ display:'flex' }}>
+                          <span style={{ display:'flex', alignItems:'center', padding:'0 .75rem', border:'1.5px solid #E5E7EB', borderRight:'none', borderRadius:'10px 0 0 10px', background:'var(--light)', color:'var(--gray)', fontSize:'.85rem', whiteSpace:'nowrap' }}>+51</span>
+                          <input type="tel" name="telefono" value={formData.telefono} onChange={handleChange} placeholder="987 654 321" maxLength="9" className={`dp-input ${errors.telefono ? 'dp-input-err' : formData.telefono ? 'dp-input-ok' : ''}`} style={{ borderTopLeftRadius:0, borderBottomLeftRadius:0 }} />
+                        </div>
+                        {errors.telefono && <p className="dp-error">{errors.telefono}</p>}
+                      </div>
+                      <div><label className="dp-label">DNI *</label><input type="text" name="dni" value={formData.dni} onChange={handleChange} placeholder="12345678" maxLength="8" className={inCls('dni')} />{errors.dni && <p className="dp-error">{errors.dni}</p>}</div>
+                    </div>
+                    <div><label className="dp-label">Correo electrónico *</label><input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="tu@correo.com" className={inCls('email')} />{errors.email && <p className="dp-error">{errors.email}</p>}</div>
+                    <div>
+                      <label className="dp-label">Curriculum Vitae (PDF) *</label>
+                      <div onDragEnter={handleDrag} onDragLeave={handleDrag} onDragOver={handleDrag} onDrop={handleDrop} className={`dp-drop ${dragActive ? 'dp-drop-active' : errors.curriculum ? 'dp-drop-err' : formData.curriculum ? 'dp-drop-ok' : ''}`} style={{ padding:'1.25rem', textAlign:'center', cursor:'pointer' }}>
+                        <input type="file" name="curriculum" accept=".pdf" onChange={handleChange} className="hidden" id="cv-input" style={{ display:'none' }} />
+                        <label htmlFor="cv-input" style={{ cursor:'pointer', display:'block' }}>
+                          {formData.curriculum ? (
+                            <div>
+                              <div style={{ width:40, height:40, borderRadius:'50%', background:'#f0fdf4', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto .5rem' }}><svg width="22" height="22" fill="none" stroke="#4ade80" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg></div>
+                              <p style={{ fontWeight:700, fontSize:'.85rem', color:'#166534' }}>{formData.curriculum.name}</p>
+                              <p style={{ color:'var(--gray)', fontSize:'.75rem', marginTop:'.2rem' }}>{(formData.curriculum.size/1024).toFixed(1)} KB · Cambiar archivo</p>
+                            </div>
+                          ) : (
+                            <div>
+                              <svg width="32" height="32" fill="none" stroke="var(--gray)" strokeWidth="1.8" viewBox="0 0 24 24" style={{ margin:'0 auto .5rem', display:'block' }}><path strokeLinecap="round" strokeLinejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                              <p style={{ fontWeight:600, fontSize:'.85rem', color:'#374151' }}>Arrastra tu CV aquí o <span style={{ color:'var(--gold)', fontWeight:700 }}>selecciona</span></p>
+                              <p style={{ color:'var(--gray)', fontSize:'.75rem', marginTop:'.2rem' }}>PDF · Máximo 5 MB</p>
+                            </div>
+                          )}
+                        </label>
+                      </div>
+                      {errors.curriculum && <p className="dp-error">{errors.curriculum}</p>}
+                    </div>
+                    <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'.75rem' }}>
+                      <div><SearchableSelect label="País *" options={countriesData.countries.map(c => c.name)} value={formData.pais} onChange={v => setFormData(p => ({ ...p, pais: v }))} placeholder="Busca tu país..." error={errors.pais} /></div>
+                      <div style={!formData.pais ? { opacity:.5, pointerEvents:'none' } : {}}><SearchableSelect label="Ciudad *" options={availableCities} value={formData.ciudad} onChange={v => setFormData(p => ({ ...p, ciudad: v }))} placeholder={formData.pais ? 'Busca tu ciudad...' : 'Selecciona país primero'} error={errors.ciudad} /></div>
+                    </div>
+                    <button type="submit" disabled={isSubmitting} className="dp-submit" style={{ marginTop:'.25rem' }}>
+                      {isSubmitting ? <span style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:'.5rem' }}><svg style={{ animation:'spin 1s linear infinite', width:18, height:18 }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>Procesando…</span>
+                      : <span style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:'.5rem' }}>Siguiente: Cuestionario <ArrowRight /></span>}
+                    </button>
+                    <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:.5, marginTop:'-.25rem' }}>
+                      <svg width="13" height="13" fill="none" stroke="var(--gray)" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                      <span style={{ color:'var(--gray)', fontSize:'.75rem' }}>Datos protegidos · <a href="/politica-privacidad" style={{ color:'var(--gray)', textDecoration:'underline' }}>Política de Privacidad</a></span>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
         </div>
+      </section>
+
+      <section style={{ background:'var(--light)', padding:'5rem 1.5rem' }}>
+        <div style={{ maxWidth:'900px', margin:'0 auto' }}>
+          <div style={{ textAlign:'center', marginBottom:'3rem' }}>
+            <span className="dp-badge dp-badge-gold" style={{ marginBottom:'.75rem', display:'inline-flex' }}>Más información</span>
+            <h2 className="dp-section-title" style={{ color:'var(--black)' }}>¿Qué buscamos y qué ofrecemos?</h2>
+          </div>
+          <div style={{ display:'grid', gridTemplateColumns:'1fr', gap:'1.5rem' }} className="req-grid">
+            <div style={{ background:'var(--white)', borderRadius:16, padding:'2rem', border:'1px solid rgba(0,0,0,.06)', boxShadow:'0 4px 20px rgba(0,0,0,.05)' }}>
+              <div style={{ display:'flex', alignItems:'center', gap:'.75rem', marginBottom:'1.25rem' }}>
+                <div style={{ width:42, height:42, borderRadius:'50%', background:'var(--gold)', display:'flex', alignItems:'center', justifyContent:'center' }}><svg width="20" height="20" fill="none" stroke="var(--black)" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg></div>
+                <div><p style={{ color:'var(--gold)', fontSize:'.7rem', fontWeight:700, letterSpacing:'.1em', textTransform:'uppercase' }}>Lo que pedimos</p><p style={{ fontWeight:800, fontSize:'1.1rem', color:'var(--black)' }}>Requisitos</p></div>
+              </div>
+              <ul style={{ listStyle:'none', padding:0, margin:0, display:'flex', flexDirection:'column', gap:'.75rem' }}>
+                <CheckItem>Mínimo 6 meses de experiencia en ventas directas.</CheckItem>
+                <CheckItem>Excelente comunicación y don de gentes.</CheckItem>
+                <CheckItem>Orientado/a a resultados y metas comerciales.</CheckItem>
+                <CheckItem>Disponibilidad de lunes a sábado para trabajar con el equipo.</CheckItem>
+              </ul>
+            </div>
+            <div style={{ background:'var(--black)', borderRadius:16, padding:'2rem', border:'1px solid rgba(200,161,62,.25)', boxShadow:'0 4px 20px rgba(0,0,0,.12)' }}>
+              <div style={{ display:'flex', alignItems:'center', gap:'.75rem', marginBottom:'1.25rem' }}>
+                <div style={{ width:42, height:42, borderRadius:'50%', background:'var(--gold)', display:'flex', alignItems:'center', justifyContent:'center' }}><svg width="20" height="20" fill="none" stroke="var(--black)" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg></div>
+                <div><p style={{ color:'var(--gold)', fontSize:'.7rem', fontWeight:700, letterSpacing:'.1em', textTransform:'uppercase' }}>Lo que recibes</p><p style={{ fontWeight:800, fontSize:'1.1rem', color:'var(--white)' }}>Ofrecemos</p></div>
+              </div>
+              <ul style={{ listStyle:'none', padding:0, margin:0, display:'flex', flexDirection:'column', gap:'.75rem' }}>
+                {['Esquema salarial competitivo con comisiones por rendimiento.','Capacitación en todos los tratamientos que asesoras.','Ambiente de trabajo motivador y en crecimiento.','Los mejores asesores avanzan rápido dentro de la clínica.','Oportunidad real de construir una carrera comercial sólida.'].map(o => (
+                  <li key={o} style={{ display:'flex', gap:'.75rem', alignItems:'flex-start' }}>
+                    <span style={{ color:'var(--gold)', flexShrink:0, marginTop:2 }}><Tick /></span>
+                    <span style={{ color:'rgba(255,255,255,.8)', fontSize:'.92rem', lineHeight:1.5 }}>{o}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+          <style>{`@media (min-width: 768px) { .req-grid { grid-template-columns: 1fr 1fr !important; } }`}</style>
+        </div>
+      </section>
+
+      <section style={{ background:'var(--black)', padding:'5rem 1.5rem', position:'relative', overflow:'hidden' }}>
+        <div className="dp-dots" style={{ position:'absolute', inset:0, opacity:.3, pointerEvents:'none' }} />
+        <div style={{ maxWidth:'700px', margin:'0 auto', textAlign:'center', position:'relative' }}>
+          <span className="dp-badge dp-badge-rose" style={{ marginBottom:'1.25rem', display:'inline-flex' }}>¿Te interesa?</span>
+          <h2 style={{ fontWeight:900, fontSize:'clamp(2rem,5vw,3rem)', color:'var(--white)', lineHeight:1.1, marginBottom:'.75rem' }}>Sé parte de nuestro<br /><span style={{ color:'var(--gold)' }}>equipo comercial.</span></h2>
+          <p style={{ color:'rgba(255,255,255,.6)', fontSize:'.95rem', lineHeight:1.7, marginBottom:'2rem' }}>Postúlate y cuéntanos tu historia. Tu próxima gran oportunidad puede estar aquí.</p>
+          <button onClick={scrollToForm} className="dp-btn dp-btn-gold" style={{ fontSize:'1rem', padding:'1rem 2.5rem', borderRadius:'9999px' }}>Postúlate ahora <ArrowRight size={20} /></button>
+          <p style={{ color:'rgba(255,255,255,.35)', fontSize:'.78rem', marginTop:'1rem' }}>El proceso tarda menos de 5 minutos.</p>
+        </div>
+      </section>
+
+      <footer style={{ background:'var(--black)', borderTop:'1px solid rgba(200,161,62,.18)', padding:'2rem 1.5rem', textAlign:'center' }}>
+        <p style={{ fontWeight:800, color:'var(--white)', marginBottom:'.3rem' }}>Dérmica<span style={{ color:'var(--gold)' }}>Pro</span></p>
+        <p style={{ color:'var(--gray)', fontSize:'.82rem' }}>Av. Larco 877, Trujillo, Perú · +51 974 637 783</p>
+        <p style={{ color:'rgba(255,255,255,.25)', fontSize:'.72rem', marginTop:'.75rem' }}>© {new Date().getFullYear()} DermicaPro. Todos los derechos reservados.</p>
       </footer>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } } @media (min-width: 1024px) { .lg-hidden { display: none !important; } } html { scroll-behavior: smooth; }`}</style>
     </div>
   );
 }
-
-export default VendedorPostulacionPage;

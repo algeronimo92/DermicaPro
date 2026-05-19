@@ -218,6 +218,53 @@ export const QUESTIONNAIRES = {
     ],
   },
 
+  "Cosmiatra": {
+    title: "Cuestionario - Cosmiatra",
+    description:
+      "Responde las siguientes preguntas para completar tu postulación",
+    questions: [
+      {
+        id: "experiencia_cosmiatra",
+        type: "select",
+        question: "¿Cuántos años de experiencia tienes en cosmiatría o cosmetología?",
+        options: ["Menos de 1 año", "1-2 años", "2-5 años", "Más de 5 años"],
+      },
+      {
+        id: "tipos_tratamiento",
+        type: "checkbox",
+        question:
+          "¿En cuáles de estos tratamientos tienes experiencia? (Marca los que apliquen)",
+        options: [
+          "Tratamientos faciales (hidratación, limpieza profunda)",
+          "Tratamientos corporales (reductivos, modeladores)",
+          "Peeling químico",
+          "Microdermoabrasión",
+          "Radiofrecuencia",
+          "Mesoterapia",
+          "Tratamientos con láser",
+        ],
+      },
+      {
+        id: "formacion",
+        type: "text",
+        question: "¿Qué título o certificaciones tienes en el área de cosmiatría o estética?",
+        placeholder: "Ej: Técnico en Cosmiatría - Instituto X, Certificación en Estética Avanzada",
+      },
+      {
+        id: "disponibilidad",
+        type: "select",
+        question: "¿Cuál es tu disponibilidad horaria?",
+        options: ["Tiempo completo", "Medio tiempo", "Fines de semana"],
+      },
+      {
+        id: "motivacion",
+        type: "text",
+        question: "¿Por qué te interesa trabajar en DermicaPro?",
+        placeholder: "Cuéntanos brevemente tu motivación...",
+      },
+    ],
+  },
+
   "Asesor Comercial": {
     title: "Cuestionario - Asesor Comercial",
     description:

@@ -19,6 +19,18 @@ const positions = [
     icon: "💼",
   },
   {
+    title: "Cosmiatra",
+    type: "Tiempo completo",
+    area: "Clínica",
+    description:
+      "Buscamos una cosmiatra apasionada por el cuidado de la piel, con experiencia en tratamientos faciales y corporales. Si amas transformar la piel de tus pacientes y quieres trabajar con tecnología de vanguardia, este lugar es para ti.",
+    tags: ["Estética", "Cosmiatría", "Faciales", "Presencial"],
+    link: "/postulacion/cosmiatra",
+    color: "bg-pink-50 border-pink-200",
+    badge: "bg-pink-100 text-pink-700",
+    icon: "🌸",
+  },
+  {
     title: "Especialista en Tratamientos Láser",
     type: "Tiempo completo",
     area: "Clínica",
