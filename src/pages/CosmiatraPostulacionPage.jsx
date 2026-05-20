@@ -393,10 +393,10 @@ export default function CosmiatraPostulacionPage() {
               {/* Título */}
               <div className="dp-anim dp-anim-d2" style={{ marginBottom:'1rem' }}>
                 <h1 className="dp-hero-title" style={{ color:'#2A0A0A', margin:0 }}>
-                  Cosmiatra
+                  ¿Amas la piel
                 </h1>
                 <h1 className="dp-hero-sub" style={{ color:'#7A2020', margin:'0' }}>
-                  &amp; Cosmetóloga
+                  y sabes vender?
                 </h1>
               </div>
 
@@ -404,21 +404,21 @@ export default function CosmiatraPostulacionPage() {
               <div className="dp-anim dp-anim-d2" style={{ display:'flex', alignItems:'center', gap:'.75rem', marginBottom:'1.75rem' }}>
                 <div style={{ flexShrink:0, width:36, height:2, background:'rgba(90,20,20,.45)', borderRadius:4 }} />
                 <span style={{ color:'#5A2020', fontSize:'.78rem', fontWeight:700, letterSpacing:'.14em', textTransform:'uppercase', fontStyle:'italic' }}>
-                  con pasión por el cuidado de la piel
+                  cosmiatra · cosmetóloga · apasionada por la estética
                 </span>
               </div>
 
               {/* Descripción */}
               <p className="dp-anim dp-anim-d3" style={{ color:'rgba(42,10,10,.75)', fontSize:'1.05rem', lineHeight:1.75, marginBottom:'2rem', maxWidth:'480px' }}>
-                Buscamos una cosmiatra con manos expertas y vocación de servicio. Si amas transformar la piel y la autoestima de tus pacientes, este lugar es para ti.
+                Buscamos a alguien que combine <strong>pasión genuina por el cuidado de la piel</strong> con habilidades reales de <strong>ventas y atención al cliente</strong>. No importa si vienes de cosmiatría, estética o ventas — lo que importa es tu actitud y tus ganas de crecer.
               </p>
 
               {/* Trust chips */}
               <div className="dp-anim dp-anim-d3" style={{ display:'flex', flexWrap:'wrap', gap:'.85rem', marginBottom:'2.5rem' }}>
                 {[
-                  { icon:'✨', label:'Tecnología de vanguardia' },
+                  { icon:'💸', label:'Comisiones por ventas' },
+                  { icon:'✨', label:'Capacitación incluida' },
                   { icon:'📈', label:'Crecimiento real' },
-                  { icon:'💛', label:'Ambiente que inspira' },
                 ].map(b => (
                   <div key={b.label} style={{ display:'flex', alignItems:'center', gap:'.5rem', background:'rgba(255,255,255,.35)', border:'1.5px solid rgba(255,255,255,.6)', borderRadius:'12px', padding:'.6rem 1rem', backdropFilter:'blur(4px)' }}>
                     <span style={{ fontSize:'1rem' }}>{b.icon}</span>
@@ -557,7 +557,7 @@ export default function CosmiatraPostulacionPage() {
           <div style={{ textAlign:'center', marginBottom:'3rem' }}>
             <span className="dp-badge dp-badge-rose" style={{ display:'inline-flex', marginBottom:'.8rem' }}>Más información</span>
             <h2 className="dp-section-title" style={{ color:'var(--black)', margin:'0 0 .5rem' }}>¿Qué buscamos y qué ofrecemos?</h2>
-            <p style={{ color:'#7A5050', fontSize:'.9rem' }}>Todo lo que necesitas saber antes de postular.</p>
+            <p style={{ color:'#7A5050', fontSize:'.9rem' }}>No buscamos perfección en papel — buscamos actitud, pasión y habilidad para conectar con las clientas.</p>
           </div>
 
           <div className="req-grid">
@@ -570,14 +570,15 @@ export default function CosmiatraPostulacionPage() {
                 </div>
                 <div>
                   <p style={{ color:'var(--rose-deep)', fontSize:'.7rem', fontWeight:700, letterSpacing:'.1em', textTransform:'uppercase' }}>Lo que pedimos</p>
-                  <p style={{ fontWeight:800, fontSize:'1.1rem', color:'var(--black)', margin:0 }}>Requisitos</p>
+                  <p style={{ fontWeight:800, fontSize:'1.1rem', color:'var(--black)', margin:0 }}>Perfil que buscamos</p>
                 </div>
               </div>
               <ul style={{ listStyle:'none', padding:0, margin:0, display:'flex', flexDirection:'column', gap:'.75rem' }}>
-                <CheckItem>Título o certificación en Cosmiatría, Cosmetología o carrera afín.</CheckItem>
-                <CheckItem>Experiencia en tratamientos faciales, corporales o de medicina estética.</CheckItem>
-                <CheckItem>Trato cálido, empático y profesional en cada sesión.</CheckItem>
-                <CheckItem>Disposición para aprender nuevas técnicas y protocolos de tratamiento.</CheckItem>
+                <CheckItem>Experiencia en ventas o atención al cliente — en cualquier rubro.</CheckItem>
+                <CheckItem>Pasión genuina por la estética, el cuidado de la piel o la belleza.</CheckItem>
+                <CheckItem>Facilidad para hablar con personas y generar confianza rápidamente.</CheckItem>
+                <CheckItem>Formación en cosmiatría o estética (es un plus, no excluyente).</CheckItem>
+                <CheckItem>Ganas reales de aprender, crecer y superar metas.</CheckItem>
               </ul>
             </div>
 
@@ -598,7 +599,13 @@ export default function CosmiatraPostulacionPage() {
                 </div>
               </div>
               <ul style={{ listStyle:'none', padding:0, margin:0, display:'flex', flexDirection:'column', gap:'.75rem', position:'relative' }}>
-                {['Trabajo con equipos de última generación: HIFU, Pico Láser, radiofrecuencia.','Remuneración competitiva acorde a tu experiencia.','Capacitación constante en nuevas técnicas y protocolos.','Ambiente profesional con un equipo comprometido y empático.','Oportunidades reales de crecimiento dentro de la clínica.'].map(o => (
+                {[
+                  'Sueldo base + comisiones reales por cada venta que cierres.',
+                  'Capacitación completa en técnicas y protocolos de tratamientos.',
+                  'Trabajo con tecnología de punta: HIFU, Pico Láser, radiofrecuencia.',
+                  'Ambiente profesional, empático y con metas claras.',
+                  'Oportunidades reales de crecimiento dentro de la clínica.',
+                ].map(o => (
                   <li key={o} style={{ display:'flex', gap:'.75rem', alignItems:'flex-start' }}>
                     <span style={{ color:'var(--rose)', flexShrink:0, marginTop:2 }}><Tick /></span>
                     <span style={{ color:'rgba(255,255,255,.82)', fontSize:'.92rem', lineHeight:1.55 }}>{o}</span>
@@ -632,14 +639,15 @@ export default function CosmiatraPostulacionPage() {
           <span className="dp-badge dp-badge-rose" style={{ display:'inline-flex', marginBottom:'1rem' }}>¿Te interesa?</span>
 
           <h2 style={{ fontWeight:900, fontSize:'clamp(2rem,5vw,3rem)', color:'var(--black)', lineHeight:1.08, margin:'0 0 .35rem' }}>
-            Transforma pieles y
+            Si amas la piel y sabes
           </h2>
           <h2 style={{ fontWeight:300, fontStyle:'italic', fontSize:'clamp(1.6rem,4vw,2.4rem)', color:'var(--rose-deep)', lineHeight:1.2, margin:'0 0 1.1rem' }}>
-            autoestimas con nosotros.
+            conectar con las personas, este lugar es tuyo.
           </h2>
 
           <p style={{ color:'#6B4A4A', fontSize:'.95rem', lineHeight:1.75, marginBottom:'2.2rem' }}>
-            Postúlate y cuéntanos tu experiencia.<br />Tu próxima gran oportunidad puede estar aquí.
+            No importa si eres cosmiatra, cosmetóloga o vienes del mundo de las ventas.<br />
+            Lo que buscamos es <strong>pasión + actitud comercial</strong>. El resto lo aprendes aquí.
           </p>
 
           <button onClick={scrollToForm} className="dp-btn dp-btn-gold" style={{ fontSize:'1rem', padding:'1rem 2.8rem', boxShadow:'0 8px 28px rgba(200,161,62,.32)' }}>

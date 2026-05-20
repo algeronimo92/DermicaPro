@@ -224,43 +224,60 @@ export const QUESTIONNAIRES = {
       "Responde las siguientes preguntas para completar tu postulación",
     questions: [
       {
-        id: "experiencia_cosmiatra",
+        id: "formacion_estetica",
         type: "select",
-        question: "¿Cuántos años de experiencia tienes en cosmiatría o cosmetología?",
-        options: ["Menos de 1 año", "1-2 años", "2-5 años", "Más de 5 años"],
-      },
-      {
-        id: "tipos_tratamiento",
-        type: "checkbox",
-        question:
-          "¿En cuáles de estos tratamientos tienes experiencia? (Marca los que apliquen)",
+        question: "¿Tienes formación en cosmiatría, estética o áreas afines?",
         options: [
-          "Tratamientos faciales (hidratación, limpieza profunda)",
-          "Tratamientos corporales (reductivos, modeladores)",
-          "Peeling químico",
-          "Microdermoabrasión",
-          "Radiofrecuencia",
-          "Mesoterapia",
-          "Tratamientos con láser",
+          "Sí, tengo título técnico o universitario",
+          "Sí, tengo cursos o certificaciones",
+          "Estoy estudiando actualmente",
+          "No tengo formación formal pero tengo experiencia práctica",
         ],
       },
       {
-        id: "formacion",
-        type: "text",
-        question: "¿Qué título o certificaciones tienes en el área de cosmiatría o estética?",
-        placeholder: "Ej: Técnico en Cosmiatría - Instituto X, Certificación en Estética Avanzada",
+        id: "procedimientos",
+        type: "checkbox",
+        question:
+          "¿Cuáles de estos procedimientos has realizado alguna vez? (Marca los que apliquen)",
+        options: [
+          "Limpieza facial / hidratación",
+          "Masajes / drenaje linfático",
+          "Peeling o exfoliación",
+          "Depilación",
+          "Maquillaje profesional",
+          "Ninguno aún, pero estoy dispuesta/o a aprender",
+        ],
       },
       {
-        id: "disponibilidad",
+        id: "experiencia_ventas",
         type: "select",
-        question: "¿Cuál es tu disponibilidad horaria?",
-        options: ["Tiempo completo", "Medio tiempo", "Fines de semana"],
+        question: "¿Tienes experiencia en atención al cliente o ventas?",
+        options: [
+          "Sí, en clínica estética o spa",
+          "Sí, en otro rubro (retail, servicios, etc.)",
+          "Poca experiencia, pero me manejo bien con personas",
+          "No tengo experiencia en ventas aún",
+        ],
       },
       {
-        id: "motivacion",
+        id: "habilidad_venta",
+        type: "select",
+        question:
+          "¿Cómo describirías tu habilidad para recomendar o vender servicios a un cliente?",
+        options: [
+          "Muy buena, me resulta natural",
+          "Buena, lo he practicado antes",
+          "Regular, pero estoy dispuesta/o a mejorar",
+          "Aún no lo he desarrollado pero me interesa aprender",
+        ],
+      },
+      {
+        id: "enfoque_venta",
         type: "text",
-        question: "¿Por qué te interesa trabajar en DermicaPro?",
-        placeholder: "Cuéntanos brevemente tu motivación...",
+        question:
+          "Si una clienta viene solo por una limpieza facial, ¿cómo le ofrecerías un tratamiento adicional?",
+        placeholder:
+          "Cuéntanos cómo lo abordarías en pocas palabras...",
       },
     ],
   },
