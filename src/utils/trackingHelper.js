@@ -104,9 +104,9 @@ export const captureAllUTM = () => {
     // Meta Pixel Browser IDs (v25 CAPI user_data)
     fbp: readCookie('_fbp') || null,
     fbc: (() => {
+      if (fbclidVal) return `fb.1.${Date.now()}.${fbclidVal}`;
       const cookie = readCookie('_fbc');
-      if (cookie) return cookie;
-      return fbclidVal ? `fb.1.${Date.now()}.${fbclidVal}` : null;
+      return cookie || null;
     })(),
   };
 };
