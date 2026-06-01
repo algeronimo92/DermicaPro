@@ -393,7 +393,7 @@ export default async function handler(req, res) {
 
   try {
     const response = await fetch(
-      `https://graph.facebook.com/v18.0/${pixelId}/events`,
+      `https://graph.facebook.com/v25.0/${pixelId}/events`,
       {
         method: 'POST',
         headers: {

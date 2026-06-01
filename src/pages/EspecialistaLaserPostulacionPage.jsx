@@ -258,7 +258,7 @@ export default function EspecialistaLaserPostulacionPage() {
       payload.append('landing_url', window.location.href);
       payload.append('timestamp',   new Date().toISOString());
       payload.append('respuestas_cuestionario', JSON.stringify(answers));
-      ['ttclid','fbclid','ad_id','adset_id','campaign_id','utm_source','utm_medium','utm_campaign','utm_content','utm_term']
+      ['ttclid','fbclid','fbp','fbc','ad_id','adset_id','campaign_id','utm_source','utm_medium','utm_campaign','utm_content','utm_term']
         .forEach(f => payload.append(f, utmData[f] || ''));
 
       const ctrl = new AbortController();

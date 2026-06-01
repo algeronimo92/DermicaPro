@@ -58,6 +58,18 @@ export const trackPageViewConditional = (contentName, contentType = 'landing_pag
 };
 
 /**
+ * Lee el valor de una cookie por nombre.
+ * @param {string} name - Nombre de la cookie
+ * @returns {string|null} Valor de la cookie o null si no existe
+ */
+const readCookie = (name) => {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+  return null;
+};
+
+/**
  * Captura todos los parámetros UTM de TikTok Ads, Meta Ads y UTM estándar.
  * Guarda en sessionStorage y retorna objeto unificado para enviar a n8n.
  * @returns {object} Objeto con todos los parámetros UTM capturados
@@ -73,11 +85,13 @@ export const captureAllUTM = () => {
     return value.replace(/[<>"'`]/g, '').substring(0, 100);
   };
 
+  const fbclidVal = sanitize(urlParams.get('fbclid'));
+
   return {
     // TikTok Ads
     ttclid: sanitize(urlParams.get('ttclid')),
     // Meta Ads
-    fbclid: sanitize(urlParams.get('fbclid')),
+    fbclid: fbclidVal,
     ad_id: sanitize(urlParams.get('ad_id')),
     adset_id: sanitize(urlParams.get('adset_id')),
     campaign_id: sanitize(urlParams.get('campaign_id')),
@@ -87,6 +101,13 @@ export const captureAllUTM = () => {
     utm_campaign: sanitize(urlParams.get('utm_campaign')),
     utm_content: sanitize(urlParams.get('utm_content')),
     utm_term: sanitize(urlParams.get('utm_term')),
+    // Meta Pixel Browser IDs (v25 CAPI user_data)
+    fbp: readCookie('_fbp') || null,
+    fbc: (() => {
+      const cookie = readCookie('_fbc');
+      if (cookie) return cookie;
+      return fbclidVal ? `fb.1.${Date.now()}.${fbclidVal}` : null;
+    })(),
   };
 };
 

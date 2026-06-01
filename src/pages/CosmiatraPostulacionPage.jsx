@@ -293,7 +293,7 @@ export default function CosmiatraPostulacionPage() {
       if (formData.curriculum instanceof File) payload.append('curriculum', formData.curriculum);
       payload.append('puesto', NOMBRE_PUESTO); payload.append('landing_url', window.location.href);
       payload.append('timestamp', new Date().toISOString()); payload.append('respuestas_cuestionario', JSON.stringify(answers));
-      ['ttclid','fbclid','ad_id','adset_id','campaign_id','utm_source','utm_medium','utm_campaign','utm_content','utm_term'].forEach(f => payload.append(f, utmData[f] || ''));
+      ['ttclid','fbclid','fbp','fbc','ad_id','adset_id','campaign_id','utm_source','utm_medium','utm_campaign','utm_content','utm_term'].forEach(f => payload.append(f, utmData[f] || ''));
       const ctrl = new AbortController(); const tid = setTimeout(() => ctrl.abort(), 15000);
       const res = await fetch(WEBHOOK_URL, { method:'POST', body:payload, signal:ctrl.signal });
       clearTimeout(tid);
